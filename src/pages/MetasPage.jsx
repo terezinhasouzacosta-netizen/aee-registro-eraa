@@ -697,9 +697,10 @@ function MetasPage() {
                 onChange={handleChange}
                 rows={3}
                 className="eixo-tematico-input"
+                placeholder="Ex.: Comunicação oral, atenção e concentração, autonomia."
                 required
-              />
-
+               />
+              
               <label htmlFor="descricao">Habilidades do eixo temático</label>
               <textarea
                 id="descricao"
@@ -707,6 +708,7 @@ function MetasPage() {
                 value={form.descricao}
                 onChange={handleChange}
                 rows={4}
+                placeholder="Digite uma habilidade por linha."
                 required
               />
 
