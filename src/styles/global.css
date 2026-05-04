@@ -378,6 +378,10 @@ h3 {
   margin-top: 1rem;
 }
 
+.alunos-cadastro-page .alunos-grid {
+  grid-template-columns: 1fr;
+}
+
 .panel {
   background: #ffffff;
   border-radius: 14px;
@@ -1327,6 +1331,10 @@ textarea:focus {
   .alunos-grid {
     grid-template-columns: 360px 1fr;
     align-items: start;
+  }
+
+  .alunos-cadastro-page .alunos-grid {
+    grid-template-columns: 1fr;
   }
 
   .filters-grid {
