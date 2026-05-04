@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import AlunoForm from "../components/AlunoForm";
 import AlunosList from "../components/AlunosList";
@@ -118,7 +118,7 @@ function AlunosPage() {
   };
 
   return (
-    <main className="alunos-page">
+    <main className="alunos-page alunos-cadastro-page">
       <header className="page-header">
         <h1>AEE Registro - Cadastro de Alunos</h1>
         <p>Gerencie os alunos atendidos pelo AEE em um único lugar.</p>
