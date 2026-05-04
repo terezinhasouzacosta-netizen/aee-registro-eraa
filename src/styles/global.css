@@ -1988,15 +1988,15 @@ textarea:focus {
 }
 
 .alunos-table {
-  min-width: 980px;
+  min-width: 820px;
   table-layout: auto;
 }
 
 .alunos-table th:last-child,
 .alunos-table td:last-child {
-  width: 120px;
-  min-width: 120px;
-  max-width: 120px;
+  width: 96px;
+  min-width: 96px;
+  max-width: 96px;
   white-space: nowrap;
 }
 
@@ -2008,22 +2008,23 @@ textarea:focus {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 8px;
-  width: 88px;
-  min-width: 88px;
+  gap: 6px;
+  width: 74px;
+  min-width: 74px;
 }
 
 .alunos-table td .form-actions button,
 .alunos-table td:last-child button,
 .alunos-table td .btn-secondary,
 .alunos-table td .btn-danger {
-  width: 88px;
-  min-width: 88px;
-  max-width: 88px;
+  width: 74px;
+  min-width: 74px;
+  max-width: 74px;
   white-space: nowrap;
   word-break: normal;
   overflow-wrap: normal;
   text-align: center;
-  padding: 0.5rem 0.65rem;
+  padding: 0.46rem 0.55rem;
+  font-size: 0.85rem;
   line-height: 1.1;
 }
