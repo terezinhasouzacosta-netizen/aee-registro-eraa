@@ -2069,3 +2069,82 @@ textarea:focus {
   padding: 0.44rem 0.5rem;
   line-height: 1.1;
 }
+
+.alunos-cadastro-page .table-wrapper {
+  overflow-x: visible;
+}
+
+.alunos-cadastro-page .alunos-table {
+  width: 100%;
+  min-width: 0 !important;
+  table-layout: fixed;
+}
+
+.alunos-cadastro-page .alunos-table th,
+.alunos-cadastro-page .alunos-table td {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.alunos-cadastro-page .alunos-table th:nth-child(1),
+.alunos-cadastro-page .alunos-table td:nth-child(1) {
+  width: 14%;
+}
+
+.alunos-cadastro-page .alunos-table th:nth-child(2),
+.alunos-cadastro-page .alunos-table td:nth-child(2) {
+  width: 11%;
+  white-space: nowrap;
+}
+
+.alunos-cadastro-page .alunos-table th:nth-child(3),
+.alunos-cadastro-page .alunos-table td:nth-child(3) {
+  width: 8%;
+}
+
+.alunos-cadastro-page .alunos-table th:nth-child(4),
+.alunos-cadastro-page .alunos-table td:nth-child(4) {
+  width: 24%;
+}
+
+.alunos-cadastro-page .alunos-table th:nth-child(5),
+.alunos-cadastro-page .alunos-table td:nth-child(5) {
+  width: 13%;
+}
+
+.alunos-cadastro-page .alunos-table th:nth-child(6),
+.alunos-cadastro-page .alunos-table td:nth-child(6) {
+  width: 18%;
+}
+
+.alunos-cadastro-page .alunos-table th:nth-child(7),
+.alunos-cadastro-page .alunos-table td:nth-child(7) {
+  width: 12%;
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+.alunos-cadastro-page .alunos-table td:nth-child(7) .form-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.alunos-cadastro-page .alunos-table td:nth-child(7) button,
+.alunos-cadastro-page .alunos-table td:nth-child(7) .btn-secondary,
+.alunos-cadastro-page .alunos-table td:nth-child(7) .btn-danger {
+  width: auto;
+  min-width: 58px;
+  max-width: none;
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+  text-align: center;
+  font-size: 0.78rem;
+  padding: 0.38rem 0.48rem;
+  line-height: 1.1;
+}
