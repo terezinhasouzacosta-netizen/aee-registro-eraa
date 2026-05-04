@@ -500,6 +500,17 @@ function AcompanhamentoPage() {
         if (somenteVinculados) {
           const idsPermitidos = await buscarIdsAlunosVinculados(currentUser.uid);
           alunosData = await listarAlunosAcompanhamento({ idsPermitidos });
+
+          if (!alunosData.length) {
+            console.warn(
+              "[AcompanhamentoPage] Nenhum aluno retornado por vinculação. Aplicando fallback para lista geral de alunos.",
+              {
+                uid: currentUser.uid,
+                idsPermitidosCount: idsPermitidos.length,
+              }
+            );
+            alunosData = await listarAlunosAcompanhamento();
+          }
         } else {
           alunosData = await listarAlunosAcompanhamento();
         }
@@ -1334,7 +1345,11 @@ function AcompanhamentoPage() {
         {loadingAlunos ? <p>Carregando alunos...</p> : null}
 
         {!loadingAlunos && alunos.length === 0 ? (
-          <p>Nenhum aluno vinculado para este usuário no momento.</p>
+          <p>
+            {somenteVinculados
+              ? "Nenhum aluno vinculado para este usuário no momento."
+              : "Nenhum aluno cadastrado foi encontrado para exibição no momento."}
+          </p>
         ) : null}
 
         {!loadingAlunos && alunos.length > 0 && podeSalvarDiario ? (
@@ -1585,7 +1600,11 @@ function AcompanhamentoPage() {
         {loadingAlunos ? <p>Carregando alunos...</p> : null}
 
         {!loadingAlunos && alunos.length === 0 ? (
-          <p>Nenhum aluno vinculado para este usuário no momento.</p>
+          <p>
+            {somenteVinculados
+              ? "Nenhum aluno vinculado para este usuário no momento."
+              : "Nenhum aluno cadastrado foi encontrado para exibição no momento."}
+          </p>
         ) : null}
 
         {!loadingAlunos && alunos.length > 0 && podeSalvarProfessor ? (

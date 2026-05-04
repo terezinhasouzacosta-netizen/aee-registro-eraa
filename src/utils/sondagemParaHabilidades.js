@@ -23,9 +23,15 @@
     eixo: "Comportamento e autorregula\u00E7\u00E3o",
     rotulo: "Comportamento",
   },
+  {
+    campo: "coordenacaoMotora",
+    eixo: "Coordena\u00E7\u00E3o motora",
+    rotulo: "Coordena\u00E7\u00E3o motora",
+  },
 ];
 
 const RESULTADOS_INTERVENCAO = new Set([
+  "nao realiza",
   "realiza com muito apoio",
   "realiza com apoio",
   "realiza parcialmente",
@@ -50,6 +56,51 @@ const DESCRICAO_BASE_POR_EIXO = {
     "Estimular autonomia nas atividades com decomposi\u00E7\u00E3o de tarefas, pistas graduais, refor\u00E7o positivo e retirada progressiva de ajuda para favorecer iniciativa e autorregula\u00E7\u00E3o.",
   "Comportamento e autorregula\u00E7\u00E3o":
     "Desenvolver autorregula\u00E7\u00E3o comportamental com combinados claros, antecipa\u00E7\u00E3o de rotina, estrat\u00E9gias de autocontrole e acompanhamento cont\u00EDnuo das respostas emocionais em sala.",
+  "Coordena\u00E7\u00E3o motora":
+    "Estimular coordena\u00E7\u00E3o motora fina e ampla com atividades graduadas, materiais manipul\u00E1veis e propostas psicomotoras que favore\u00E7am organiza\u00E7\u00E3o corporal e funcionalidade nas tarefas escolares.",
+};
+
+const SUGESTOES_POR_EIXO = {
+  "Leitura e escrita": [
+    "Realizar leitura mediada de palavras e frases com apoio visual e repetição guiada.",
+    "Produzir pequenos registros escritos com banco de palavras e estruturação por etapas.",
+    "Trabalhar compreensão de enunciados curtos com perguntas objetivas e pistas graduais.",
+  ],
+  "Comunica\u00E7\u00E3o oral": [
+    "Estimular oralidade funcional em rodas de conversa com mediação e turnos de fala.",
+    "Ampliar repertório verbal com nomeação de objetos, ações e situações cotidianas.",
+    "Promover participação oral em atividades coletivas com apoio de perguntas direcionadas.",
+  ],
+  "Matem\u00E1tica funcional": [
+    "Resolver situações-problema simples com material concreto e apoio visual.",
+    "Trabalhar noções de quantidade, comparação e sequência com atividades contextualizadas.",
+    "Reforçar operações básicas com estratégias passo a passo e mediação individual.",
+  ],
+  "Aten\u00E7\u00E3o e concentra\u00E7\u00E3o": [
+    "Organizar rotina de tarefas curtas com pausas planejadas e objetivos claros.",
+    "Utilizar recursos visuais de foco (checklist e sequência) para manter permanência na atividade.",
+    "Aplicar estratégias de autorregulação para retomar a atenção durante propostas pedagógicas.",
+  ],
+  "Intera\u00E7\u00E3o social": [
+    "Promover interação em duplas com combinados de convivência e papéis definidos.",
+    "Estimular participação em atividades colaborativas com mediação de conflitos.",
+    "Ampliar comunicação respeitosa em contextos de sala por meio de modelagem social.",
+  ],
+  "Autonomia nas atividades": [
+    "Desenvolver execução de tarefas com retirada progressiva de ajuda.",
+    "Estimular iniciativa em atividades escolares com pistas graduais e reforço positivo.",
+    "Trabalhar organização de materiais e etapas da tarefa com apoio visual.",
+  ],
+  "Comportamento e autorregula\u00E7\u00E3o": [
+    "Aplicar combinados claros de convivência com monitoramento contínuo.",
+    "Utilizar estratégias de regulação emocional em situações de frustração.",
+    "Antecipar rotina e transições para reduzir comportamentos de evasão da tarefa.",
+  ],
+  "Coordena\u00E7\u00E3o motora": [
+    "Desenvolver coordenação motora fina com recorte, traçado e atividades de preensão.",
+    "Estimular coordenação motora ampla com circuitos e movimentos orientados.",
+    "Trabalhar organização motora para apoio às tarefas de escrita e manipulação de materiais.",
+  ],
 };
 
 function normalizarTexto(valor) {
@@ -59,6 +110,21 @@ function normalizarTexto(valor) {
     .replace(/\s+/g, " ")
     .trim()
     .toLowerCase();
+}
+
+function resultadoIndicaIntervencao(valor) {
+  const texto = normalizarTexto(valor);
+  if (!texto) return false;
+
+  if (RESULTADOS_INTERVENCAO.has(texto)) return true;
+
+  // Cobertura para variações legadas de preenchimento sem quebrar o fluxo atual.
+  return (
+    texto.includes("nao realiza") ||
+    texto.includes("realiza com muito apoio") ||
+    texto.includes("realiza com apoio") ||
+    texto.includes("realiza parcialmente")
+  );
 }
 
 function obterTimestamp(sondagem) {
@@ -123,8 +189,7 @@ export function gerarSugestoesHabilidadesDaSondagem(sondagem) {
   const mapaEixos = new Map();
 
   CAMPOS_PARA_EIXO.forEach(({ campo, eixo, rotulo }) => {
-    const resultado = normalizarTexto(sondagem[campo]);
-    if (!RESULTADOS_INTERVENCAO.has(resultado)) return;
+    if (!resultadoIndicaIntervencao(sondagem[campo])) return;
 
     const existente = mapaEixos.get(eixo) || [];
     existente.push({ campo: rotulo, resultado: sondagem[campo] });
@@ -136,6 +201,13 @@ export function gerarSugestoesHabilidadesDaSondagem(sondagem) {
     descricao:
       DESCRICAO_BASE_POR_EIXO[eixo] ||
       "Planejar interven\u00E7\u00F5es pedag\u00F3gicas estruturadas e graduais para ampliar participa\u00E7\u00E3o, aprendizagem e autonomia do estudante no eixo identificado.",
+    sugestoes:
+      SUGESTOES_POR_EIXO[eixo] && SUGESTOES_POR_EIXO[eixo].length
+        ? SUGESTOES_POR_EIXO[eixo]
+        : [
+            DESCRICAO_BASE_POR_EIXO[eixo] ||
+              "Planejar interven\u00E7\u00F5es pedag\u00F3gicas estruturadas e graduais para ampliar participa\u00E7\u00E3o, aprendizagem e autonomia do estudante no eixo identificado.",
+          ],
     evidencias,
   }));
 }
@@ -149,11 +221,10 @@ export function diagnosticarGeracaoHabilidadesDaSondagem(sondagem) {
 
   CAMPOS_PARA_EIXO.forEach(({ campo, rotulo }) => {
     const valorOriginal = String(sondagem?.[campo] || "").trim();
-    const valorNormalizado = normalizarTexto(valorOriginal);
     if (!valorOriginal) return;
 
     diagnostico.encontrouCamposMapeados += 1;
-    if (RESULTADOS_INTERVENCAO.has(valorNormalizado)) {
+    if (resultadoIndicaIntervencao(valorOriginal)) {
       diagnostico.camposComIntervencao.push({
         campo,
         rotulo,

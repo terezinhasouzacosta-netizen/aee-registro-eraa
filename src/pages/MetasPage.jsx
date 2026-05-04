@@ -55,6 +55,13 @@ function chaveMeta(meta) {
   ].join("|");
 }
 
+function extrairHabilidadesDigitadas(texto) {
+  return String(texto || "")
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 function obterMensagemErro(error, fallback) {
   const code = String(error?.code || "");
   const message = String(error?.message || "");
@@ -86,6 +93,7 @@ function MetasPage() {
   const [sugestoesGeradas, setSugestoesGeradas] = useState([]);
   const [duplicadasGeradas, setDuplicadasGeradas] = useState([]);
   const [idsSugestoesSelecionadas, setIdsSugestoesSelecionadas] = useState([]);
+  const [outrasHabilidadesPorEixo, setOutrasHabilidadesPorEixo] = useState({});
   const [resumoSondagemGerada, setResumoSondagemGerada] = useState(null);
   const [resultadoGeracao, setResultadoGeracao] = useState(null);
   const ultimaBuscaRef = useRef(0);
@@ -111,6 +119,15 @@ function MetasPage() {
     });
     return grupos;
   }, [metas]);
+
+  const sugestoesAgrupadasPorEixo = useMemo(() => {
+    return sugestoesGeradas.reduce((acc, item) => {
+      const eixo = item.titulo || "Eixo não identificado";
+      if (!acc[eixo]) acc[eixo] = [];
+      acc[eixo].push(item);
+      return acc;
+    }, {});
+  }, [sugestoesGeradas]);
 
   const carregarDados = async () => {
     if (!currentUser || !podeLer) {
@@ -179,6 +196,7 @@ function MetasPage() {
     setSugestoesGeradas([]);
     setDuplicadasGeradas([]);
     setIdsSugestoesSelecionadas([]);
+    setOutrasHabilidadesPorEixo({});
     setResumoSondagemGerada(null);
     setResultadoGeracao(null);
   };
@@ -193,6 +211,7 @@ function MetasPage() {
     setSugestoesGeradas([]);
     setDuplicadasGeradas([]);
     setIdsSugestoesSelecionadas([]);
+    setOutrasHabilidadesPorEixo({});
     setResumoSondagemGerada(null);
     setResultadoGeracao(null);
     setForm((prev) => ({
@@ -287,6 +306,7 @@ function MetasPage() {
         setSugestoesGeradas([]);
         setDuplicadasGeradas([]);
         setIdsSugestoesSelecionadas([]);
+        setOutrasHabilidadesPorEixo({});
         setResumoSondagemGerada(null);
 
         const mensagem = `Nenhuma sondagem encontrada para o ${bimestreSelecionado} bimestre deste aluno.`;
@@ -302,14 +322,23 @@ function MetasPage() {
         return;
       }
 
-      const sugestoes = gerarSugestoesHabilidadesDaSondagem(sondagemBase).map((item, index) => ({
-        id: `${index + 1}-${normalizarTexto(item.eixo)}`,
-        alunoId: alunoAlvoGeracao,
-        bimestre: bimestreSelecionado,
-        titulo: item.eixo,
-        descricao: item.descricao,
-        evidencias: item.evidencias,
-      }));
+      const sugestoes = gerarSugestoesHabilidadesDaSondagem(sondagemBase).flatMap(
+        (item, eixoIndex) => {
+          const habilidadesDoEixo =
+            Array.isArray(item.sugestoes) && item.sugestoes.length
+              ? item.sugestoes
+              : [item.descricao];
+
+          return habilidadesDoEixo.map((habilidade, habilidadeIndex) => ({
+            id: `${eixoIndex + 1}-${normalizarTexto(item.eixo)}-${habilidadeIndex + 1}`,
+            alunoId: alunoAlvoGeracao,
+            bimestre: bimestreSelecionado,
+            titulo: item.eixo,
+            descricao: habilidade,
+            evidencias: item.evidencias,
+          }));
+        }
+      );
 
       if (!sugestoes.length) {
         const mensagem = "Nenhuma sugestão encontrada para esta sondagem.";
@@ -317,6 +346,7 @@ function MetasPage() {
         setSugestoesGeradas([]);
         setDuplicadasGeradas([]);
         setIdsSugestoesSelecionadas([]);
+        setOutrasHabilidadesPorEixo({});
         setResumoSondagemGerada({
           periodo: sondagemBase?.periodo || "-",
           data: sondagemBase?.dataSondagem || "-",
@@ -357,6 +387,7 @@ function MetasPage() {
       setSugestoesGeradas(novasSugestoes);
       setDuplicadasGeradas(duplicadas);
       setIdsSugestoesSelecionadas(novasSugestoes.map((item) => item.id));
+      setOutrasHabilidadesPorEixo({});
       setResumoSondagemGerada({
         periodo: sondagemBase?.periodo || "-",
         data: sondagemBase?.dataSondagem || "-",
@@ -433,17 +464,27 @@ function MetasPage() {
 
   const handleSalvarSugestoes = async () => {
     if (!podeEditar || !currentUser) return;
-    if (!sugestoesGeradas.length) {
-      setErro("Gere sugestões antes de salvar.");
-      return;
-    }
 
     const selecionadas = sugestoesGeradas.filter((item) =>
       idsSugestoesSelecionadas.includes(item.id)
     );
 
-    if (!selecionadas.length) {
-      setErro("Selecione ao menos uma sugestão para salvar.");
+    const adicionaisManuais = Object.entries(outrasHabilidadesPorEixo).flatMap(
+      ([eixo, texto]) =>
+        extrairHabilidadesDigitadas(texto).map((descricao, index) => ({
+          id: `manual-${normalizarTexto(eixo)}-${index + 1}-${normalizarTexto(descricao).slice(0, 40)}`,
+          alunoId: form.alunoId,
+          bimestre: form.bimestre,
+          titulo: eixo,
+          descricao,
+          evidencias: [],
+        }))
+    );
+
+    const candidatas = [...selecionadas, ...adicionaisManuais];
+
+    if (!candidatas.length) {
+      setErro("Selecione sugestões e/ou preencha outras habilidades para salvar.");
       return;
     }
 
@@ -469,7 +510,7 @@ function MetasPage() {
       const paraSalvar = [];
       const jaExistentes = [];
 
-      selecionadas.forEach((item) => {
+      candidatas.forEach((item) => {
         const chave = chaveMeta(item);
         if (chavesExistentes.has(chave)) {
           jaExistentes.push(item);
@@ -497,6 +538,7 @@ function MetasPage() {
       const idsSalvos = new Set(paraSalvar.map((item) => item.id));
       setSugestoesGeradas((prev) => prev.filter((item) => !idsSalvos.has(item.id)));
       setIdsSugestoesSelecionadas((prev) => prev.filter((id) => !idsSalvos.has(id)));
+      setOutrasHabilidadesPorEixo({});
 
       if (!paraSalvar.length) {
         setFeedback(
@@ -699,8 +741,11 @@ function MetasPage() {
                 className="eixo-tematico-input"
                 placeholder="Ex.: Comunicação oral, atenção e concentração, autonomia."
                 required
-               />
-              
+              />
+              <p className="muted">
+                Registre apenas o eixo temático mais prioritário para o aluno. Você pode escrever
+                manualmente, mesmo sem usar as sugestões automáticas.
+              </p>
               <label htmlFor="descricao">Habilidades do eixo temático</label>
               <textarea
                 id="descricao"
@@ -711,6 +756,10 @@ function MetasPage() {
                 placeholder="Digite uma habilidade por linha."
                 required
               />
+              <p className="muted">
+                Descreva as habilidades prioritárias do aluno neste eixo. Use somente o que
+                considerar mais relevante pedagogicamente.
+              </p>
 
               <label htmlFor="bimestre">Bimestre</label>
               <select
@@ -760,28 +809,45 @@ function MetasPage() {
             {sugestoesGeradas.length ? (
               <section className="form-section">
                 <h3>Sugestões geradas</h3>
-                {sugestoesGeradas.map((item) => (
-                  <article key={item.id} className="meta-card">
-                    <label className="checkbox-item">
-                      <input
-                        type="checkbox"
-                        checked={idsSugestoesSelecionadas.includes(item.id)}
-                        onChange={() => handleAlternarSugestao(item.id)}
-                      />
-                      Salvar esta habilidade
-                    </label>
+                {Object.entries(sugestoesAgrupadasPorEixo).map(([eixo, sugestoesDoEixo]) => (
+                  <article key={`eixo-${normalizarTexto(eixo)}`} className="meta-card">
                     <p>
-                      <strong>Eixo temático:</strong> {item.titulo}
+                      <strong>Eixo temático:</strong> {eixo}
                     </p>
-                    <p className="report-text">
-                      <strong>Habilidade sugerida:</strong> {item.descricao}
-                    </p>
+
                     <p className="muted">
                       Evidências da sondagem:{" "}
-                      {item.evidencias
+                      {(sugestoesDoEixo[0]?.evidencias || [])
                         .map((evidencia) => `${evidencia.campo} (${evidencia.resultado || "-"})`)
                         .join("; ")}
                     </p>
+
+                    {sugestoesDoEixo.map((item) => (
+                      <label key={item.id} className="checkbox-item">
+                        <input
+                          type="checkbox"
+                          checked={idsSugestoesSelecionadas.includes(item.id)}
+                          onChange={() => handleAlternarSugestao(item.id)}
+                        />
+                        {item.descricao}
+                      </label>
+                    ))}
+
+                    <label htmlFor={`outras-${normalizarTexto(eixo)}`}>
+                      Outras habilidades para este eixo
+                    </label>
+                    <textarea
+                      id={`outras-${normalizarTexto(eixo)}`}
+                      rows={3}
+                      placeholder="Digite outras habilidades (uma por linha)."
+                      value={outrasHabilidadesPorEixo[eixo] || ""}
+                      onChange={(event) =>
+                        setOutrasHabilidadesPorEixo((prev) => ({
+                          ...prev,
+                          [eixo]: event.target.value,
+                        }))
+                      }
+                    />
                   </article>
                 ))}
                 <div className="form-actions">
