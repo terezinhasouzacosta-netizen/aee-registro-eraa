@@ -1451,6 +1451,12 @@ textarea:focus {
   width: 145px;
 }
 
+.painel-coordenacao-table th:nth-child(7),
+.painel-coordenacao-table td:nth-child(7) {
+  width: 160px;
+  min-width: 160px;
+}
+
 .painel-coordenacao-table th:nth-child(10),
 .painel-coordenacao-table td:nth-child(10),
 .painel-coordenacao-table th:nth-child(11),
@@ -2406,61 +2412,3 @@ textarea:focus {
   line-height: 1.1;
 }
 
-.painel-coordenacao-table-wrapper {
-  overflow-x: auto;
-}
-
-.painel-coordenacao-table {
-  width: 100%;
-  min-width: 1180px;
-  table-layout: auto;
-}
-
-.painel-coordenacao-table th,
-.painel-coordenacao-table td {
-  white-space: normal;
-  word-break: normal;
-  overflow-wrap: normal;
-  vertical-align: middle;
-}
-
-.painel-coordenacao-table th {
-  text-align: center;
-  line-height: 1.2;
-}
-
-.painel-coordenacao-table td {
-  line-height: 1.35;
-}
-
-.painel-coordenacao-table th:nth-child(1),
-.painel-coordenacao-table td:nth-child(1) {
-  min-width: 110px;
-}
-
-.painel-coordenacao-table th:nth-child(2),
-.painel-coordenacao-table td:nth-child(2) {
-  min-width: 80px;
-}
-
-.painel-coordenacao-table th:nth-child(3),
-.painel-coordenacao-table td:nth-child(3) {
-  min-width: 110px;
-}
-
-.painel-coordenacao-table th:nth-child(4),
-.painel-coordenacao-table td:nth-child(4),
-.painel-coordenacao-table th:nth-child(5),
-.painel-coordenacao-table td:nth-child(5) {
-  min-width: 130px;
-}
-
-.painel-coordenacao-table th:last-child,
-.painel-coordenacao-table td:last-child {
-  min-width: 100px;
-  white-space: nowrap;
-}
-
-.painel-coordenacao-table td:last-child button {
-  white-space: nowrap;
-}
