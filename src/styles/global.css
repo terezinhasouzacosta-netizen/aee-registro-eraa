@@ -1336,7 +1336,7 @@ textarea:focus {
 .painel-coordenacao-table {
   width: 100%;
   max-width: none;
-  min-width: 1280px;
+  min-width: 1540px;
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
@@ -1351,14 +1351,15 @@ textarea:focus {
   font-size: 11px;
   font-weight: 600;
   text-transform: none;
-  line-height: 1.2;
+  line-height: 1.25;
   text-align: center;
   letter-spacing: 0;
   padding: 0.56rem 0.62rem;
   border-bottom: 1px solid #cbd5e1;
   white-space: normal;
-  word-break: keep-all;
-  overflow-wrap: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
 }
 
 .painel-coordenacao-table tbody td {
@@ -1366,7 +1367,8 @@ textarea:focus {
   border-bottom: 1px solid #e2e8f0;
   vertical-align: middle;
   white-space: normal;
-  word-break: break-word;
+  word-break: normal;
+  overflow-wrap: anywhere;
 }
 
 .painel-coordenacao-table tbody tr:nth-child(even) {
@@ -1380,27 +1382,27 @@ textarea:focus {
 .painel-coordenacao-table .col-num {
   text-align: center;
   font-variant-numeric: tabular-nums;
-  width: 6.8%;
-  max-width: 92px;
+  width: 7.4%;
+  max-width: none;
 }
 
 .painel-coordenacao-table .col-date {
   font-weight: 500;
   color: #334155;
-  width: 9%;
-  max-width: 124px;
+  width: 10.5%;
+  max-width: none;
 }
 
 .painel-coordenacao-table .col-status {
   text-align: center;
-  width: 8.5%;
-  max-width: 110px;
+  width: 9%;
+  max-width: none;
 }
 
 .painel-coordenacao-table .col-actions {
   text-align: center;
   width: 8.5%;
-  max-width: 112px;
+  max-width: none;
 }
 
 .painel-coordenacao-table .col-actions .btn-secondary {
@@ -1410,7 +1412,7 @@ textarea:focus {
 
 .painel-coordenacao-table th,
 .painel-coordenacao-table td {
-  max-width: 180px;
+  max-width: none;
 }
 
 .painel-coordenacao-table th:nth-child(1),
@@ -1432,12 +1434,12 @@ textarea:focus {
 .painel-coordenacao-table td:nth-child(4),
 .painel-coordenacao-table th:nth-child(5),
 .painel-coordenacao-table td:nth-child(5) {
-  width: 140px;
+  width: 170px;
 }
 
 .painel-coordenacao-table th:nth-child(6),
 .painel-coordenacao-table td:nth-child(6) {
-  width: 110px;
+  width: 135px;
 }
 
 .painel-coordenacao-table th:nth-child(7),
@@ -1446,19 +1448,26 @@ textarea:focus {
 .painel-coordenacao-table td:nth-child(8),
 .painel-coordenacao-table th:nth-child(9),
 .painel-coordenacao-table td:nth-child(9) {
-  width: 110px;
+  width: 145px;
 }
 
 .painel-coordenacao-table th:nth-child(10),
 .painel-coordenacao-table td:nth-child(10),
 .painel-coordenacao-table th:nth-child(11),
 .painel-coordenacao-table td:nth-child(11) {
-  width: 110px;
+  width: 165px;
 }
 
 .painel-coordenacao-table th:nth-child(12),
 .painel-coordenacao-table td:nth-child(12) {
-  width: 110px;
+  width: 130px;
+}
+
+.painel-coordenacao-table th:nth-child(13),
+.painel-coordenacao-table td:nth-child(13) {
+  width: 120px;
+  min-width: 120px;
+  white-space: nowrap;
 }
 
 .painel-resumo-card h2,
