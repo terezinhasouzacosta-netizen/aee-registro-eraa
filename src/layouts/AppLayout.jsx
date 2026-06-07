@@ -357,28 +357,40 @@ function AppLayout() {
           </div>
 
           <div className="sidebar-section">
-            <p className="sidebar-section-title">🏠 GERAL</p>
+            <p className="sidebar-section-title">
+              <span className="sidebar-section-icon" aria-hidden="true">🏠</span>
+              <span>GERAL</span>
+            </p>
             <NavLink to="/">Início</NavLink>
             {mostrarAlunos ? <NavLink to="/alunos">Alunos</NavLink> : null}
           </div>
 
           {mostrarSondagem ? (
             <div className="sidebar-section">
-              <p className="sidebar-section-title">🔍 DIAGNÓSTICO</p>
+              <p className="sidebar-section-title">
+                <span className="sidebar-section-icon" aria-hidden="true">🔍</span>
+                <span>DIAGNÓSTICO</span>
+              </p>
               <NavLink to="/sondagens">Sondagem</NavLink>
             </div>
           ) : null}
 
           {mostrarHabilidades ? (
             <div className="sidebar-section">
-              <p className="sidebar-section-title">🧠 PLANEJAMENTO</p>
+              <p className="sidebar-section-title">
+                <span className="sidebar-section-icon" aria-hidden="true">🧠</span>
+                <span>PLANEJAMENTO</span>
+              </p>
               <NavLink to="/metas">Habilidades</NavLink>
             </div>
           ) : null}
 
           {mostrarAtendimentoAEE || mostrarAcompanhamento ? (
             <div className="sidebar-section">
-              <p className="sidebar-section-title">🎯 INTERVENÇÃO</p>
+              <p className="sidebar-section-title">
+                <span className="sidebar-section-icon" aria-hidden="true">🎯</span>
+                <span>INTERVENÇÃO</span>
+              </p>
               {mostrarAtendimentoAEE ? (
                 <NavLink to="/atendimento-aee" className="sidebar-link-highlight">
                   Atendimento AEE
@@ -390,7 +402,10 @@ function AppLayout() {
 
           {mostrarMonitoramento || mostrarRelatorios ? (
             <div className="sidebar-section">
-              <p className="sidebar-section-title">📊 AVALIAÇÃO E ANÁLISE</p>
+              <p className="sidebar-section-title">
+                <span className="sidebar-section-icon" aria-hidden="true">📊</span>
+                <span>AVALIAÇÃO E ANÁLISE</span>
+              </p>
               {mostrarMonitoramento ? <NavLink to="/monitoramentos">Monitoramento</NavLink> : null}
               {mostrarRelatorios ? <NavLink to="/relatorios">Relatórios</NavLink> : null}
             </div>
@@ -398,7 +413,10 @@ function AppLayout() {
 
           {mostrarPainelCoordenacao ? (
             <div className="sidebar-section">
-              <p className="sidebar-section-title">⚙️ GESTÃO</p>
+              <p className="sidebar-section-title">
+                <span className="sidebar-section-icon" aria-hidden="true">⚙️</span>
+                <span>GESTÃO</span>
+              </p>
               <NavLink to="/painel-coordenacao">Painel da Coordenação</NavLink>
             </div>
           ) : null}

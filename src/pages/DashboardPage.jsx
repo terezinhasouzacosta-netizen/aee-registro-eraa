@@ -94,6 +94,8 @@ function DashboardPage() {
 
   const podeLer = podeVisualizarAlunos(perfil);
   const somenteVinculados = visualizaSomenteVinculados(perfil);
+  const primeiroNome = currentUser?.displayName?.trim()?.split(/\s+/)?.[0] || "Profissional";
+  const saudacaoPerfil = perfil || "Equipe AEE";
 
   console.log("[DashboardPage] checagem de acesso", {
     rotaAtual: location.pathname,
@@ -213,17 +215,22 @@ function DashboardPage() {
   }
 
   return (
-    <main
-      className="alunos-page module-page dashboard-page-wrapper"
-      style={{
-        opacity: 1,
-        filter: "none",
-        backgroundColor: "#f8fafc",
-        boxShadow: "none",
-      }}
-    >
-      <header className="page-header">
-        <h1>Painel inicial</h1>
+    <main className="alunos-page module-page dashboard-page-wrapper dashboard-aee-page">
+      <header className="page-header dashboard-hero">
+        <div className="dashboard-hero-badge">Ambiente inicial AEE Registro</div>
+        <div className="dashboard-hero-heading">
+          <div>
+            <p className="dashboard-hero-kicker">Boas-vindas, {primeiroNome}</p>
+            <h1>Painel inicial</h1>
+          </div>
+          <div className="dashboard-hero-profile-card" aria-label="Perfil atual">
+            <span className="dashboard-icon-badge" aria-hidden="true">A</span>
+            <div>
+              <strong>{saudacaoPerfil}</strong>
+              <p>Acompanhamento institucional da Educação Especial</p>
+            </div>
+          </div>
+        </div>
         <p>Visão geral dos registros de sondagem e monitoramento dos alunos.</p>
         <p className="muted">
           Orientação: Este painel inicial apresenta um resumo das informações do sistema,
@@ -234,73 +241,55 @@ function DashboardPage() {
 
       {erro ? <p className="toast-error">{erro}</p> : null}
 
-      <section
-        className="dashboard-grid dashboard-content-block"
-        style={{ opacity: 1, filter: "none", backgroundColor: "#f8fafc", boxShadow: "none" }}
-      >
-        <article
-          className="panel stat-card dashboard-card"
-          style={{ opacity: 1, filter: "none", backgroundColor: "#f8fafc", boxShadow: "none" }}
-        >
+      <section className="dashboard-grid dashboard-content-block dashboard-stats-grid">
+        <article className="panel stat-card dashboard-card dashboard-stat-card">
+          <span className="dashboard-card-icon" aria-hidden="true">A</span>
           <h2>Total de alunos</h2>
           <strong>{alunos.length}</strong>
         </article>
-        <article
-          className="panel stat-card dashboard-card"
-          style={{ opacity: 1, filter: "none", backgroundColor: "#f8fafc", boxShadow: "none" }}
-        >
+        <article className="panel stat-card dashboard-card dashboard-stat-card">
+          <span className="dashboard-card-icon" aria-hidden="true">S</span>
           <h2>Total de sondagens</h2>
           <strong>{sondagens.length}</strong>
         </article>
-        <article
-          className="panel stat-card dashboard-card"
-          style={{ opacity: 1, filter: "none", backgroundColor: "#f8fafc", boxShadow: "none" }}
-        >
+        <article className="panel stat-card dashboard-card dashboard-stat-card">
+          <span className="dashboard-card-icon" aria-hidden="true">M</span>
           <h2>Total de monitoramentos</h2>
           <strong>{monitoramentos.length}</strong>
         </article>
       </section>
 
-      <section
-        className="panel quick-links no-print dashboard-content-block dashboard-card"
-        style={{ opacity: 1, filter: "none", backgroundColor: "#f8fafc", boxShadow: "none" }}
-      >
+      <section className="panel quick-links no-print dashboard-content-block dashboard-card dashboard-shortcuts">
         <h2>Atalhos</h2>
         <div className="form-actions">
           <Link className="btn-secondary" to="/sondagens">
+            <span className="dashboard-link-icon" aria-hidden="true">S</span>
             Abrir Sondagem
           </Link>
           <Link className="btn-secondary" to="/monitoramentos">
+            <span className="dashboard-link-icon" aria-hidden="true">M</span>
             Abrir Monitoramento
           </Link>
           <Link className="btn-secondary" to="/relatorios">
+            <span className="dashboard-link-icon" aria-hidden="true">R</span>
             Abrir Relatórios
           </Link>
           <Link className="btn-secondary" to="/atendimento-aee">
+            <span className="dashboard-link-icon" aria-hidden="true">A</span>
             Abrir Atendimento AEE
           </Link>
         </div>
       </section>
 
-      <div
-        className="alunos-grid dashboard-content-block"
-        style={{ opacity: 1, filter: "none", backgroundColor: "#f8fafc", boxShadow: "none" }}
-      >
-        <section
-          className="panel dashboard-card"
-          style={{ opacity: 1, filter: "none", backgroundColor: "#f8fafc", boxShadow: "none" }}
-        >
+      <div className="alunos-grid dashboard-content-block dashboard-columns">
+        <section className="panel dashboard-card dashboard-section-card">
           <h2>Monitoramentos recentes</h2>
           {loading ? <p>Carregando...</p> : null}
           {!loading && monitoramentosRecentes.length === 0 ? (
             <p>Nenhum monitoramento recente encontrado.</p>
           ) : null}
           {monitoramentosRecentes.map((item) => (
-            <article
-              key={item.id}
-              className="meta-card dashboard-card"
-              style={{ opacity: 1, filter: "none", backgroundColor: "#f8fafc", boxShadow: "none" }}
-            >
+            <article key={item.id} className="meta-card dashboard-card dashboard-meta-card">
               <p>
                 <strong>Aluno:</strong> {item.alunoNome || "-"}
               </p>
@@ -317,10 +306,7 @@ function DashboardPage() {
           ))}
         </section>
 
-        <section
-          className="panel alerts-panel dashboard-card"
-          style={{ opacity: 1, filter: "none", backgroundColor: "#f8fafc", boxShadow: "none" }}
-        >
+        <section className="panel alerts-panel dashboard-card dashboard-section-card">
           <h2>Alertas pedagógicos</h2>
           <div className="alert-group">
             <p>
@@ -351,10 +337,7 @@ function DashboardPage() {
         </section>
       </div>
 
-      <section
-        className="panel dashboard-content-block dashboard-card"
-        style={{ opacity: 1, filter: "none", backgroundColor: "#f8fafc", boxShadow: "none" }}
-      >
+      <section className="panel dashboard-content-block dashboard-card dashboard-section-card">
         <h2>Perfis e responsabilidades</h2>
         <p className="muted">
           Esta seção orienta o papel de cada usuário na plataforma e os principais registros
@@ -362,11 +345,7 @@ function DashboardPage() {
         </p>
         <div className="perfis-grid">
           {PERFIS_RESPONSABILIDADES.map((item) => (
-            <article
-              key={item.perfil}
-              className="perfil-card dashboard-card"
-              style={{ opacity: 1, filter: "none", backgroundColor: "#f8fafc", boxShadow: "none" }}
-            >
+            <article key={item.perfil} className="perfil-card dashboard-card dashboard-profile-card">
               <h3>{item.perfil}</h3>
               <p>
                 <strong>Função no sistema:</strong> {item.funcao}
