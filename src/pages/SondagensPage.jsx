@@ -35,6 +35,52 @@ const CAMPOS_PADRONIZADOS = [
   ["atencaoConcentracao", "Atenção e concentração"],
 ];
 
+const BLOCOS_AVALIACAO = [
+  {
+    id: "comunicacao-linguagem",
+    titulo: "Comunicação e Linguagem",
+    campos: [["comunicacao", "Comunicação e linguagem"]],
+  },
+  {
+    id: "leitura",
+    titulo: "Leitura",
+    campos: [["leitura", "Leitura"]],
+  },
+  {
+    id: "escrita",
+    titulo: "Escrita",
+    campos: [["escrita", "Escrita"]],
+  },
+  {
+    id: "raciocinio-matematico",
+    titulo: "Raciocínio Lógico-Matemático",
+    campos: [["matematica", "Raciocínio lógico-matemático"]],
+  },
+  {
+    id: "atencao-funcoes-executivas",
+    titulo: "Atenção e Funções Executivas",
+    campos: [
+      ["atencaoConcentracao", "Atenção e concentração"],
+      ["comportamento", "Comportamento e autorregulação"],
+    ],
+  },
+  {
+    id: "interacao-social",
+    titulo: "Interação Social",
+    campos: [["interacaoSocial", "Interação social"]],
+  },
+  {
+    id: "autonomia",
+    titulo: "Autonomia",
+    campos: [["autonomia", "Autonomia"]],
+  },
+  {
+    id: "motricidade",
+    titulo: "Motricidade",
+    campos: [["coordenacaoMotora", "Motricidade / coordenação motora"]],
+  },
+];
+
 const formInicial = {
   alunoId: "",
   nome: "",
@@ -349,93 +395,134 @@ function SondagensPage() {
           <section className="panel no-print module-form-panel">
             <h2>{sondagemEmEdicao ? "Editar sondagem" : "Nova sondagem"}</h2>
             <form className="aluno-form" onSubmit={handleSalvar}>
-              <section className="form-section">
-                <h3>Dados gerais</h3>
-                <label htmlFor="alunoId">Aluno</label>
-                <select id="alunoId" name="alunoId" value={form.alunoId} onChange={handleChange}>
-                  {alunos.map((aluno) => (
-                    <option key={aluno.id} value={aluno.id}>
-                      {aluno.nome}
-                    </option>
-                  ))}
-                </select>
+              <div className="sondagem-form-grid">
+                <section className="form-section sondagem-card sondagem-card-wide">
+                  <div className="sondagem-card-header">
+                    <h3>Dados Gerais</h3>
+                    <p className="muted">
+                      Informações básicas da aplicação da sondagem e identificação do aluno.
+                    </p>
+                  </div>
 
-                <label htmlFor="dataNascimento">Data de nascimento</label>
-                <input
-                  id="dataNascimento"
-                  name="dataNascimento"
-                  type="date"
-                  value={form.dataNascimento}
-                  readOnly
-                />
+                  <div className="sondagem-fields-grid">
+                    <div>
+                      <label htmlFor="alunoId">Aluno</label>
+                      <select
+                        id="alunoId"
+                        name="alunoId"
+                        value={form.alunoId}
+                        onChange={handleChange}
+                      >
+                        {alunos.map((aluno) => (
+                          <option key={aluno.id} value={aluno.id}>
+                            {aluno.nome}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                <label htmlFor="dataSondagem">Data da sondagem</label>
-                <input
-                  id="dataSondagem"
-                  name="dataSondagem"
-                  type="date"
-                  value={form.dataSondagem}
-                  onChange={handleChange}
-                  required
-                />
+                    <div>
+                      <label htmlFor="dataNascimento">Data de nascimento</label>
+                      <input
+                        id="dataNascimento"
+                        name="dataNascimento"
+                        type="date"
+                        value={form.dataNascimento}
+                        readOnly
+                      />
+                    </div>
 
-                <label htmlFor="periodo">Bimestre/período</label>
-                <input id="periodo" name="periodo" value={form.periodo} onChange={handleChange} />
+                    <div>
+                      <label htmlFor="dataSondagem">Data da sondagem</label>
+                      <input
+                        id="dataSondagem"
+                        name="dataSondagem"
+                        type="date"
+                        value={form.dataSondagem}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
 
-                <label htmlFor="responsavelAplicacao">Responsável pela aplicação</label>
-                <input
-                  id="responsavelAplicacao"
-                  name="responsavelAplicacao"
-                  value={form.responsavelAplicacao}
-                  onChange={handleChange}
-                />
-              </section>
+                    <div>
+                      <label htmlFor="periodo">Bimestre/período</label>
+                      <input
+                        id="periodo"
+                        name="periodo"
+                        value={form.periodo}
+                        onChange={handleChange}
+                      />
+                    </div>
 
-              <section className="form-section">
-                <h3>Linguagem e comunicação</h3>
-                {renderSelectAvaliacao("leitura", "Leitura")}
-                {renderSelectAvaliacao("escrita", "Escrita")}
-                {renderSelectAvaliacao("comunicacao", "Comunicação")}
-              </section>
+                    <div>
+                      <label htmlFor="responsavelAplicacao">Responsável pela aplicação</label>
+                      <input
+                        id="responsavelAplicacao"
+                        name="responsavelAplicacao"
+                        value={form.responsavelAplicacao}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                </section>
 
-              <section className="form-section">
-                <h3>Desenvolvimento cognitivo e acadêmico</h3>
-                {renderSelectAvaliacao("matematica", "Matemática")}
-                {renderSelectAvaliacao("atencaoConcentracao", "Atenção e concentração")}
-              </section>
+                {BLOCOS_AVALIACAO.map((bloco) => (
+                  <section key={bloco.id} className="form-section sondagem-card">
+                    <div className="sondagem-card-header">
+                      <h3>{bloco.titulo}</h3>
+                    </div>
+                    <div className="sondagem-fields-grid">
+                      {bloco.campos.map(([name, label]) => renderSelectAvaliacao(name, label))}
+                    </div>
+                  </section>
+                ))}
 
-              <section className="form-section">
-                <h3>Desenvolvimento socioemocional</h3>
-                {renderSelectAvaliacao("interacaoSocial", "Interação social")}
-                {renderSelectAvaliacao("autonomia", "Autonomia")}
-                {renderSelectAvaliacao("comportamento", "Comportamento")}
-              </section>
+                <section className="form-section sondagem-card">
+                  <div className="sondagem-card-header">
+                    <h3>Tecnologia Assistiva</h3>
+                    <p className="muted">
+                      Bloco reservado para futuras perguntas, mantendo a estrutura da página
+                      preparada sem alterar o banco de dados nesta etapa.
+                    </p>
+                  </div>
+                  <div className="sondagem-placeholder">
+                    Nenhum campo adicional foi incluído agora. A organização visual já deixa este
+                    eixo pronto para expansão futura.
+                  </div>
+                </section>
 
-              <section className="form-section">
-                <h3>Desenvolvimento motor</h3>
-                {renderSelectAvaliacao("coordenacaoMotora", "Coordenação motora")}
-              </section>
+                <section className="form-section sondagem-card sondagem-card-wide">
+                  <div className="sondagem-card-header">
+                    <h3>Observações Gerais</h3>
+                  </div>
+                  <label htmlFor="observacoes">Observações gerais</label>
+                  <textarea
+                    id="observacoes"
+                    name="observacoes"
+                    rows={4}
+                    value={form.observacoes}
+                    onChange={handleChange}
+                  />
+                </section>
 
-              <section className="form-section">
-                <h3>Registro complementar</h3>
-                <label htmlFor="observacoes">Observações</label>
-                <textarea
-                  id="observacoes"
-                  name="observacoes"
-                  rows={4}
-                  value={form.observacoes}
-                  onChange={handleChange}
-                />
-
-                <label htmlFor="encaminhamentos">Encaminhamentos</label>
-                <textarea
-                  id="encaminhamentos"
-                  name="encaminhamentos"
-                  rows={4}
-                  value={form.encaminhamentos}
-                  onChange={handleChange}
-                />
-              </section>
+                <section className="form-section sondagem-card sondagem-card-wide">
+                  <div className="sondagem-card-header">
+                    <h3>Síntese Diagnóstica</h3>
+                    <p className="muted">
+                      Campo mantido com a gravação atual, reorganizado para apoiar sínteses e
+                      encaminhamentos pedagógicos futuros.
+                    </p>
+                  </div>
+                  <label htmlFor="encaminhamentos">Síntese diagnóstica e encaminhamentos</label>
+                  <textarea
+                    id="encaminhamentos"
+                    name="encaminhamentos"
+                    rows={4}
+                    value={form.encaminhamentos}
+                    onChange={handleChange}
+                  />
+                </section>
+              </div>
 
               <div className="form-actions sticky-actions">
                 <button type="submit" disabled={salvando}>

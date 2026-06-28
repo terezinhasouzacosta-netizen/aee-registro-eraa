@@ -2128,6 +2128,12 @@ textarea:focus {
   min-height: auto;
 }
 
+.sondagens-page .sondagem-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
 .sondagens-page .form-section {
   padding: 0.8rem 0.9rem;
   margin-bottom: 14px;
@@ -2139,6 +2145,56 @@ textarea:focus {
 
 .sondagens-page .aluno-form {
   gap: 0.62rem;
+}
+
+.sondagens-page .sondagem-card {
+  margin-bottom: 0;
+  padding: 1rem;
+  border: 1px solid #d8e3ef;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 10px 24px rgba(15, 39, 71, 0.06);
+}
+
+.sondagens-page .sondagem-card-wide {
+  grid-column: 1 / -1;
+}
+
+.sondagens-page .sondagem-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 0.8rem;
+}
+
+.sondagens-page .sondagem-card-header h3 {
+  margin: 0;
+}
+
+.sondagens-page .sondagem-card-header .muted {
+  margin: 0;
+}
+
+.sondagens-page .sondagem-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 14px;
+}
+
+.sondagens-page .sondagem-fields-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sondagens-page .sondagem-placeholder {
+  padding: 0.9rem 1rem;
+  border: 1px dashed #bfd3ea;
+  border-radius: 12px;
+  background: #f8fbff;
+  color: #47617d;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .sondagens-page .sticky-actions {
@@ -2205,6 +2261,17 @@ textarea:focus {
     align-items: start;
   }
 }
+
+@media (max-width: 900px) {
+  .sondagens-page .sondagem-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sondagens-page .sondagem-fields-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .sidebar-title {
   color: var(--sidebar-title) !important;
   font-size: 22px;
