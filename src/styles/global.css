@@ -2128,6 +2128,17 @@ textarea:focus {
   min-height: auto;
 }
 
+.sondagens-page .sondagem-compat-note {
+  margin-bottom: 14px;
+  padding: 0.9rem 1rem;
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
 .sondagens-page .sondagem-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2167,6 +2178,32 @@ textarea:focus {
   margin-bottom: 0.8rem;
 }
 
+.sondagens-page .sondagem-card-header-horizontal {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.sondagens-page .sondagem-card-header-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.sondagens-page .sondagem-card-index {
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.22);
+}
+
 .sondagens-page .sondagem-card-header h3 {
   margin: 0;
 }
@@ -2185,6 +2222,44 @@ textarea:focus {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.sondagens-page .sondagem-perguntas-list {
+  display: grid;
+  gap: 10px;
+}
+
+.sondagens-page .sondagem-pergunta-item {
+  padding: 0.85rem 0.9rem;
+  border: 1px solid #d9e5f2;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.sondagens-page .sondagem-pergunta-item label {
+  line-height: 1.4;
+}
+
+.sondagens-page .sondagem-axis-summary {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.sondagens-page .sondagem-text-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+
+.sondagens-page .sondagem-text-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sondagens-page .sondagem-text-item-wide {
+  grid-column: 1 / -1;
 }
 
 .sondagens-page .sondagem-placeholder {
@@ -2269,6 +2344,14 @@ textarea:focus {
 
   .sondagens-page .sondagem-fields-grid {
     grid-template-columns: 1fr;
+  }
+
+  .sondagens-page .sondagem-text-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sondagens-page .sondagem-card-header-horizontal {
+    align-items: center;
   }
 }
 

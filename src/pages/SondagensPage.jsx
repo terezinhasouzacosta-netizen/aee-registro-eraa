@@ -35,61 +35,200 @@ const CAMPOS_PADRONIZADOS = [
   ["atencaoConcentracao", "Atenção e concentração"],
 ];
 
+const CAMPOS_SINTESE = [
+  {
+    key: "sintesePotencialidadesInteresses",
+    titulo: "Potencialidades e interesses do estudante",
+  },
+  {
+    key: "sinteseHabilidadesConsolidadas",
+    titulo: "Habilidades consolidadas",
+  },
+  {
+    key: "sinteseHabilidadesDesenvolvimento",
+    titulo: "Habilidades em desenvolvimento",
+  },
+  {
+    key: "sinteseHabilidadesPrioritarias",
+    titulo: "Habilidades prioritárias para intervenção",
+  },
+  {
+    key: "sinteseRecomendacoesEncaminhamentos",
+    titulo: "Recomendações pedagógicas e encaminhamentos",
+  },
+];
+
 const BLOCOS_AVALIACAO = [
   {
+    numero: 1,
     id: "comunicacao-linguagem",
     titulo: "Comunicação e Linguagem",
-    campos: [["comunicacao", "Comunicação e linguagem"]],
+    campoSintese: "comunicacao",
+    perguntas: [
+      "Compreende instruções simples.",
+      "Compreende instruções com duas ou mais etapas.",
+      "Expressa desejos e necessidades.",
+      "Responde perguntas simples.",
+      "Faz perguntas.",
+      "Mantém diálogo.",
+      "Relata acontecimentos.",
+      "Utiliza gestos, imagens ou comunicação alternativa quando necessário.",
+    ],
   },
   {
+    numero: 2,
     id: "interacao-social",
     titulo: "Interação Social",
-    campos: [["interacaoSocial", "Interação social"]],
+    campoSintese: "interacaoSocial",
+    perguntas: [
+      "Interage com colegas.",
+      "Interage com adultos.",
+      "Participa de atividades em grupo.",
+      "Compartilha materiais.",
+      "Aguarda sua vez.",
+      "Solicita ajuda quando necessário.",
+      "Respeita combinados e regras de convivência.",
+    ],
   },
   {
+    numero: 3,
     id: "convivencia-autorregulacao",
     titulo: "Convivência e Autorregulação",
-    campos: [["comportamento", "Convivência e autorregulação"]],
+    campoSintese: "comportamento",
+    perguntas: [
+      "Aceita mudanças na rotina.",
+      "Lida com frustrações.",
+      "Controla impulsos.",
+      "Permanece na atividade proposta.",
+      "Necessita mediação constante para regular o comportamento.",
+      "Demonstra estratégias para se acalmar.",
+      "Aceita orientações do adulto.",
+    ],
   },
   {
+    numero: 4,
     id: "locomocao-orientacao-seguranca",
     titulo: "Locomoção, Orientação e Segurança",
-    campos: [],
+    campoSintese: "",
+    perguntas: [
+      "Desloca-se com segurança pelos espaços da escola.",
+      "Reconhece os principais ambientes escolares.",
+      "Segue orientações de deslocamento.",
+      "Identifica situações de risco.",
+      "Utiliza escadas, rampas ou corredores com segurança.",
+      "Necessita acompanhamento para locomoção.",
+      "Orienta-se na rotina escolar.",
+    ],
   },
   {
+    numero: 5,
     id: "alimentacao-higiene-autonomia",
     titulo: "Alimentação, Higiene e Autonomia Pessoal",
-    campos: [["autonomia", "Alimentação, higiene e autonomia pessoal"]],
+    campoSintese: "autonomia",
+    perguntas: [
+      "Alimenta-se com autonomia.",
+      "Utiliza talheres ou utensílios adequadamente.",
+      "Lava as mãos.",
+      "Utiliza o banheiro com autonomia.",
+      "Organiza seus pertences.",
+      "Cuida dos materiais escolares.",
+      "Realiza atividades de autocuidado conforme sua faixa etária.",
+    ],
   },
   {
+    numero: 6,
     id: "coordenacao-motora",
     titulo: "Coordenação Motora",
-    campos: [["coordenacaoMotora", "Coordenação motora"]],
+    campoSintese: "coordenacaoMotora",
+    perguntas: [
+      "Segura o lápis ou instrumento de escrita adequadamente.",
+      "Realiza pintura, traçado ou contorno.",
+      "Recorta com tesoura.",
+      "Cola, encaixa ou manipula materiais pequenos.",
+      "Apresenta coordenação motora ampla em deslocamentos e brincadeiras.",
+      "Mantém equilíbrio corporal.",
+      "Participa de atividades motoras propostas.",
+    ],
   },
   {
+    numero: 7,
     id: "leitura",
     titulo: "Leitura",
-    campos: [["leitura", "Leitura"]],
+    campoSintese: "leitura",
+    perguntas: [
+      "Reconhece o próprio nome.",
+      "Reconhece letras do alfabeto.",
+      "Relaciona letra e som.",
+      "Lê sílabas.",
+      "Lê palavras.",
+      "Lê frases simples.",
+      "Compreende pequenos textos.",
+      "Localiza informações em textos ou imagens.",
+    ],
   },
   {
+    numero: 8,
     id: "escrita",
     titulo: "Escrita",
-    campos: [["escrita", "Escrita"]],
+    campoSintese: "escrita",
+    perguntas: [
+      "Escreve o próprio nome.",
+      "Copia letras, palavras ou frases.",
+      "Escreve palavras espontaneamente.",
+      "Produz frases simples.",
+      "Organiza ideias por escrito.",
+      "Utiliza espaçamento entre palavras.",
+      "Utiliza pontuação básica.",
+      "Registra respostas por escrita, desenho ou outro recurso.",
+    ],
   },
   {
+    numero: 9,
     id: "atencao",
     titulo: "Atenção",
-    campos: [["atencaoConcentracao", "Atenção"]],
+    campoSintese: "atencaoConcentracao",
+    perguntas: [
+      "Mantém atenção em atividades curtas.",
+      "Mantém atenção em atividades mais longas.",
+      "Inicia atividades após orientação.",
+      "Conclui atividades propostas.",
+      "Distrai-se facilmente com estímulos externos.",
+      "Necessita redirecionamento frequente.",
+      "Mantém foco em atividades de interesse.",
+    ],
   },
   {
+    numero: 10,
     id: "memoria",
     titulo: "Memória",
-    campos: [],
+    campoSintese: "",
+    perguntas: [
+      "Recorda combinados da rotina.",
+      "Lembra instruções dadas anteriormente.",
+      "Recorda conteúdos trabalhados.",
+      "Reconhece pessoas, espaços e objetos familiares.",
+      "Memoriza sequências simples.",
+      "Retoma aprendizagens após intervalo.",
+      "Relaciona experiências anteriores com novas atividades.",
+    ],
   },
   {
+    numero: 11,
     id: "raciocinio-matematico",
     titulo: "Raciocínio Lógico-Matemático",
-    campos: [["matematica", "Raciocínio lógico-matemático"]],
+    campoSintese: "matematica",
+    perguntas: [
+      "Reconhece números.",
+      "Conta oralmente.",
+      "Relaciona número e quantidade.",
+      "Compara quantidades.",
+      "Classifica objetos por cor, forma, tamanho ou função.",
+      "Organiza sequências e padrões.",
+      "Resolve situações-problema simples.",
+      "Realiza adição com apoio concreto.",
+      "Realiza subtração com apoio concreto.",
+      "Reconhece noções de tempo, calendário, dinheiro ou medidas em situações funcionais.",
+    ],
   },
 ];
 
@@ -111,7 +250,73 @@ const formInicial = {
   atencaoConcentracao: "",
   observacoes: "",
   encaminhamentos: "",
+  sintesePotencialidadesInteresses: "",
+  sinteseHabilidadesConsolidadas: "",
+  sinteseHabilidadesDesenvolvimento: "",
+  sinteseHabilidadesPrioritarias: "",
+  sinteseRecomendacoesEncaminhamentos: "",
 };
+
+function criarRespostasDetalhadasIniciais() {
+  const respostas = {};
+
+  BLOCOS_AVALIACAO.forEach((bloco) => {
+    bloco.perguntas.forEach((_, index) => {
+      respostas[`${bloco.id}-pergunta-${index}`] = "";
+    });
+  });
+
+  return respostas;
+}
+
+function extrairSinteseDiagnostica(texto = "") {
+  const resultado = Object.fromEntries(CAMPOS_SINTESE.map((campo) => [campo.key, ""]));
+  const textoLimpo = String(texto || "").trim();
+
+  if (!textoLimpo) return resultado;
+
+  const linhas = textoLimpo.split(/\r?\n/);
+  let chaveAtual = null;
+  let encontrouCabecalho = false;
+
+  linhas.forEach((linha) => {
+    const linhaLimpa = linha.trim();
+    const cabecalho = CAMPOS_SINTESE.find((campo) =>
+      linhaLimpa.startsWith(`${campo.titulo}:`)
+    );
+
+    if (cabecalho) {
+      encontrouCabecalho = true;
+      chaveAtual = cabecalho.key;
+      const conteudoNaMesmaLinha = linhaLimpa.slice(cabecalho.titulo.length + 1).trim();
+      if (conteudoNaMesmaLinha) {
+        resultado[chaveAtual] = conteudoNaMesmaLinha;
+      }
+      return;
+    }
+
+    if (chaveAtual) {
+      resultado[chaveAtual] = resultado[chaveAtual]
+        ? `${resultado[chaveAtual]}\n${linha}`
+        : linha;
+    }
+  });
+
+  if (!encontrouCabecalho) {
+    resultado.sinteseRecomendacoesEncaminhamentos = textoLimpo;
+  }
+
+  return resultado;
+}
+
+function montarSinteseDiagnostica(form) {
+  return CAMPOS_SINTESE.map((campo) => {
+    const valor = String(form[campo.key] || "").trim();
+    return valor ? `${campo.titulo}:\n${valor}` : "";
+  })
+    .filter(Boolean)
+    .join("\n\n");
+}
 
 function formatarDataFlex(data) {
   if (!data) return "-";
@@ -137,6 +342,7 @@ function SondagensPage() {
   const [alunoIdSelecionado, setAlunoIdSelecionado] = useState("");
   const [sondagens, setSondagens] = useState([]);
   const [form, setForm] = useState(formInicial);
+  const [respostasDetalhadas, setRespostasDetalhadas] = useState(criarRespostasDetalhadasIniciais);
   const [sondagemEmEdicao, setSondagemEmEdicao] = useState(null);
   const [idsPermitidos, setIdsPermitidos] = useState(undefined);
   const [loadingBase, setLoadingBase] = useState(true);
@@ -255,6 +461,7 @@ function SondagensPage() {
       alunoId: alunoIdSelecionado,
       responsavelAplicacao: currentUser?.displayName || currentUser?.email || "",
     });
+    setRespostasDetalhadas(criarRespostasDetalhadasIniciais());
   };
 
   const handleSalvar = async (event) => {
@@ -282,7 +489,7 @@ function SondagensPage() {
       coordenacaoMotora: form.coordenacaoMotora,
       atencaoConcentracao: form.atencaoConcentracao,
       observacoes: form.observacoes.trim(),
-      encaminhamentos: form.encaminhamentos.trim(),
+      encaminhamentos: montarSinteseDiagnostica(form),
     };
 
     try {
@@ -306,6 +513,7 @@ function SondagensPage() {
   const handleEditar = (sondagem) => {
     if (!podeEditar) return;
     const alunoDaSondagem = alunos.find((item) => item.id === sondagem.alunoId) || null;
+    const sintese = extrairSinteseDiagnostica(sondagem.encaminhamentos || "");
 
     setSondagemEmEdicao(sondagem);
     setAlunoIdSelecionado(sondagem.alunoId || alunoIdSelecionado);
@@ -327,7 +535,9 @@ function SondagensPage() {
       atencaoConcentracao: sondagem.atencaoConcentracao || "",
       observacoes: sondagem.observacoes || "",
       encaminhamentos: sondagem.encaminhamentos || "",
+      ...sintese,
     });
+    setRespostasDetalhadas(criarRespostasDetalhadasIniciais());
   };
 
   const handleExcluir = async (sondagem) => {
@@ -353,20 +563,32 @@ function SondagensPage() {
     }, 100);
   };
 
+  const handlePerguntaDetalhadaChange = (event) => {
+    const { name, value } = event.target;
+    setRespostasDetalhadas((prev) => ({ ...prev, [name]: value }));
+  };
+
   const renderSelectAvaliacao = (name, label, opcoes = {}) => {
-    const { disabled = false, reservado = false } = opcoes;
-    const valorAtual = form[name] || "";
+    const {
+      disabled = false,
+      reservado = false,
+      helperText = "",
+      onChange,
+      value,
+      containerClassName = "",
+    } = opcoes;
+    const valorAtual = value ?? form[name] ?? "";
     const valorNaoPadrao =
       valorAtual && !AVALIACAO_OPCOES.includes(valorAtual) ? valorAtual : "";
 
     return (
-      <div key={name}>
+      <div key={name} className={containerClassName}>
         <label htmlFor={name}>{label}</label>
         <select
           id={name}
           name={name}
           value={disabled ? "" : valorAtual}
-          onChange={disabled ? undefined : handleChange}
+          onChange={disabled ? undefined : onChange || handleChange}
           disabled={disabled}
         >
           <option value="">{reservado ? "Estrutura reservada" : "Selecione"}</option>
@@ -381,6 +603,7 @@ function SondagensPage() {
               ))
             : null}
         </select>
+        {helperText ? <p className="muted">{helperText}</p> : null}
         {reservado ? (
           <p className="muted">
             Bloco visual preparado para expansão futura, sem impacto nos dados salvos nesta etapa.
@@ -421,6 +644,10 @@ function SondagensPage() {
           <section className="panel no-print module-form-panel">
             <h2>{sondagemEmEdicao ? "Editar sondagem" : "Nova sondagem"}</h2>
             <form className="aluno-form" onSubmit={handleSalvar}>
+              <div className="sondagem-compat-note">
+                Nesta etapa, as perguntas detalhadas organizam a ficha diagnóstica na interface. O
+                salvamento principal da plataforma permanece compatível com o modelo atual.
+              </div>
               <div className="sondagem-form-grid">
                 <section className="form-section sondagem-card sondagem-card-wide">
                   <div className="sondagem-card-header">
@@ -494,23 +721,52 @@ function SondagensPage() {
 
                 {BLOCOS_AVALIACAO.map((bloco) => (
                   <section key={bloco.id} className="form-section sondagem-card">
-                    <div className="sondagem-card-header">
-                      <h3>{bloco.titulo}</h3>
+                    <div className="sondagem-card-header sondagem-card-header-horizontal">
+                      <span className="sondagem-card-index">{bloco.numero}</span>
+                      <div className="sondagem-card-header-content">
+                        <h3>{bloco.titulo}</h3>
+                        <p className="muted">
+                          Perguntas objetivas com a escala padrão da plataforma.
+                        </p>
+                      </div>
                     </div>
-                    <div className="sondagem-fields-grid">
-                      {bloco.campos.length > 0
-                        ? bloco.campos.map(([name, label]) => renderSelectAvaliacao(name, label))
-                        : renderSelectAvaliacao(`${bloco.id}-placeholder`, bloco.titulo, {
-                            disabled: true,
-                            reservado: true,
-                          })}
+
+                    <div className="sondagem-perguntas-list">
+                      {bloco.perguntas.map((pergunta, index) =>
+                        renderSelectAvaliacao(`${bloco.id}-pergunta-${index}`, pergunta, {
+                          value: respostasDetalhadas[`${bloco.id}-pergunta-${index}`] || "",
+                          onChange: handlePerguntaDetalhadaChange,
+                          containerClassName: "sondagem-pergunta-item",
+                        })
+                      )}
+                    </div>
+
+                    <div className="sondagem-axis-summary">
+                      {bloco.campoSintese
+                        ? renderSelectAvaliacao(
+                            bloco.campoSintese,
+                            "Registro síntese do eixo (salvo no modelo atual)",
+                            {
+                              helperText:
+                                "Este campo preserva a estrutura de salvamento já utilizada pela plataforma.",
+                            }
+                          )
+                        : (
+                          <p className="muted">
+                            Este eixo foi estruturado apenas na interface nesta etapa e ainda não
+                            altera os campos persistidos no banco de dados.
+                          </p>
+                        )}
                     </div>
                   </section>
                 ))}
 
                 <section className="form-section sondagem-card sondagem-card-wide">
-                  <div className="sondagem-card-header">
-                    <h3>Observações Gerais</h3>
+                  <div className="sondagem-card-header sondagem-card-header-horizontal">
+                    <span className="sondagem-card-index">12</span>
+                    <div className="sondagem-card-header-content">
+                      <h3>Observações Gerais</h3>
+                    </div>
                   </div>
                   <label htmlFor="observacoes">Observações gerais</label>
                   <textarea
@@ -523,21 +779,37 @@ function SondagensPage() {
                 </section>
 
                 <section className="form-section sondagem-card sondagem-card-wide">
-                  <div className="sondagem-card-header">
-                    <h3>Síntese Diagnóstica</h3>
-                    <p className="muted">
-                      Campo mantido com a gravação atual, reorganizado para apoiar sínteses e
-                      encaminhamentos pedagógicos futuros.
-                    </p>
+                  <div className="sondagem-card-header sondagem-card-header-horizontal">
+                    <span className="sondagem-card-index">13</span>
+                    <div className="sondagem-card-header-content">
+                      <h3>Síntese Diagnóstica</h3>
+                      <p className="muted">
+                        Os campos abaixo continuam sendo consolidados no registro já existente de
+                        encaminhamentos, sem alterar o banco de dados nesta etapa.
+                      </p>
+                    </div>
                   </div>
-                  <label htmlFor="encaminhamentos">Síntese diagnóstica e encaminhamentos</label>
-                  <textarea
-                    id="encaminhamentos"
-                    name="encaminhamentos"
-                    rows={4}
-                    value={form.encaminhamentos}
-                    onChange={handleChange}
-                  />
+                  <div className="sondagem-text-grid">
+                    {CAMPOS_SINTESE.map((campo) => (
+                      <div
+                        key={campo.key}
+                        className={
+                          campo.key === "sinteseRecomendacoesEncaminhamentos"
+                            ? "sondagem-text-item sondagem-text-item-wide"
+                            : "sondagem-text-item"
+                        }
+                      >
+                        <label htmlFor={campo.key}>{campo.titulo}</label>
+                        <textarea
+                          id={campo.key}
+                          name={campo.key}
+                          rows={4}
+                          value={form[campo.key]}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </section>
               </div>
 
