@@ -42,6 +42,31 @@ const BLOCOS_AVALIACAO = [
     campos: [["comunicacao", "Comunicação e linguagem"]],
   },
   {
+    id: "interacao-social",
+    titulo: "Interação Social",
+    campos: [["interacaoSocial", "Interação social"]],
+  },
+  {
+    id: "convivencia-autorregulacao",
+    titulo: "Convivência e Autorregulação",
+    campos: [["comportamento", "Convivência e autorregulação"]],
+  },
+  {
+    id: "locomocao-orientacao-seguranca",
+    titulo: "Locomoção, Orientação e Segurança",
+    campos: [],
+  },
+  {
+    id: "alimentacao-higiene-autonomia",
+    titulo: "Alimentação, Higiene e Autonomia Pessoal",
+    campos: [["autonomia", "Alimentação, higiene e autonomia pessoal"]],
+  },
+  {
+    id: "coordenacao-motora",
+    titulo: "Coordenação Motora",
+    campos: [["coordenacaoMotora", "Coordenação motora"]],
+  },
+  {
     id: "leitura",
     titulo: "Leitura",
     campos: [["leitura", "Leitura"]],
@@ -52,32 +77,19 @@ const BLOCOS_AVALIACAO = [
     campos: [["escrita", "Escrita"]],
   },
   {
+    id: "atencao",
+    titulo: "Atenção",
+    campos: [["atencaoConcentracao", "Atenção"]],
+  },
+  {
+    id: "memoria",
+    titulo: "Memória",
+    campos: [],
+  },
+  {
     id: "raciocinio-matematico",
     titulo: "Raciocínio Lógico-Matemático",
     campos: [["matematica", "Raciocínio lógico-matemático"]],
-  },
-  {
-    id: "atencao-funcoes-executivas",
-    titulo: "Atenção e Funções Executivas",
-    campos: [
-      ["atencaoConcentracao", "Atenção e concentração"],
-      ["comportamento", "Comportamento e autorregulação"],
-    ],
-  },
-  {
-    id: "interacao-social",
-    titulo: "Interação Social",
-    campos: [["interacaoSocial", "Interação social"]],
-  },
-  {
-    id: "autonomia",
-    titulo: "Autonomia",
-    campos: [["autonomia", "Autonomia"]],
-  },
-  {
-    id: "motricidade",
-    titulo: "Motricidade",
-    campos: [["coordenacaoMotora", "Motricidade / coordenação motora"]],
   },
 ];
 
@@ -341,7 +353,8 @@ function SondagensPage() {
     }, 100);
   };
 
-  const renderSelectAvaliacao = (name, label) => {
+  const renderSelectAvaliacao = (name, label, opcoes = {}) => {
+    const { disabled = false, reservado = false } = opcoes;
     const valorAtual = form[name] || "";
     const valorNaoPadrao =
       valorAtual && !AVALIACAO_OPCOES.includes(valorAtual) ? valorAtual : "";
@@ -349,17 +362,30 @@ function SondagensPage() {
     return (
       <div key={name}>
         <label htmlFor={name}>{label}</label>
-        <select id={name} name={name} value={valorAtual} onChange={handleChange}>
-          <option value="">Selecione</option>
-          {valorNaoPadrao ? (
+        <select
+          id={name}
+          name={name}
+          value={disabled ? "" : valorAtual}
+          onChange={disabled ? undefined : handleChange}
+          disabled={disabled}
+        >
+          <option value="">{reservado ? "Estrutura reservada" : "Selecione"}</option>
+          {!disabled && valorNaoPadrao ? (
             <option value={valorNaoPadrao}>{valorNaoPadrao} (valor anterior)</option>
           ) : null}
-          {AVALIACAO_OPCOES.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
+          {!disabled
+            ? AVALIACAO_OPCOES.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))
+            : null}
         </select>
+        {reservado ? (
+          <p className="muted">
+            Bloco visual preparado para expansão futura, sem impacto nos dados salvos nesta etapa.
+          </p>
+        ) : null}
       </div>
     );
   };
@@ -472,24 +498,15 @@ function SondagensPage() {
                       <h3>{bloco.titulo}</h3>
                     </div>
                     <div className="sondagem-fields-grid">
-                      {bloco.campos.map(([name, label]) => renderSelectAvaliacao(name, label))}
+                      {bloco.campos.length > 0
+                        ? bloco.campos.map(([name, label]) => renderSelectAvaliacao(name, label))
+                        : renderSelectAvaliacao(`${bloco.id}-placeholder`, bloco.titulo, {
+                            disabled: true,
+                            reservado: true,
+                          })}
                     </div>
                   </section>
                 ))}
-
-                <section className="form-section sondagem-card">
-                  <div className="sondagem-card-header">
-                    <h3>Tecnologia Assistiva</h3>
-                    <p className="muted">
-                      Bloco reservado para futuras perguntas, mantendo a estrutura da página
-                      preparada sem alterar o banco de dados nesta etapa.
-                    </p>
-                  </div>
-                  <div className="sondagem-placeholder">
-                    Nenhum campo adicional foi incluído agora. A organização visual já deixa este
-                    eixo pronto para expansão futura.
-                  </div>
-                </section>
 
                 <section className="form-section sondagem-card sondagem-card-wide">
                   <div className="sondagem-card-header">
