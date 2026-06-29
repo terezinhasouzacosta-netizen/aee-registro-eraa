@@ -382,6 +382,7 @@ function AppLayout() {
                 <span>PLANEJAMENTO</span>
               </p>
               <NavLink to="/metas">Habilidades</NavLink>
+              <NavLink to="/paee">PAEE</NavLink>
             </div>
           ) : null}
 
