@@ -9,6 +9,7 @@ import LoginPage from "../pages/LoginPage";
 import MetasPage from "../pages/MetasPage";
 import MonitoramentosPage from "../pages/MonitoramentosPage";
 import PainelCoordenacaoPage from "../pages/PainelCoordenacaoPage";
+import PAEEPage from "../pages/PAEEPage";
 import RelatoriosPage from "../pages/RelatoriosPage";
 import SondagensPage from "../pages/SondagensPage";
 import UnauthorizedPage from "../pages/UnauthorizedPage";
@@ -43,6 +44,7 @@ function AppRoutes() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/alunos" element={<AlunosPage />} />
             <Route path="/metas" element={<MetasPage />} />
+            <Route path="/paee" element={<PAEEPage />} />
             <Route path="/relatorios" element={<RelatoriosPage />} />
             <Route path="/sondagens" element={<SondagensPage />} />
             <Route path="/monitoramentos" element={<MonitoramentosPage />} />
