@@ -405,6 +405,43 @@ h3 {
   gap: 0.85rem;
 }
 
+.alunos-cadastro-page .aluno-form-master {
+  gap: 1rem;
+}
+
+.alunos-cadastro-page .aluno-form-section {
+  border: 1px solid #dbe5f0;
+  border-radius: 14px;
+  padding: 1rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.alunos-cadastro-page .aluno-form-section-header {
+  margin-bottom: 0.85rem;
+}
+
+.alunos-cadastro-page .aluno-form-section-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #163957;
+}
+
+.alunos-cadastro-page .aluno-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+
+.alunos-cadastro-page .aluno-form-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.alunos-cadastro-page .aluno-form-grid-span-2 {
+  grid-column: 1 / -1;
+}
+
 .aluno-form label {
   font-size: 0.9rem;
   font-weight: 600;
@@ -2484,12 +2521,12 @@ textarea:focus {
 }
 
 .alunos-cadastro-page .table-wrapper {
-  overflow-x: visible;
+  overflow-x: auto;
 }
 
 .alunos-cadastro-page .alunos-table {
   width: 100%;
-  min-width: 0 !important;
+  min-width: 1120px !important;
   table-layout: fixed;
 }
 
@@ -2499,25 +2536,40 @@ textarea:focus {
   word-break: normal;
 }
 
+.alunos-cadastro-page .alunos-table td .aluno-cell-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.alunos-cadastro-page .alunos-table td .aluno-cell-stack strong {
+  color: #14314a;
+}
+
+.alunos-cadastro-page .alunos-table td .aluno-cell-stack span {
+  color: #53687c;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
 .alunos-cadastro-page .alunos-table th:nth-child(1),
 .alunos-cadastro-page .alunos-table td:nth-child(1) {
-  width: 14%;
+  width: 18%;
 }
 
 .alunos-cadastro-page .alunos-table th:nth-child(2),
 .alunos-cadastro-page .alunos-table td:nth-child(2) {
-  width: 11%;
-  white-space: nowrap;
+  width: 14%;
 }
 
 .alunos-cadastro-page .alunos-table th:nth-child(3),
 .alunos-cadastro-page .alunos-table td:nth-child(3) {
-  width: 8%;
+  width: 10%;
 }
 
 .alunos-cadastro-page .alunos-table th:nth-child(4),
 .alunos-cadastro-page .alunos-table td:nth-child(4) {
-  width: 24%;
+  width: 20%;
 }
 
 .alunos-cadastro-page .alunos-table th:nth-child(5),
@@ -2527,12 +2579,12 @@ textarea:focus {
 
 .alunos-cadastro-page .alunos-table th:nth-child(6),
 .alunos-cadastro-page .alunos-table td:nth-child(6) {
-  width: 18%;
+  width: 17%;
 }
 
 .alunos-cadastro-page .alunos-table th:nth-child(7),
 .alunos-cadastro-page .alunos-table td:nth-child(7) {
-  width: 12%;
+  width: 8%;
   min-width: 120px;
   white-space: nowrap;
 }
@@ -2560,5 +2612,15 @@ textarea:focus {
   font-size: 0.78rem;
   padding: 0.38rem 0.48rem;
   line-height: 1.1;
+}
+
+@media (max-width: 900px) {
+  .alunos-cadastro-page .aluno-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .alunos-cadastro-page .aluno-form-grid-span-2 {
+    grid-column: auto;
+  }
 }
 

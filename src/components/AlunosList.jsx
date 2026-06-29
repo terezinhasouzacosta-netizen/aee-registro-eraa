@@ -1,4 +1,30 @@
-﻿function AlunosList({ alunos, onEditar, onExcluir, loading, podeEditar }) {
+function formatarSerieTurma(aluno) {
+  const serieAno = aluno.serieAno || "";
+  const turma = aluno.turma || "";
+
+  if (serieAno && turma) return `${serieAno} • Turma ${turma}`;
+  if (serieAno) return serieAno;
+  if (turma) return turma;
+  return "-";
+}
+
+function formatarProfessorAee(aluno) {
+  return aluno.professorAee || "-";
+}
+
+function formatarAcompanhamento(aluno) {
+  const tipo = aluno.tipoAcompanhamento || "Sem mediação";
+  const nomeProfissional =
+    aluno.profissionalAcompanhamentoNome ||
+    (Array.isArray(aluno.responsaveis) ? aluno.responsaveis.join(", ") : "");
+
+  return {
+    tipo,
+    profissional: nomeProfissional || "-",
+  };
+}
+
+function AlunosList({ alunos, onEditar, onExcluir, loading, podeEditar }) {
   return (
     <section className="panel">
       <h2>Lista de alunos</h2>
@@ -15,43 +41,59 @@
             <thead>
               <tr>
                 <th>Nome</th>
-                <th>Nascimento</th>
-                <th>Turma</th>
+                <th>Série/Ano e turma</th>
+                <th>Turno</th>
                 <th>Diagnóstico</th>
-                <th>Acompanhamento</th>
-                <th>Responsáveis</th>
+                <th>Professor(a) AEE</th>
+                <th>Acompanhamento escolar</th>
                 {podeEditar ? <th>Ações</th> : null}
               </tr>
             </thead>
             <tbody>
-              {alunos.map((aluno) => (
-                <tr key={aluno.id}>
-                  <td>{aluno.nome}</td>
-                  <td>{aluno.dataNascimento}</td>
-                  <td>{aluno.turma}</td>
-                  <td>{aluno.diagnostico}</td>
-                  <td>{aluno.tipoAcompanhamento}</td>
-                  <td>{(aluno.responsaveis || []).join(", ")}</td>
-                  {podeEditar ? (
+              {alunos.map((aluno) => {
+                const acompanhamento = formatarAcompanhamento(aluno);
+
+                return (
+                  <tr key={aluno.id}>
                     <td>
-                      <button
-                        type="button"
-                        className="btn-secondary"
-                        onClick={() => onEditar(aluno)}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-danger"
-                        onClick={() => onExcluir(aluno)}
-                      >
-                        Excluir
-                      </button>
+                      <div className="aluno-cell-stack">
+                        <strong>{aluno.nome}</strong>
+                        <span>{aluno.dataNascimento || "Nascimento não informado"}</span>
+                      </div>
                     </td>
-                  ) : null}
-                </tr>
-              ))}
+                    <td>{formatarSerieTurma(aluno)}</td>
+                    <td>{aluno.turno || "-"}</td>
+                    <td>{aluno.diagnostico || "-"}</td>
+                    <td>{formatarProfessorAee(aluno)}</td>
+                    <td>
+                      <div className="aluno-cell-stack">
+                        <strong>{acompanhamento.tipo}</strong>
+                        <span>{acompanhamento.profissional}</span>
+                      </div>
+                    </td>
+                    {podeEditar ? (
+                      <td>
+                        <div className="form-actions">
+                          <button
+                            type="button"
+                            className="btn-secondary"
+                            onClick={() => onEditar(aluno)}
+                          >
+                            Editar
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-danger"
+                            onClick={() => onExcluir(aluno)}
+                          >
+                            Excluir
+                          </button>
+                        </div>
+                      </td>
+                    ) : null}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
