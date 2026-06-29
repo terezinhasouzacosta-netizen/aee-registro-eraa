@@ -217,16 +217,6 @@ function AlunoForm({ alunoEmEdicao, onSubmit, onCancel, loading }) {
                 <option value="Não">Não</option>
               </select>
             </div>
-
-            <div>
-              <label htmlFor="comprometimento">Comprometimento</label>
-              <input
-                id="comprometimento"
-                name="comprometimento"
-                value={form.comprometimento}
-                onChange={handleChange}
-              />
-            </div>
           </div>
         </section>
 
