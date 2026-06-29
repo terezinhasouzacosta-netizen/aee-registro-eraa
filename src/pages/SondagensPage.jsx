@@ -39,22 +39,30 @@ const CAMPOS_SINTESE = [
   {
     key: "sintesePotencialidadesInteresses",
     titulo: "Potencialidades e interesses do estudante",
+    aliases: ["Potencialidades e interesses do estudante"],
   },
   {
     key: "sinteseHabilidadesConsolidadas",
     titulo: "Habilidades consolidadas",
+    aliases: ["Habilidades consolidadas"],
   },
   {
     key: "sinteseHabilidadesDesenvolvimento",
     titulo: "Habilidades em desenvolvimento",
+    aliases: ["Habilidades em desenvolvimento"],
   },
   {
     key: "sinteseHabilidadesPrioritarias",
-    titulo: "Habilidades prioritárias para intervenção",
+    titulo: "Habilidades prioritárias para intervenções",
+    aliases: [
+      "Habilidades prioritárias para intervenções",
+      "Habilidades prioritárias para intervenção",
+    ],
   },
   {
     key: "sinteseRecomendacoesEncaminhamentos",
     titulo: "Recomendações pedagógicas e encaminhamentos",
+    aliases: ["Recomendações pedagógicas e encaminhamentos"],
   },
 ];
 
@@ -65,14 +73,17 @@ const BLOCOS_AVALIACAO = [
     titulo: "Comunicação e Linguagem",
     campoSintese: "comunicacao",
     perguntas: [
-      "Compreende instruções simples.",
-      "Compreende instruções com duas ou mais etapas.",
-      "Expressa desejos e necessidades.",
-      "Responde perguntas simples.",
-      "Faz perguntas.",
-      "Mantém diálogo.",
-      "Relata acontecimentos.",
-      "Utiliza gestos, imagens ou comunicação alternativa quando necessário.",
+      "Comunica desejos, necessidades e desconfortos espontaneamente.",
+      "Utiliza linguagem verbal de forma funcional.",
+      "Utiliza gestos, imagens, Libras ou comunicação alternativa quando necessário.",
+      "Compreende instruções simples e com mais de uma etapa.",
+      "Solicita ajuda quando necessita.",
+      "Responde perguntas simples de forma adequada.",
+      "Mantém diálogo respeitando os turnos da conversa.",
+      "Relata acontecimentos ou experiências de forma compreensível.",
+      "Utiliza vocabulário funcional adequado ao contexto.",
+      "Mantém contato visual durante a comunicação, quando pertinente ao perfil do estudante.",
+      "Apresenta repetição frequente de palavras ou frases sem função comunicativa.",
     ],
   },
   {
@@ -81,13 +92,16 @@ const BLOCOS_AVALIACAO = [
     titulo: "Interação Social",
     campoSintese: "interacaoSocial",
     perguntas: [
-      "Interage com colegas.",
-      "Interage com adultos.",
-      "Participa de atividades em grupo.",
-      "Compartilha materiais.",
-      "Aguarda sua vez.",
-      "Solicita ajuda quando necessário.",
-      "Respeita combinados e regras de convivência.",
+      "Interage com adultos de referência.",
+      "Interage com os colegas.",
+      "Participa de atividades em dupla ou grupo.",
+      "Aguarda sua vez e respeita turnos.",
+      "Compreende e respeita regras e combinados.",
+      "Compartilha materiais e cuida dos próprios pertences.",
+      "Reconhece e expressa sentimentos e emoções.",
+      "Comunica desconforto ou necessidade de ajuda/pausa.",
+      "Demonstra iniciativa para interagir com outras pessoas.",
+      "Apresenta comportamentos que possam causar danos a si ou aos outros.",
     ],
   },
   {
@@ -103,6 +117,8 @@ const BLOCOS_AVALIACAO = [
       "Necessita mediação constante para regular o comportamento.",
       "Demonstra estratégias para se acalmar.",
       "Aceita orientações do adulto.",
+      "Permanece sentado quando a atividade exige.",
+      "Organiza seus materiais durante as atividades.",
     ],
   },
   {
@@ -118,6 +134,8 @@ const BLOCOS_AVALIACAO = [
       "Utiliza escadas, rampas ou corredores com segurança.",
       "Necessita acompanhamento para locomoção.",
       "Orienta-se na rotina escolar.",
+      "Localiza sozinho os principais espaços da escola.",
+      "Utiliza materiais e mobiliários escolares com segurança.",
     ],
   },
   {
@@ -130,52 +148,83 @@ const BLOCOS_AVALIACAO = [
       "Utiliza talheres ou utensílios adequadamente.",
       "Lava as mãos.",
       "Utiliza o banheiro com autonomia.",
-      "Organiza seus pertences.",
-      "Cuida dos materiais escolares.",
+      "Realiza cuidados de higiene pessoal conforme sua faixa etária.",
+      "Organiza seus pertences pessoais.",
       "Realiza atividades de autocuidado conforme sua faixa etária.",
     ],
   },
   {
     numero: 6,
+    id: "autonomia-escolar",
+    titulo: "Autonomia Escolar",
+    campoSintese: "",
+    perguntas: [
+      "Organiza seus materiais escolares.",
+      "Copia do quadro ou de material de apoio com autonomia.",
+      "Inicia as atividades propostas sem necessidade de incentivo constante.",
+      "Realiza as atividades escolares com autonomia.",
+      "Realiza as avaliações com autonomia.",
+      "Conclui as atividades propostas.",
+      "Solicita ajuda quando necessário.",
+      "Guarda os materiais após o uso.",
+      "Cumpre a rotina escolar com autonomia.",
+      "Utiliza agenda, caderno e demais materiais de forma organizada.",
+      "Entrega atividades no tempo previsto.",
+      "Demonstra independência crescente na realização das atividades escolares.",
+    ],
+  },
+  {
+    numero: 7,
     id: "coordenacao-motora",
     titulo: "Coordenação Motora",
     campoSintese: "coordenacaoMotora",
     perguntas: [
-      "Segura o lápis ou instrumento de escrita adequadamente.",
+      "Segura e utiliza o lápis ou instrumento de escrita com coordenação adequada.",
       "Realiza pintura, traçado ou contorno.",
       "Recorta com tesoura.",
       "Cola, encaixa ou manipula materiais pequenos.",
       "Apresenta coordenação motora ampla em deslocamentos e brincadeiras.",
       "Mantém equilíbrio corporal.",
       "Participa de atividades motoras propostas.",
+      "Apresenta legibilidade na escrita.",
     ],
   },
   {
-    numero: 7,
+    numero: 8,
     id: "leitura",
     titulo: "Leitura",
     campoSintese: "leitura",
     perguntas: [
       "Reconhece o próprio nome.",
+      "Diferencia letras, números e outros símbolos.",
       "Reconhece letras do alfabeto.",
+      "Identifica sons iniciais e finais das palavras.",
       "Relaciona letra e som.",
+      "Reconhece palavras familiares.",
       "Lê sílabas.",
       "Lê palavras.",
+      "Lê palavras novas.",
       "Lê frases simples.",
+      "Compreende histórias ou textos lidos pelo professor.",
       "Compreende pequenos textos.",
-      "Localiza informações em textos ou imagens.",
+      "Ordena sequência de imagens ou histórias.",
+      "Localiza informações em textos, imagens ou recursos visuais.",
     ],
   },
   {
-    numero: 8,
+    numero: 9,
     id: "escrita",
     titulo: "Escrita",
     campoSintese: "escrita",
     perguntas: [
       "Escreve o próprio nome.",
+      "Escreve letras do alfabeto.",
+      "Escreve sílabas.",
       "Copia letras, palavras ou frases.",
+      "Escreve palavras ditadas.",
       "Escreve palavras espontaneamente.",
       "Produz frases simples.",
+      "Produz pequenos textos.",
       "Organiza ideias por escrito.",
       "Utiliza espaçamento entre palavras.",
       "Utiliza pontuação básica.",
@@ -183,37 +232,48 @@ const BLOCOS_AVALIACAO = [
     ],
   },
   {
-    numero: 9,
+    numero: 10,
     id: "atencao",
-    titulo: "Atenção",
+    titulo: "Atenção e Funções Executivas",
     campoSintese: "atencaoConcentracao",
     perguntas: [
       "Mantém atenção em atividades curtas.",
       "Mantém atenção em atividades mais longas.",
+      "Mantém foco atencional durante as atividades propostas.",
       "Inicia atividades após orientação.",
-      "Conclui atividades propostas.",
+      "Mantém-se engajado na atividade até sua conclusão.",
       "Distrai-se facilmente com estímulos externos.",
       "Necessita redirecionamento frequente.",
-      "Mantém foco em atividades de interesse.",
+      "Compreende e mantém a sequência da atividade.",
+      "Organiza materiais e espaço de trabalho.",
+      "Retoma a atividade após interrupções.",
+      "Confere o próprio trabalho antes de finalizar.",
+      "Tolera correções e tenta novamente.",
+      "Demonstra curiosidade sobre assuntos do dia a dia.",
     ],
   },
   {
-    numero: 10,
+    numero: 11,
     id: "memoria",
     titulo: "Memória",
     campoSintese: "",
     perguntas: [
       "Recorda combinados da rotina.",
       "Lembra instruções dadas anteriormente.",
-      "Recorda conteúdos trabalhados.",
+      "Recorda conteúdos trabalhados anteriormente.",
       "Reconhece pessoas, espaços e objetos familiares.",
       "Memoriza sequências simples.",
-      "Retoma aprendizagens após intervalo.",
-      "Relaciona experiências anteriores com novas atividades.",
+      "Recorda fatos ou acontecimentos recentes.",
+      "Relaciona experiências anteriores com novas aprendizagens.",
+      "Memoriza nomes de pessoas e objetos.",
+      "Memoriza letras, números ou símbolos.",
+      "Memoriza sequência de ações.",
+      "Retoma aprendizagens após um intervalo de tempo.",
+      "Evoca informações quando solicitado.",
     ],
   },
   {
-    numero: 11,
+    numero: 12,
     id: "raciocinio-matematico",
     titulo: "Raciocínio Lógico-Matemático",
     campoSintese: "matematica",
@@ -221,13 +281,23 @@ const BLOCOS_AVALIACAO = [
       "Reconhece números.",
       "Conta oralmente.",
       "Relaciona número e quantidade.",
+      "Identifica antecessor e sucessor.",
       "Compara quantidades.",
       "Classifica objetos por cor, forma, tamanho ou função.",
       "Organiza sequências e padrões.",
       "Resolve situações-problema simples.",
       "Realiza adição com apoio concreto.",
       "Realiza subtração com apoio concreto.",
-      "Reconhece noções de tempo, calendário, dinheiro ou medidas em situações funcionais.",
+      "Realiza cálculos mentais simples.",
+      "Realiza multiplicações simples.",
+      "Realiza divisões simples.",
+      "Compreende os conceitos de mais e menos.",
+      "Compreende inteiro, metade e dobro.",
+      "Compreende medidas de tempo.",
+      "Identifica os dias da semana.",
+      "Identifica os meses do ano.",
+      "Reconhece horas exatas em relógio digital ou analógico.",
+      "Reconhece moedas, cédulas e valores monetários.",
     ],
   },
 ];
@@ -282,13 +352,16 @@ function extrairSinteseDiagnostica(texto = "") {
   linhas.forEach((linha) => {
     const linhaLimpa = linha.trim();
     const cabecalho = CAMPOS_SINTESE.find((campo) =>
-      linhaLimpa.startsWith(`${campo.titulo}:`)
+      (campo.aliases || [campo.titulo]).some((alias) => linhaLimpa.startsWith(`${alias}:`))
     );
 
     if (cabecalho) {
       encontrouCabecalho = true;
       chaveAtual = cabecalho.key;
-      const conteudoNaMesmaLinha = linhaLimpa.slice(cabecalho.titulo.length + 1).trim();
+      const aliasUsado = (cabecalho.aliases || [cabecalho.titulo]).find((alias) =>
+        linhaLimpa.startsWith(`${alias}:`)
+      );
+      const conteudoNaMesmaLinha = linhaLimpa.slice((aliasUsado || cabecalho.titulo).length + 1).trim();
       if (conteudoNaMesmaLinha) {
         resultado[chaveAtual] = conteudoNaMesmaLinha;
       }
@@ -762,11 +835,8 @@ function SondagensPage() {
                 ))}
 
                 <section className="form-section sondagem-card sondagem-card-wide">
-                  <div className="sondagem-card-header sondagem-card-header-horizontal">
-                    <span className="sondagem-card-index">12</span>
-                    <div className="sondagem-card-header-content">
-                      <h3>Observações Gerais</h3>
-                    </div>
+                  <div className="sondagem-card-header">
+                    <h3>Observações Gerais</h3>
                   </div>
                   <label htmlFor="observacoes">Observações gerais</label>
                   <textarea
@@ -779,15 +849,12 @@ function SondagensPage() {
                 </section>
 
                 <section className="form-section sondagem-card sondagem-card-wide">
-                  <div className="sondagem-card-header sondagem-card-header-horizontal">
-                    <span className="sondagem-card-index">13</span>
-                    <div className="sondagem-card-header-content">
-                      <h3>Síntese Diagnóstica</h3>
-                      <p className="muted">
-                        Os campos abaixo continuam sendo consolidados no registro já existente de
-                        encaminhamentos, sem alterar o banco de dados nesta etapa.
-                      </p>
-                    </div>
+                  <div className="sondagem-card-header">
+                    <h3>Síntese Diagnóstica</h3>
+                    <p className="muted">
+                      Os campos abaixo continuam sendo consolidados no registro já existente de
+                      encaminhamentos, sem alterar o banco de dados nesta etapa.
+                    </p>
                   </div>
                   <div className="sondagem-text-grid">
                     {CAMPOS_SINTESE.map((campo) => (
