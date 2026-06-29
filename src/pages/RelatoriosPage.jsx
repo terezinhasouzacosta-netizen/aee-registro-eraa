@@ -27,6 +27,14 @@ const OPCOES_FUNCAO = [
   "Professor(a) do SRM",
   "Professor(a) do Atendimento Domiciliar",
 ];
+const OPCOES_LOCALIZACAO = ["Urbana", "Rural", "Campo"];
+const OPCOES_LAUDO = ["Sim", "Não"];
+const OPCOES_TIPO_ACOMPANHAMENTO = [
+  "Sem mediação",
+  "Com mediador",
+  "Com assistente educacional",
+  "Atendimento domiciliar",
+];
 
 const initialRelatorioForm = {
   bimestre: "1\u00BA",
@@ -34,20 +42,88 @@ const initialRelatorioForm = {
   dataFim: "",
   nomeEscola: "",
   municipio: "",
-  localizacao: "Urbana",
+  localizacao: "",
   alunoNome: "",
   dataNascimento: "",
   serieAno: "",
+  turma: "",
   turno: "",
-  laudo: "Não",
+  diagnostico: "",
+  laudo: "",
   comprometimento: "",
   pai: "",
   mae: "",
   profissionalAEE: "",
+  tipoAcompanhamento: "",
+  profissionalAcompanhamentoNome: "",
   responsavelPreenchimento: "",
   funcao: [],
   textoRelatorio: "",
 };
+
+function normalizarTipoAcompanhamento(valor) {
+  const texto = normalizarTexto(valor);
+  if (!texto) return "";
+  if (texto === "sem mediacao" || texto === "sem mediador") return "Sem mediação";
+  if (texto === "com mediador") return "Com mediador";
+  if (texto === "com assistente educacional") return "Com assistente educacional";
+  if (texto === "atendimento domiciliar") return "Atendimento domiciliar";
+  return String(valor || "").trim();
+}
+
+function obterDadosCadastroAlunoParaRelatorio(aluno) {
+  if (!aluno) {
+    return {
+      nomeEscola: "",
+      municipio: "",
+      localizacao: "",
+      alunoNome: "",
+      dataNascimento: "",
+      serieAno: "",
+      turma: "",
+      turno: "",
+      diagnostico: "",
+      laudo: "",
+      profissionalAEE: "",
+      tipoAcompanhamento: "",
+      profissionalAcompanhamentoNome: "",
+    };
+  }
+
+  return {
+    nomeEscola: aluno.nomeEscola || "",
+    municipio: aluno.municipio || "",
+    localizacao: aluno.localizacao || "",
+    alunoNome: aluno.nome || "",
+    dataNascimento: aluno.dataNascimento || "",
+    serieAno: aluno.serieAno || "",
+    turma: aluno.turma || "",
+    turno: aluno.turno || "",
+    diagnostico: aluno.diagnostico || "",
+    laudo: aluno.laudo || "",
+    profissionalAEE: aluno.professorAee || "",
+    tipoAcompanhamento: normalizarTipoAcompanhamento(aluno.tipoAcompanhamento),
+    profissionalAcompanhamentoNome:
+      aluno.profissionalAcompanhamentoNome ||
+      (Array.isArray(aluno.responsaveis) ? aluno.responsaveis.join(", ") : ""),
+  };
+}
+
+function preencherCamposVazios(prev, dados) {
+  let alterou = false;
+  const next = { ...prev };
+
+  Object.entries(dados).forEach(([campo, valor]) => {
+    if (String(prev[campo] || "").trim()) return;
+    const novoValor = valor || "";
+    if ((prev[campo] || "") !== novoValor) {
+      next[campo] = novoValor;
+      alterou = true;
+    }
+  });
+
+  return alterou ? next : prev;
+}
 
 function normalizarTexto(valor) {
   return String(valor || "")
@@ -219,6 +295,7 @@ function RelatoriosPage() {
   });
   const [gerandoSinteseAtendimento, setGerandoSinteseAtendimento] = useState(false);
   const [gerandoRelatorioAutomatico, setGerandoRelatorioAutomatico] = useState(false);
+  const ultimoAlunoSincronizadoRef = useRef("");
 
   const podeLer = podeVisualizarRelatorios(perfil);
   const podeGerenciarRelatorio = podeEditarRelatorios(perfil);
@@ -278,7 +355,8 @@ function RelatoriosPage() {
       return {
         ...relatorioEmEdicao,
         ...formRelatorio,
-        alunoNome: alunoSelecionado?.nome || formRelatorio.alunoNome || relatorioEmEdicao.alunoNome,
+        alunoNome:
+          formRelatorio.alunoNome || relatorioEmEdicao.alunoNome || alunoSelecionado?.nome || "-",
         atualizadoEm: new Date(),
       };
     }
@@ -288,7 +366,7 @@ function RelatoriosPage() {
     if (formRelatorio.textoRelatorio?.trim()) {
       return {
         ...formRelatorio,
-        alunoNome: alunoSelecionado?.nome || formRelatorio.alunoNome || "-",
+        alunoNome: formRelatorio.alunoNome || alunoSelecionado?.nome || "-",
         atualizadoEm: new Date(),
       };
     }
@@ -353,17 +431,25 @@ function RelatoriosPage() {
 
   useEffect(() => {
     if (!alunoSelecionado) return;
+    const dadosAluno = obterDadosCadastroAlunoParaRelatorio(alunoSelecionado);
+    const mudouAluno = ultimoAlunoSincronizadoRef.current !== alunoIdSelecionado;
+
     setFormRelatorio((prev) => ({
-      ...prev,
-      alunoNome: alunoSelecionado.nome || "",
-      dataNascimento: alunoSelecionado.dataNascimento || "",
-      serieAno: prev.serieAno || alunoSelecionado.turma || "",
+      ...(relatorioEmEdicao
+        ? preencherCamposVazios(prev, dadosAluno)
+        : mudouAluno
+          ? {
+              ...prev,
+              ...dadosAluno,
+            }
+          : prev),
       responsavelPreenchimento:
         !relatorioEmEdicao && !prev.responsavelPreenchimento
           ? responsavelPadrao
           : prev.responsavelPreenchimento,
     }));
-  }, [alunoSelecionado, relatorioEmEdicao, responsavelPadrao]);
+    ultimoAlunoSincronizadoRef.current = alunoIdSelecionado;
+  }, [alunoSelecionado, alunoIdSelecionado, relatorioEmEdicao, responsavelPadrao]);
 
   useEffect(() => {
     if (!responsavelPadrao || relatorioEmEdicao) return;
@@ -615,10 +701,15 @@ function RelatoriosPage() {
           municipio: formRelatorio.municipio,
           localizacao: formRelatorio.localizacao,
           serieAno: formRelatorio.serieAno,
+          turma: formRelatorio.turma,
           turno: formRelatorio.turno,
+          diagnostico: formRelatorio.diagnostico,
           laudo: formRelatorio.laudo,
           pai: formRelatorio.pai,
           mae: formRelatorio.mae,
+          profissionalAEE: formRelatorio.profissionalAEE,
+          tipoAcompanhamento: formRelatorio.tipoAcompanhamento,
+          profissionalAcompanhamentoNome: formRelatorio.profissionalAcompanhamentoNome,
         },
         aluno: alunoSelecionado,
         periodo: {
@@ -703,16 +794,20 @@ function RelatoriosPage() {
       dataFim: relatório.dataFim || "",
       nomeEscola: relatório.nomeEscola || "",
       municipio: relatório.municipio || "",
-      localizacao: relatório.localizacao || "Urbana",
+      localizacao: relatório.localizacao || "",
       alunoNome: relatório.alunoNome || "",
       dataNascimento: relatório.dataNascimento || "",
       serieAno: relatório.serieAno || "",
+      turma: relatório.turma || "",
       turno: relatório.turno || "",
-      laudo: relatório.laudo || "Não",
+      diagnostico: relatório.diagnostico || "",
+      laudo: relatório.laudo || "",
       comprometimento: relatório.comprometimento || "",
       pai: relatório.pai || "",
       mae: relatório.mae || "",
       profissionalAEE: relatório.profissionalAEE || "",
+      tipoAcompanhamento: normalizarTipoAcompanhamento(relatório.tipoAcompanhamento),
+      profissionalAcompanhamentoNome: relatório.profissionalAcompanhamentoNome || "",
       responsavelPreenchimento:
         relatório.responsavelPreenchimento || relatório.coordenadorNome || "",
       funcao: Array.isArray(relatório.funcao) ? relatório.funcao : [],
@@ -844,12 +939,11 @@ function RelatoriosPage() {
   };
 
   const limparFormRelatorio = () => {
+    const dadosAluno = obterDadosCadastroAlunoParaRelatorio(alunoSelecionado);
     setRelatorioEmEdicao(null);
     setFormRelatorio({
       ...initialRelatorioForm,
-      alunoNome: alunoSelecionado?.nome || "",
-      dataNascimento: alunoSelecionado?.dataNascimento || "",
-      serieAno: alunoSelecionado?.turma || "",
+      ...dadosAluno,
       responsavelPreenchimento: responsavelPadrao,
     });
   };
@@ -874,7 +968,7 @@ function RelatoriosPage() {
 
     const payload = {
       alunoId: alunoSelecionado.id,
-      alunoNome: alunoSelecionado.nome || "",
+      alunoNome: formRelatorio.alunoNome.trim() || alunoSelecionado.nome || "",
       bimestre: formRelatorio.bimestre,
       dataInicio: formRelatorio.dataInicio || "",
       dataFim: formRelatorio.dataFim || "",
@@ -1038,8 +1132,12 @@ function RelatoriosPage() {
               value={formRelatorio.localizacao}
               onChange={handleChangeRelatorio}
             >
-              <option value="Urbana">Urbana</option>
-              <option value="Campo">Campo</option>
+              <option value="">Selecione</option>
+              {OPCOES_LOCALIZACAO.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
             </select>
 
             <label htmlFor="bimestreRelatorio">Bimestre</label>
@@ -1083,7 +1181,7 @@ function RelatoriosPage() {
             <input
               id="alunoNome"
               name="alunoNome"
-              value={alunoSelecionado?.nome || ""}
+              value={formRelatorio.alunoNome}
               readOnly
             />
 
@@ -1104,11 +1202,27 @@ function RelatoriosPage() {
               onChange={handleChangeRelatorio}
             />
 
+            <label htmlFor="turma">Turma</label>
+            <input
+              id="turma"
+              name="turma"
+              value={formRelatorio.turma}
+              onChange={handleChangeRelatorio}
+            />
+
             <label htmlFor="turno">Turno</label>
             <input
               id="turno"
               name="turno"
               value={formRelatorio.turno}
+              onChange={handleChangeRelatorio}
+            />
+
+            <label htmlFor="diagnosticoRelatorio">Diagnóstico</label>
+            <input
+              id="diagnosticoRelatorio"
+              name="diagnostico"
+              value={formRelatorio.diagnostico}
               onChange={handleChangeRelatorio}
             />
 
@@ -1119,17 +1233,13 @@ function RelatoriosPage() {
               value={formRelatorio.laudo}
               onChange={handleChangeRelatorio}
             >
-              <option value="Sim">Sim</option>
-              <option value="Não">Não</option>
+              <option value="">Selecione</option>
+              {OPCOES_LAUDO.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
             </select>
-
-            <label htmlFor="comprometimento">Comprometimento</label>
-            <input
-              id="comprometimento"
-              name="comprometimento"
-              value={formRelatorio.comprometimento}
-              onChange={handleChangeRelatorio}
-            />
 
             <label htmlFor="pai">Pai</label>
             <input
@@ -1147,11 +1257,36 @@ function RelatoriosPage() {
               onChange={handleChangeRelatorio}
             />
 
-            <label htmlFor="profissionalAEE">Professor(a) responsável pelo relatório</label>
+            <label htmlFor="profissionalAEE">Professor(a) do AEE</label>
             <input
               id="profissionalAEE"
               name="profissionalAEE"
               value={formRelatorio.profissionalAEE}
+              onChange={handleChangeRelatorio}
+            />
+
+            <label htmlFor="tipoAcompanhamentoRelatorio">Tipo de acompanhamento</label>
+            <select
+              id="tipoAcompanhamentoRelatorio"
+              name="tipoAcompanhamento"
+              value={formRelatorio.tipoAcompanhamento}
+              onChange={handleChangeRelatorio}
+            >
+              <option value="">Selecione</option>
+              {OPCOES_TIPO_ACOMPANHAMENTO.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+
+            <label htmlFor="profissionalAcompanhamentoNome">
+              Nome do profissional de acompanhamento
+            </label>
+            <input
+              id="profissionalAcompanhamentoNome"
+              name="profissionalAcompanhamentoNome"
+              value={formRelatorio.profissionalAcompanhamentoNome}
               onChange={handleChangeRelatorio}
             />
 
@@ -1337,7 +1472,7 @@ function RelatoriosPage() {
                 )}
               </div>
               <p>
-                <strong>Professor(a) responsável pelo relatório:</strong> {relatório.profissionalAEE || "-"}
+                <strong>Professor(a) do AEE:</strong> {relatório.profissionalAEE || "-"}
               </p>
               <p>
                 <strong>Responsável preenchimento:</strong>{" "}
@@ -1442,7 +1577,13 @@ function RelatoriosPage() {
               <strong>Série/Ano:</strong> {relatorio.serieAno || "-"}
             </p>
             <p>
+              <strong>Turma:</strong> {relatorio.turma || "-"}
+            </p>
+            <p>
               <strong>Turno:</strong> {relatorio.turno || "-"}
+            </p>
+            <p>
+              <strong>Diagnóstico:</strong> {relatorio.diagnostico || "-"}
             </p>
             <p>
               <strong>Laudo:</strong> {relatorio.laudo || "-"}
@@ -1457,7 +1598,14 @@ function RelatoriosPage() {
               <strong>Mãe:</strong> {relatorio.mae || "-"}
             </p>
             <p>
-              <strong>Professor(a) responsável pelo relatório:</strong> {relatorio.profissionalAEE || "-"}
+              <strong>Professor(a) do AEE:</strong> {relatorio.profissionalAEE || "-"}
+            </p>
+            <p>
+              <strong>Tipo de acompanhamento:</strong> {relatorio.tipoAcompanhamento || "-"}
+            </p>
+            <p>
+              <strong>Profissional de acompanhamento:</strong>{" "}
+              {relatorio.profissionalAcompanhamentoNome || "-"}
             </p>
             <p>
               <strong>Função:</strong>{" "}
@@ -1481,7 +1629,7 @@ function RelatoriosPage() {
               <p>
                 {relatorio.municipio || "Cidade"}, {formatarData(relatorio.atualizadoEm)}
               </p>
-            <p>{relatorio.profissionalAEE || "Professor(a) responsável pelo relatório"}</p>
+            <p>{relatorio.profissionalAEE || "Professor(a) do AEE"}</p>
               <p>
                 {relatorio.responsavelPreenchimento ||
                   relatorio.coordenadorNome ||
@@ -1544,7 +1692,13 @@ function RelatoriosPage() {
             <strong>Série/Ano:</strong> {relatorioParaExportacao?.serieAno || "-"}
           </p>
           <p>
+            <strong>Turma:</strong> {relatorioParaExportacao?.turma || "-"}
+          </p>
+          <p>
             <strong>Turno:</strong> {relatorioParaExportacao?.turno || "-"}
+          </p>
+          <p>
+            <strong>Diagnóstico:</strong> {relatorioParaExportacao?.diagnostico || "-"}
           </p>
           <p>
             <strong>Laudo:</strong> {relatorioParaExportacao?.laudo || "-"}
@@ -1559,7 +1713,14 @@ function RelatoriosPage() {
             <strong>Mãe:</strong> {relatorioParaExportacao?.mae || "-"}
           </p>
           <p>
-            <strong>Professor(a) responsável pelo relatório:</strong> {relatorioParaExportacao?.profissionalAEE || "-"}
+            <strong>Professor(a) do AEE:</strong> {relatorioParaExportacao?.profissionalAEE || "-"}
+          </p>
+          <p>
+            <strong>Tipo de acompanhamento:</strong> {relatorioParaExportacao?.tipoAcompanhamento || "-"}
+          </p>
+          <p>
+            <strong>Profissional de acompanhamento:</strong>{" "}
+            {relatorioParaExportacao?.profissionalAcompanhamentoNome || "-"}
           </p>
           <p>
             <strong>Função:</strong>{" "}
@@ -1586,7 +1747,7 @@ function RelatoriosPage() {
               {relatorioParaExportacao?.municipio || "Cidade"},{" "}
               {formatarDataFlex(relatorioParaExportacao?.atualizadoEm)}
             </p>
-            <p>{relatorioParaExportacao?.profissionalAEE || "Professor(a) responsável pelo relatório"}</p>
+            <p>{relatorioParaExportacao?.profissionalAEE || "Professor(a) do AEE"}</p>
             <p>
               {relatorioParaExportacao?.responsavelPreenchimento ||
                 "Responsável pelo preenchimento do relatório"}
