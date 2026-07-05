@@ -371,6 +371,7 @@ function AppLayout() {
                 <span className="sidebar-section-icon" aria-hidden="true">🔍</span>
                 <span>DIAGNÓSTICO</span>
               </p>
+              <NavLink to="/estudo-de-caso">Estudo de Caso</NavLink>
               <NavLink to="/sondagens">Sondagem</NavLink>
             </div>
           ) : null}
