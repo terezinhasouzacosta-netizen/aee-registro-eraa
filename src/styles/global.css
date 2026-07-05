@@ -914,6 +914,96 @@ textarea:focus {
   margin-top: 1rem;
 }
 
+.metas-page .metas-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.metas-page .metas-form-panel,
+.metas-page .metas-list-panel,
+.metas-page .metas-sugestoes-panel {
+  min-width: 0;
+}
+
+.metas-page .metas-sugestoes-panel {
+  margin-top: 1rem;
+}
+
+.metas-page .metas-sugestoes-section,
+.metas-page .metas-duplicadas-section {
+  margin-bottom: 0;
+}
+
+.metas-page .metas-sugestoes-header {
+  display: grid;
+  gap: 0.3rem;
+  margin-bottom: 0.85rem;
+}
+
+.metas-page .metas-sugestoes-header h3,
+.metas-page .metas-duplicadas-section h3 {
+  margin-bottom: 0;
+}
+
+.metas-page .metas-sugestoes-header .muted {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.metas-page .metas-sugestoes-grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.metas-page .metas-sugestao-card {
+  padding: 1rem 1.05rem;
+}
+
+.metas-page .metas-sugestao-card p {
+  line-height: 1.45;
+}
+
+.metas-page .metas-sugestao-evidencias {
+  margin-bottom: 0.75rem;
+}
+
+.metas-page .metas-sugestao-lista {
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 0.9rem;
+}
+
+.metas-page .metas-sugestao-checkbox {
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.72rem 0.8rem;
+  border: 1px solid #dbe5f0;
+  border-radius: 12px;
+  background: #f8fbff;
+}
+
+.metas-page .metas-sugestao-checkbox input {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.metas-page .metas-sugestao-checkbox span {
+  display: block;
+  line-height: 1.48;
+  color: #1f2937;
+}
+
+.metas-page .metas-sugestoes-actions {
+  margin-top: 0.95rem;
+}
+
+.metas-page .metas-duplicadas-lista {
+  display: grid;
+  gap: 0.4rem;
+}
+
 .module-form-panel,
 .module-list-panel {
   min-height: 320px;
@@ -1633,6 +1723,11 @@ textarea:focus {
 
   .alunos-cadastro-page .alunos-grid {
     grid-template-columns: 1fr;
+  }
+
+  .metas-page .metas-layout {
+    grid-template-columns: 360px minmax(0, 1fr);
+    align-items: start;
   }
 
   .filters-grid {
@@ -2785,6 +2880,10 @@ textarea:focus {
 
   .alunos-cadastro-page .aluno-form-grid-span-2 {
     grid-column: auto;
+  }
+
+  .metas-page .metas-sugestao-checkbox {
+    padding: 0.68rem 0.72rem;
   }
 }
 

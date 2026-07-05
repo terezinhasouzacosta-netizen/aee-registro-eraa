@@ -620,7 +620,7 @@ function MetasPage() {
   }
 
   return (
-    <main className="alunos-page">
+    <main className="alunos-page metas-page">
       <header className="page-header">
         <h1>Habilidades pedagógicas</h1>
         <p>Acompanhamento por aluno com organização por bimestre.</p>
@@ -672,9 +672,9 @@ function MetasPage() {
         </div>
       </section>
 
-      <div className="alunos-grid metas-grid">
+      <div className="metas-layout">
         {podeEditar ? (
-          <section className="panel">
+          <section className="panel metas-form-panel">
             <h2>{metaEmEdicao ? "Editar habilidade" : "Nova habilidade"}</h2>
 
             <section className="form-section">
@@ -806,74 +806,9 @@ function MetasPage() {
                 </p>
               </section>
             ) : null}
-
-            {sugestoesGeradas.length ? (
-              <section className="form-section">
-                <h3>Sugestões geradas</h3>
-                {Object.entries(sugestoesAgrupadasPorEixo).map(([eixo, sugestoesDoEixo]) => (
-                  <article key={`eixo-${normalizarTexto(eixo)}`} className="meta-card">
-                    <p>
-                      <strong>Eixo temático:</strong> {eixo}
-                    </p>
-
-                    <p className="muted">
-                      Evidências da sondagem:{" "}
-                      {(sugestoesDoEixo[0]?.evidencias || [])
-                        .map((evidencia) => `${evidencia.campo} (${evidencia.resultado || "-"})`)
-                        .join("; ")}
-                    </p>
-
-                    {sugestoesDoEixo.map((item) => (
-                      <label key={item.id} className="checkbox-item">
-                        <input
-                          type="checkbox"
-                          checked={idsSugestoesSelecionadas.includes(item.id)}
-                          onChange={() => handleAlternarSugestao(item.id)}
-                        />
-                        {item.descricao}
-                      </label>
-                    ))}
-
-                    <label htmlFor={`outras-${normalizarTexto(eixo)}`}>
-                      Outras habilidades para este eixo
-                    </label>
-                    <textarea
-                      id={`outras-${normalizarTexto(eixo)}`}
-                      rows={3}
-                      placeholder="Digite outras habilidades (uma por linha)."
-                      value={outrasHabilidadesPorEixo[eixo] || ""}
-                      onChange={(event) =>
-                        setOutrasHabilidadesPorEixo((prev) => ({
-                          ...prev,
-                          [eixo]: event.target.value,
-                        }))
-                      }
-                    />
-                  </article>
-                ))}
-                <div className="form-actions">
-                  <button type="button" onClick={handleSalvarSugestoes} disabled={salvandoSugestoes}>
-                    {salvandoSugestoes
-                      ? "Salvando sugestões..."
-                      : "Salvar habilidades selecionadas"}
-                  </button>
-                </div>
-              </section>
-            ) : null}
-
-            {duplicadasGeradas.length ? (
-              <section className="form-section">
-                <h3>Habilidades já existentes no bimestre</h3>
-                {duplicadasGeradas.map((item) => (
-                  <p key={`duplicada-${item.id}`} className="muted">
-                    {item.titulo}
-                  </p>
-                ))}
-              </section>
-            ) : null}
           </section>
         ) : (
-          <section className="panel">
+          <section className="panel metas-form-panel">
             <h2>Acesso de leitura</h2>
             <p>
               Seu perfil pode visualizar habilidades dos alunos vinculados por bimestre, sem
@@ -882,7 +817,7 @@ function MetasPage() {
           </section>
         )}
 
-        <section className="panel">
+        <section className="panel metas-list-panel">
           <h2>Habilidades por bimestre</h2>
           {loading ? <p>Carregando habilidades...</p> : null}
 
@@ -940,9 +875,98 @@ function MetasPage() {
                   ))
                 )}
               </div>
-            ))}
+          ))}
         </section>
       </div>
+
+      {sugestoesGeradas.length || duplicadasGeradas.length ? (
+        <section className="panel metas-sugestoes-panel">
+          {sugestoesGeradas.length ? (
+            <section className="form-section metas-sugestoes-section">
+              <div className="metas-sugestoes-header">
+                <h3>Sugestões geradas</h3>
+                <p className="muted">
+                  Revise as sugestões com mais conforto visual, marque somente as prioridades e
+                  complemente com outras habilidades quando necessário.
+                </p>
+              </div>
+
+              <div className="metas-sugestoes-grid">
+                {Object.entries(sugestoesAgrupadasPorEixo).map(([eixo, sugestoesDoEixo]) => (
+                  <article
+                    key={`eixo-${normalizarTexto(eixo)}`}
+                    className="meta-card metas-sugestao-card"
+                  >
+                    <p>
+                      <strong>Eixo temático:</strong> {eixo}
+                    </p>
+
+                    <p className="muted metas-sugestao-evidencias">
+                      Evidências da sondagem:{" "}
+                      {(sugestoesDoEixo[0]?.evidencias || [])
+                        .map((evidencia) => `${evidencia.campo} (${evidencia.resultado || "-"})`)
+                        .join("; ")}
+                    </p>
+
+                    <div className="metas-sugestao-lista">
+                      {sugestoesDoEixo.map((item) => (
+                        <label
+                          key={item.id}
+                          className="checkbox-item metas-sugestao-checkbox"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={idsSugestoesSelecionadas.includes(item.id)}
+                            onChange={() => handleAlternarSugestao(item.id)}
+                          />
+                          <span>{item.descricao}</span>
+                        </label>
+                      ))}
+                    </div>
+
+                    <label htmlFor={`outras-${normalizarTexto(eixo)}`}>
+                      Outras habilidades para este eixo
+                    </label>
+                    <textarea
+                      id={`outras-${normalizarTexto(eixo)}`}
+                      rows={3}
+                      placeholder="Digite outras habilidades (uma por linha)."
+                      value={outrasHabilidadesPorEixo[eixo] || ""}
+                      onChange={(event) =>
+                        setOutrasHabilidadesPorEixo((prev) => ({
+                          ...prev,
+                          [eixo]: event.target.value,
+                        }))
+                      }
+                    />
+                  </article>
+                ))}
+              </div>
+
+              <div className="form-actions metas-sugestoes-actions">
+                <button type="button" onClick={handleSalvarSugestoes} disabled={salvandoSugestoes}>
+                  {salvandoSugestoes
+                    ? "Salvando sugestões..."
+                    : "Salvar habilidades selecionadas"}
+                </button>
+              </div>
+            </section>
+          ) : null}
+
+          {duplicadasGeradas.length ? (
+            <section className="form-section metas-duplicadas-section">
+              <h3>Habilidades já existentes no bimestre</h3>
+              <div className="metas-duplicadas-lista">
+                {duplicadasGeradas.map((item) => (
+                  <p key={`duplicada-${item.id}`} className="muted">
+                    {item.titulo}
+                  </p>
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </section>
+      ) : null}
     </main>
   );
 }
