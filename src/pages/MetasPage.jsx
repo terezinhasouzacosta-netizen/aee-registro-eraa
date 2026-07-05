@@ -11,6 +11,7 @@ import {
 import { listarSondagens } from "../services/sondagensService";
 import {
   gerarSugestoesHabilidadesDaSondagem,
+  normalizarTituloMetaParaComparacao,
   obterNumeroBimestre,
   selecionarSondagemMaisRecentePorBimestre,
 } from "../utils/sondagemParaHabilidades";
@@ -50,7 +51,7 @@ function chaveMeta(meta) {
   return [
     normalizarTexto(meta?.alunoId),
     normalizarTexto(meta?.bimestre),
-    normalizarTexto(meta?.titulo),
+    normalizarTituloMetaParaComparacao(meta?.titulo),
     normalizarTexto(meta?.descricao),
   ].join("|");
 }

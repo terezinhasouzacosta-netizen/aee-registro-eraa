@@ -1,32 +1,129 @@
-﻿const CAMPOS_PARA_EIXO = [
-  { campo: "leitura", eixo: "Leitura e escrita", rotulo: "Leitura" },
-  { campo: "escrita", eixo: "Leitura e escrita", rotulo: "Escrita" },
+const EIXOS_PERSISTIDOS = [
   {
     campo: "comunicacao",
-    eixo: "Comunica\u00E7\u00E3o oral",
-    rotulo: "Comunica\u00E7\u00E3o",
-  },
-  { campo: "matematica", eixo: "Matem\u00E1tica funcional", rotulo: "Matem\u00E1tica" },
-  {
-    campo: "atencaoConcentracao",
-    eixo: "Aten\u00E7\u00E3o e concentra\u00E7\u00E3o",
-    rotulo: "Aten\u00E7\u00E3o e concentra\u00E7\u00E3o",
+    eixo: "Comunicação e Linguagem",
+    rotulo: "Comunicação e Linguagem",
+    grupoDuplicidade: "comunicacao-e-linguagem",
+    aliasesDuplicidade: ["Comunicação oral"],
+    descricaoBase:
+      "Ampliar a comunicação funcional do estudante com mediação intencional, apoio visual e oportunidades estruturadas de expressão, compreensão e participação nas interações escolares.",
+    sugestoes: [
+      "Compreender instruções simples e progressivamente mais complexas com apoio verbal, visual e mediação do professor.",
+      "Expressar desejos, necessidades e ideias em situações escolares por meio da linguagem oral, gestual ou comunicação alternativa, quando necessário.",
+      "Participar de diálogos e responder perguntas com ampliação gradual da autonomia comunicativa em diferentes contextos pedagógicos.",
+    ],
   },
   {
     campo: "interacaoSocial",
-    eixo: "Intera\u00E7\u00E3o social",
-    rotulo: "Intera\u00E7\u00E3o social",
+    eixo: "Interação Social",
+    rotulo: "Interação Social",
+    grupoDuplicidade: "interacao-social",
+    aliasesDuplicidade: ["Interação social"],
+    descricaoBase:
+      "Promover interação social com mediação progressiva, combinados de convivência e situações colaborativas que favoreçam participação, solicitação de ajuda e comunicação respeitosa.",
+    sugestoes: [
+      "Interagir com colegas e adultos em atividades mediadas, respeitando turnos, combinados e situações de cooperação.",
+      "Participar de propostas em dupla ou grupo com apoio para compartilhamento de materiais, solicitação de ajuda e manutenção da convivência.",
+      "Desenvolver repertório de interação social funcional em diferentes momentos da rotina escolar com mediação gradual.",
+    ],
   },
-  { campo: "autonomia", eixo: "Autonomia nas atividades", rotulo: "Autonomia" },
   {
     campo: "comportamento",
-    eixo: "Comportamento e autorregula\u00E7\u00E3o",
-    rotulo: "Comportamento",
+    eixo: "Convivência e Autorregulação",
+    rotulo: "Convivência e Autorregulação",
+    grupoDuplicidade: "convivencia-autorregulacao",
+    aliasesDuplicidade: ["Comportamento e autorregulação"],
+    descricaoBase:
+      "Desenvolver autorregulação e convivência escolar com rotina estruturada, antecipação de situações, combinados claros e estratégias graduais para lidar com frustrações e permanecer nas atividades.",
+    sugestoes: [
+      "Lidar com mudanças de rotina, frustrações e orientações do adulto por meio de estratégias de autorregulação e mediação pedagógica.",
+      "Permanecer nas atividades propostas com apoio gradual para controle de impulsos, organização do comportamento e aceitação de combinados.",
+      "Utilizar estratégias de regulação emocional para retomar a participação em situações desafiadoras da rotina escolar.",
+    ],
+  },
+  {
+    campo: "autonomia",
+    eixo: "Alimentação, Higiene e Autonomia Pessoal",
+    rotulo: "Alimentação, Higiene e Autonomia Pessoal",
+    grupoDuplicidade: "alimentacao-higiene-autonomia-pessoal",
+    aliasesDuplicidade: ["Autonomia nas atividades", "Autonomia"],
+    descricaoBase:
+      "Estimular autonomia pessoal nas rotinas de alimentação, higiene e autocuidado com apoio graduado, pistas visuais e retirada progressiva de ajuda conforme o perfil do estudante.",
+    sugestoes: [
+      "Realizar rotinas de alimentação, higiene e autocuidado com ampliação gradual da autonomia e redução progressiva de ajuda.",
+      "Organizar pertences pessoais e utilizar materiais de cuidado diário com apoio visual, mediação e reforço positivo.",
+      "Solicitar ajuda de forma funcional e participar das rotinas de autonomia pessoal conforme sua faixa etária e necessidades educacionais.",
+    ],
   },
   {
     campo: "coordenacaoMotora",
-    eixo: "Coordena\u00E7\u00E3o motora",
-    rotulo: "Coordena\u00E7\u00E3o motora",
+    eixo: "Coordenação Motora",
+    rotulo: "Coordenação Motora",
+    grupoDuplicidade: "coordenacao-motora",
+    aliasesDuplicidade: ["Coordenação motora"],
+    descricaoBase:
+      "Estimular coordenação motora fina e ampla em atividades escolares e funcionais, com propostas graduadas que favoreçam organização corporal, equilíbrio e manipulação de materiais.",
+    sugestoes: [
+      "Desenvolver preensão, traçado, recorte e manipulação de materiais pequenos com apoio gradual e estratégias psicomotoras.",
+      "Participar de atividades de coordenação motora ampla com foco em equilíbrio, deslocamento orientado e organização corporal.",
+      "Aprimorar a coordenação motora para favorecer participação em tarefas de escrita, pintura, colagem e demais atividades escolares.",
+    ],
+  },
+  {
+    campo: "leitura",
+    eixo: "Leitura",
+    rotulo: "Leitura",
+    grupoDuplicidade: "leitura-escrita",
+    aliasesDuplicidade: ["Leitura e escrita"],
+    descricaoBase:
+      "Ampliar competências de leitura com mediação pedagógica, apoio visual, atividades graduadas de reconhecimento e compreensão e oportunidades de uso funcional da leitura.",
+    sugestoes: [
+      "Reconhecer letras, palavras e referências visuais do cotidiano escolar com apoio visual e mediação gradual.",
+      "Realizar leitura mediada de sílabas, palavras, frases e pequenos textos com estratégias de compreensão e repetição guiada.",
+      "Localizar informações em textos, imagens e enunciados curtos com apoio de perguntas objetivas e pistas graduais.",
+    ],
+  },
+  {
+    campo: "escrita",
+    eixo: "Escrita",
+    rotulo: "Escrita",
+    grupoDuplicidade: "leitura-escrita",
+    aliasesDuplicidade: ["Leitura e escrita"],
+    descricaoBase:
+      "Desenvolver produção escrita com apoio visual, modelagem, segmentação de etapas e ampliação gradual da autonomia no registro de palavras, frases e ideias.",
+    sugestoes: [
+      "Escrever o próprio nome, letras, palavras e frases com apoio visual, modelagem e organização por etapas.",
+      "Produzir registros escritos com banco de palavras, pistas graduais e mediação pedagógica conforme a necessidade do estudante.",
+      "Organizar ideias por escrito, utilizando recursos de apoio para espaçamento, legibilidade e ampliação progressiva da autonomia.",
+    ],
+  },
+  {
+    campo: "atencaoConcentracao",
+    eixo: "Atenção e Funções Executivas",
+    rotulo: "Atenção e Funções Executivas",
+    grupoDuplicidade: "atencao-funcoes-executivas",
+    aliasesDuplicidade: ["Atenção e concentração"],
+    descricaoBase:
+      "Fortalecer atenção, permanência, organização e autorregulação nas tarefas escolares com rotina estruturada, metas curtas, apoio visual e estratégias de retomada do foco.",
+    sugestoes: [
+      "Manter atenção em atividades curtas e progressivamente mais longas com apoio visual, previsibilidade e mediação do professor.",
+      "Iniciar, organizar e concluir tarefas com estratégias de sequenciamento, redirecionamento gradual e acompanhamento da rotina.",
+      "Desenvolver foco atencional, retomada após interrupções e conferência da atividade com apoio estruturado e retirada progressiva de ajuda.",
+    ],
+  },
+  {
+    campo: "matematica",
+    eixo: "Raciocínio Lógico-Matemático",
+    rotulo: "Raciocínio Lógico-Matemático",
+    grupoDuplicidade: "raciocinio-logico-matematico",
+    aliasesDuplicidade: ["Matemática funcional"],
+    descricaoBase:
+      "Consolidar noções lógico-matemáticas com atividades contextualizadas, uso de material concreto e mediação pedagógica para ampliar compreensão, aplicação funcional e resolução de problemas.",
+    sugestoes: [
+      "Reconhecer números, quantidades, sequências e relações lógico-matemáticas com apoio concreto e visual.",
+      "Resolver situações-problema simples utilizando estratégias guiadas, material manipulável e linguagem matemática funcional.",
+      "Desenvolver noções de cálculo, tempo, medidas e uso funcional de valores em atividades contextualizadas do cotidiano escolar.",
+    ],
   },
 ];
 
@@ -35,73 +132,14 @@ const RESULTADOS_INTERVENCAO = new Set([
   "realiza com muito apoio",
   "realiza com apoio",
   "realiza parcialmente",
+]);
+
+const RESULTADOS_INTERVENCAO_LEGADOS = new Set([
   "alta dependencia",
   "compreendeu com muita ajuda",
   "manteve-se com apoio constante",
   "respondeu parcialmente",
 ]);
-
-const DESCRICAO_BASE_POR_EIXO = {
-  "Leitura e escrita":
-    "Desenvolver estrat\u00E9gias de leitura mediada e produ\u00E7\u00E3o escrita com apoio visual, segmenta\u00E7\u00E3o de tarefas e amplia\u00E7\u00E3o gradual da autonomia na compreens\u00E3o e registro de ideias.",
-  "Comunica\u00E7\u00E3o oral":
-    "Ampliar a comunica\u00E7\u00E3o oral por meio de media\u00E7\u00E3o intencional, modelagem de fala funcional, uso de pistas verbais e incentivo \u00E0 participa\u00E7\u00E3o em intera\u00E7\u00F5es com colegas e adultos.",
-  "Matem\u00E1tica funcional":
-    "Consolidar no\u00E7\u00F5es matem\u00E1ticas funcionais com atividades contextualizadas, uso de material concreto, resolu\u00E7\u00E3o guiada de situa\u00E7\u00F5es-problema e refor\u00E7o da linguagem matem\u00E1tica cotidiana.",
-  "Aten\u00E7\u00E3o e concentra\u00E7\u00E3o":
-    "Fortalecer aten\u00E7\u00E3o e perman\u00EAncia em atividade com rotina estruturada, metas curtas, apoio visual e estrat\u00E9gias de autorregula\u00E7\u00E3o para manuten\u00E7\u00E3o do foco nas propostas pedag\u00F3gicas.",
-  "Intera\u00E7\u00E3o social":
-    "Promover intera\u00E7\u00E3o social com media\u00E7\u00E3o progressiva, combinados de conviv\u00EAncia, atividades colaborativas e est\u00EDmulo \u00E0 comunica\u00E7\u00E3o respeitosa em diferentes situa\u00E7\u00F5es escolares.",
-  "Autonomia nas atividades":
-    "Estimular autonomia nas atividades com decomposi\u00E7\u00E3o de tarefas, pistas graduais, refor\u00E7o positivo e retirada progressiva de ajuda para favorecer iniciativa e autorregula\u00E7\u00E3o.",
-  "Comportamento e autorregula\u00E7\u00E3o":
-    "Desenvolver autorregula\u00E7\u00E3o comportamental com combinados claros, antecipa\u00E7\u00E3o de rotina, estrat\u00E9gias de autocontrole e acompanhamento cont\u00EDnuo das respostas emocionais em sala.",
-  "Coordena\u00E7\u00E3o motora":
-    "Estimular coordena\u00E7\u00E3o motora fina e ampla com atividades graduadas, materiais manipul\u00E1veis e propostas psicomotoras que favore\u00E7am organiza\u00E7\u00E3o corporal e funcionalidade nas tarefas escolares.",
-};
-
-const SUGESTOES_POR_EIXO = {
-  "Leitura e escrita": [
-    "Realizar leitura mediada de palavras e frases com apoio visual e repetição guiada.",
-    "Produzir pequenos registros escritos com banco de palavras e estruturação por etapas.",
-    "Trabalhar compreensão de enunciados curtos com perguntas objetivas e pistas graduais.",
-  ],
-  "Comunica\u00E7\u00E3o oral": [
-    "Estimular oralidade funcional em rodas de conversa com mediação e turnos de fala.",
-    "Ampliar repertório verbal com nomeação de objetos, ações e situações cotidianas.",
-    "Promover participação oral em atividades coletivas com apoio de perguntas direcionadas.",
-  ],
-  "Matem\u00E1tica funcional": [
-    "Resolver situações-problema simples com material concreto e apoio visual.",
-    "Trabalhar noções de quantidade, comparação e sequência com atividades contextualizadas.",
-    "Reforçar operações básicas com estratégias passo a passo e mediação individual.",
-  ],
-  "Aten\u00E7\u00E3o e concentra\u00E7\u00E3o": [
-    "Organizar rotina de tarefas curtas com pausas planejadas e objetivos claros.",
-    "Utilizar recursos visuais de foco (checklist e sequência) para manter permanência na atividade.",
-    "Aplicar estratégias de autorregulação para retomar a atenção durante propostas pedagógicas.",
-  ],
-  "Intera\u00E7\u00E3o social": [
-    "Promover interação em duplas com combinados de convivência e papéis definidos.",
-    "Estimular participação em atividades colaborativas com mediação de conflitos.",
-    "Ampliar comunicação respeitosa em contextos de sala por meio de modelagem social.",
-  ],
-  "Autonomia nas atividades": [
-    "Desenvolver execução de tarefas com retirada progressiva de ajuda.",
-    "Estimular iniciativa em atividades escolares com pistas graduais e reforço positivo.",
-    "Trabalhar organização de materiais e etapas da tarefa com apoio visual.",
-  ],
-  "Comportamento e autorregula\u00E7\u00E3o": [
-    "Aplicar combinados claros de convivência com monitoramento contínuo.",
-    "Utilizar estratégias de regulação emocional em situações de frustração.",
-    "Antecipar rotina e transições para reduzir comportamentos de evasão da tarefa.",
-  ],
-  "Coordena\u00E7\u00E3o motora": [
-    "Desenvolver coordenação motora fina com recorte, traçado e atividades de preensão.",
-    "Estimular coordenação motora ampla com circuitos e movimentos orientados.",
-    "Trabalhar organização motora para apoio às tarefas de escrita e manipulação de materiais.",
-  ],
-};
 
 function normalizarTexto(valor) {
   return String(valor || "")
@@ -117,8 +155,8 @@ function resultadoIndicaIntervencao(valor) {
   if (!texto) return false;
 
   if (RESULTADOS_INTERVENCAO.has(texto)) return true;
+  if (RESULTADOS_INTERVENCAO_LEGADOS.has(texto)) return true;
 
-  // Cobertura para variações legadas de preenchimento sem quebrar o fluxo atual.
   return (
     texto.includes("nao realiza") ||
     texto.includes("realiza com muito apoio") ||
@@ -163,8 +201,20 @@ function extrairNumeroBimestre(valor) {
   return match ? match[1] : null;
 }
 
+const MAPA_EQUIVALENCIA_EIXOS = EIXOS_PERSISTIDOS.reduce((acc, item) => {
+  [item.eixo, ...(item.aliasesDuplicidade || [])].forEach((titulo) => {
+    acc[normalizarTexto(titulo)] = item.grupoDuplicidade;
+  });
+  return acc;
+}, {});
+
 export function obterNumeroBimestre(valor) {
   return extrairNumeroBimestre(valor);
+}
+
+export function normalizarTituloMetaParaComparacao(titulo) {
+  const texto = normalizarTexto(titulo);
+  return MAPA_EQUIVALENCIA_EIXOS[texto] || texto;
 }
 
 export function selecionarSondagemMaisRecentePorBimestre(sondagens = [], bimestre) {
@@ -179,37 +229,28 @@ export function selecionarSondagemMaisRecentePorBimestre(sondagens = [], bimestr
     return bimestreDaSondagem === numeroBimestre;
   });
 
-  // Fallback para não bloquear geração quando há sondagem, mas o bimestre não está normalizado.
   return porBimestre || ordenadas[0] || null;
 }
 
 export function gerarSugestoesHabilidadesDaSondagem(sondagem) {
   if (!sondagem) return [];
 
-  const mapaEixos = new Map();
-
-  CAMPOS_PARA_EIXO.forEach(({ campo, eixo, rotulo }) => {
-    if (!resultadoIndicaIntervencao(sondagem[campo])) return;
-
-    const existente = mapaEixos.get(eixo) || [];
-    existente.push({ campo: rotulo, resultado: sondagem[campo] });
-    mapaEixos.set(eixo, existente);
-  });
-
-  return Array.from(mapaEixos.entries()).map(([eixo, evidencias]) => ({
-    eixo,
-    descricao:
-      DESCRICAO_BASE_POR_EIXO[eixo] ||
-      "Planejar interven\u00E7\u00F5es pedag\u00F3gicas estruturadas e graduais para ampliar participa\u00E7\u00E3o, aprendizagem e autonomia do estudante no eixo identificado.",
-    sugestoes:
-      SUGESTOES_POR_EIXO[eixo] && SUGESTOES_POR_EIXO[eixo].length
-        ? SUGESTOES_POR_EIXO[eixo]
-        : [
-            DESCRICAO_BASE_POR_EIXO[eixo] ||
-              "Planejar interven\u00E7\u00F5es pedag\u00F3gicas estruturadas e graduais para ampliar participa\u00E7\u00E3o, aprendizagem e autonomia do estudante no eixo identificado.",
-          ],
-    evidencias,
-  }));
+  return EIXOS_PERSISTIDOS.filter(({ campo }) => resultadoIndicaIntervencao(sondagem[campo])).map(
+    ({ campo, eixo, rotulo, descricaoBase, sugestoes }) => ({
+      eixo,
+      descricao:
+        descricaoBase ||
+        "Planejar intervenções pedagógicas estruturadas e graduais para ampliar participação, aprendizagem e autonomia do estudante no eixo identificado.",
+      sugestoes:
+        Array.isArray(sugestoes) && sugestoes.length
+          ? sugestoes
+          : [
+              descricaoBase ||
+                "Planejar intervenções pedagógicas estruturadas e graduais para ampliar participação, aprendizagem e autonomia do estudante no eixo identificado.",
+            ],
+      evidencias: [{ campo: rotulo, resultado: sondagem[campo] }],
+    })
+  );
 }
 
 export function diagnosticarGeracaoHabilidadesDaSondagem(sondagem) {
@@ -219,7 +260,7 @@ export function diagnosticarGeracaoHabilidadesDaSondagem(sondagem) {
     camposSemIntervencao: [],
   };
 
-  CAMPOS_PARA_EIXO.forEach(({ campo, rotulo }) => {
+  EIXOS_PERSISTIDOS.forEach(({ campo, rotulo }) => {
     const valorOriginal = String(sondagem?.[campo] || "").trim();
     if (!valorOriginal) return;
 
