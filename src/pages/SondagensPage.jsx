@@ -818,10 +818,10 @@ function SondagensPage() {
                       {bloco.campoSintese
                         ? renderSelectAvaliacao(
                             bloco.campoSintese,
-                            "Registro síntese do eixo (salvo no modelo atual)",
+                            "Síntese geral do eixo",
                             {
                               helperText:
-                                "Este campo preserva a estrutura de salvamento já utilizada pela plataforma.",
+                                "Após responder as perguntas deste eixo, selecione a opção que melhor resume o desempenho geral do estudante. Este campo será usado para salvar o resumo da sondagem e apoiar a geração de habilidades.",
                             }
                           )
                         : (
