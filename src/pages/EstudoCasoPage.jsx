@@ -742,14 +742,17 @@ function EstudoCasoPage() {
 
                 {aberto && bloco.tipo !== "identificacao" && (
                   <div className="estudo-caso-question-list">
-                    {bloco.perguntas.map((pergunta) => {
+                    {bloco.perguntas.map((pergunta, indicePergunta) => {
                       const chave = `${bloco.id}-${pergunta.id}`;
                       const registro = perguntasEstado[chave];
+                      const numeracaoPergunta = `${indiceBloco + 1}.${indicePergunta + 1}`;
 
                       return (
                         <article key={chave} className="estudo-caso-question-card">
                           <div className="estudo-caso-question-top">
-                            <p className="estudo-caso-question-text">{pergunta.enunciado}</p>
+                            <p className="estudo-caso-question-text">
+                              {numeracaoPergunta} {pergunta.enunciado}
+                            </p>
                             <span className={`estudo-caso-status-chip is-${registro.status}`}>
                               {
                                 STATUS_PERGUNTA_OPTIONS.find((status) => status.value === registro.status)
@@ -785,7 +788,7 @@ function EstudoCasoPage() {
                                 <textarea
                                   id={`${chave}-resposta`}
                                   rows={4}
-                                  placeholder="Digite a resposta desta pergunta."
+                                  placeholder="Registre aqui as informações observadas ou relatadas sobre esta pergunta."
                                   value={registro.resposta}
                                   onChange={(event) =>
                                     atualizarPergunta(
