@@ -978,10 +978,9 @@ textarea:focus {
 }
 
 .metas-page .metas-sugestao-checkbox {
-  display: grid;
-  grid-template-columns: 16px minmax(0, 1fr);
-  align-items: start;
-  column-gap: 0.52rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
   padding: 0.72rem 0.78rem;
   border: 1px solid #dbe5f0;
   border-radius: 12px;
@@ -991,17 +990,17 @@ textarea:focus {
 .metas-page .metas-sugestao-checkbox input {
   width: 16px;
   height: 16px;
-  margin: 0.12rem 0 0;
+  margin: 0.2rem 0 0;
   flex-shrink: 0;
-  align-self: start;
 }
 
 .metas-page .metas-sugestao-checkbox span {
   display: block;
+  flex: 1 1 auto;
   min-width: 0;
   line-height: 1.48;
   color: #1f2937;
-  transform: translateY(1px);
+  overflow-wrap: break-word;
 }
 
 .metas-page .metas-sugestao-card > label[for^="outras-"] {
@@ -2907,8 +2906,7 @@ textarea:focus {
 
   .metas-page .metas-sugestao-checkbox {
     padding: 0.68rem 0.72rem;
-    column-gap: 0.52rem;
-    grid-template-columns: 16px minmax(0, 1fr);
+    gap: 0.56rem;
   }
 
   .metas-page .metas-sugestao-card textarea {
