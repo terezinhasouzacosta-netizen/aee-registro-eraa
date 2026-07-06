@@ -1,6 +1,13 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  atualizarEstudoCaso,
+  buscarEstudoCasoPorId,
+  criarEstudoCaso,
+} from "../services/estudosCasoService";
 import { useAuth } from "../hooks/useAuth";
 import { podeVisualizarSondagens } from "../utils/permissions";
+
+const ESTUDO_CASO_RASCUNHO_ID_KEY = "estudoCasoRascunhoId";
 
 const STATUS_ESTUDO_OPTIONS = [
   { value: "em-andamento", label: "Em andamento" },
@@ -445,6 +452,98 @@ function obterResumoBloco(bloco, perguntasEstado, identificacaoEstudante) {
   return contarPorStatus(obterRegistrosBloco(bloco, perguntasEstado, identificacaoEstudante));
 }
 
+function obterResumoGeral(perguntasEstado, identificacaoEstudante) {
+  const registros = BLOCOS_ESTUDO_CASO.flatMap((bloco) =>
+    obterRegistrosBloco(bloco, perguntasEstado, identificacaoEstudante),
+  );
+
+  return contarPorStatus(registros);
+}
+
+function limparTexto(valor) {
+  return String(valor || "").trim();
+}
+
+function normalizarIdentificacaoEstudante(identificacaoEstudante = {}) {
+  return IDENTIFICACAO_FIELDS.reduce((acc, campo) => {
+    acc[campo.id] = limparTexto(identificacaoEstudante[campo.id]);
+    return acc;
+  }, {});
+}
+
+function montarPerguntasEstadoPersistido(perguntasEstado = {}) {
+  const perguntasPersistidas = {};
+
+  BLOCOS_ESTUDO_CASO.forEach((bloco, indiceBloco) => {
+    if (bloco.tipo === "identificacao") {
+      return;
+    }
+
+    bloco.perguntas.forEach((pergunta, indicePergunta) => {
+      const chave = `${bloco.id}-${pergunta.id}`;
+      const registro = perguntasEstado[chave] || {};
+
+      perguntasPersistidas[chave] = {
+        blocoId: bloco.id,
+        blocoTitulo: bloco.titulo,
+        blocoNumero: indiceBloco + 1,
+        perguntaId: pergunta.id,
+        numeroPergunta: `${indiceBloco + 1}.${indicePergunta + 1}`,
+        enunciado: pergunta.enunciado,
+        resposta: limparTexto(registro.resposta),
+        fonte: limparTexto(registro.fonte),
+        status: registro.status || "pendente",
+      };
+    });
+  });
+
+  return perguntasPersistidas;
+}
+
+function montarObservacoesObjetivasPersistidas(observacoesObjetivas = {}) {
+  return Object.fromEntries(
+    Object.entries(observacoesObjetivas).map(([blocoId, valor]) => [
+      blocoId,
+      limparTexto(valor),
+    ]),
+  );
+}
+
+function criarEstadoInicialBlocosAbertos() {
+  return Object.fromEntries(BLOCOS_ESTUDO_CASO.map((bloco) => [bloco.id, true]));
+}
+
+function salvarRascunhoIdLocal(estudoCasoId) {
+  if (!estudoCasoId || typeof window === "undefined") return;
+
+  try {
+    window.localStorage.setItem(ESTUDO_CASO_RASCUNHO_ID_KEY, estudoCasoId);
+  } catch (error) {
+    console.warn("[EstudoCasoPage] Não foi possível salvar o rascunho no localStorage.", error);
+  }
+}
+
+function obterRascunhoIdLocal() {
+  if (typeof window === "undefined") return "";
+
+  try {
+    return window.localStorage.getItem(ESTUDO_CASO_RASCUNHO_ID_KEY) || "";
+  } catch (error) {
+    console.warn("[EstudoCasoPage] Não foi possível ler o rascunho do localStorage.", error);
+    return "";
+  }
+}
+
+function removerRascunhoIdLocal() {
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.removeItem(ESTUDO_CASO_RASCUNHO_ID_KEY);
+  } catch (error) {
+    console.warn("[EstudoCasoPage] Não foi possível remover o rascunho do localStorage.", error);
+  }
+}
+
 function EstudoCasoPage() {
   const { perfil } = useAuth();
   const podeLer = podeVisualizarSondagens(perfil);
@@ -452,20 +551,73 @@ function EstudoCasoPage() {
   const [identificacaoEstudante, setIdentificacaoEstudante] = useState(IDENTIFICACAO_INICIAL);
   const [formaPreenchimento] = useState("manual");
   const [perguntasEstado, setPerguntasEstado] = useState(() => criarEstadoInicialPerguntas());
+  const [estudoCasoSalvoId, setEstudoCasoSalvoId] = useState("");
   const [observacoesObjetivas, setObservacoesObjetivas] = useState(() =>
     criarEstadoObservacoesObjetivas(),
   );
-  const [blocosAbertos, setBlocosAbertos] = useState(() =>
-    Object.fromEntries(BLOCOS_ESTUDO_CASO.map((bloco) => [bloco.id, true])),
-  );
+  const [blocosAbertos, setBlocosAbertos] = useState(criarEstadoInicialBlocosAbertos);
+  const [salvandoRascunho, setSalvandoRascunho] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [aviso, setAviso] = useState("");
+  const [erro, setErro] = useState("");
 
   const resumoGeral = useMemo(() => {
-    const registros = BLOCOS_ESTUDO_CASO.flatMap((bloco) =>
-      obterRegistrosBloco(bloco, perguntasEstado, identificacaoEstudante),
-    );
-
-    return contarPorStatus(registros);
+    return obterResumoGeral(perguntasEstado, identificacaoEstudante);
   }, [identificacaoEstudante, perguntasEstado]);
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarRascunhoAnterior() {
+      const rascunhoId = obterRascunhoIdLocal();
+      if (!rascunhoId) return;
+
+      try {
+        const estudoSalvo = await buscarEstudoCasoPorId(rascunhoId);
+
+        if (!ativo) return;
+
+        if (!estudoSalvo) {
+          removerRascunhoIdLocal();
+          setEstudoCasoSalvoId("");
+          setAviso("Rascunho anterior nÃ£o foi encontrado. Inicie um novo estudo.");
+          return;
+        }
+
+        setMetaEstudo({
+          tituloEstudo: estudoSalvo.tituloEstudo || "",
+          dataInicio: estudoSalvo.dataInicio || "",
+          periodo: estudoSalvo.periodo || "",
+          responsavel: estudoSalvo.responsavel || "",
+          status: estudoSalvo.statusGeral || META_ESTUDO_INICIAL.status,
+        });
+        setIdentificacaoEstudante({
+          ...IDENTIFICACAO_INICIAL,
+          ...(estudoSalvo.identificacaoEstudante || {}),
+        });
+        setPerguntasEstado({
+          ...criarEstadoInicialPerguntas(),
+          ...(estudoSalvo.perguntasEstado || {}),
+        });
+        setObservacoesObjetivas({
+          ...criarEstadoObservacoesObjetivas(),
+          ...(estudoSalvo.observacoesObjetivas || {}),
+        });
+        setBlocosAbertos(criarEstadoInicialBlocosAbertos());
+        setEstudoCasoSalvoId(estudoSalvo.id || rascunhoId);
+        setAviso("Rascunho anterior carregado.");
+      } catch (error) {
+        if (!ativo) return;
+        console.error("[EstudoCasoPage] Erro ao carregar rascunho anterior", error);
+      }
+    }
+
+    carregarRascunhoAnterior();
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   if (!podeLer) {
     return (
@@ -518,6 +670,59 @@ function EstudoCasoPage() {
     }));
   };
 
+  const handleSalvarRascunho = async () => {
+    const resumoAtualizado = obterResumoGeral(perguntasEstado, identificacaoEstudante);
+    const payload = {
+      alunoId: null,
+      alunoNome: limparTexto(identificacaoEstudante.aluno),
+      tituloEstudo: limparTexto(metaEstudo.tituloEstudo),
+      dataInicio: metaEstudo.dataInicio || "",
+      periodo: limparTexto(metaEstudo.periodo),
+      responsavel: limparTexto(metaEstudo.responsavel),
+      statusGeral: metaEstudo.status,
+      identificacaoEstudante: normalizarIdentificacaoEstudante(identificacaoEstudante),
+      perguntasEstado: montarPerguntasEstadoPersistido(perguntasEstado),
+      observacoesObjetivas: montarObservacoesObjetivasPersistidas(observacoesObjetivas),
+      resumo: resumoAtualizado,
+    };
+
+    setSalvandoRascunho(true);
+    setErro("");
+    setFeedback("");
+    setAviso("");
+
+    try {
+      if (estudoCasoSalvoId) {
+        await atualizarEstudoCaso(estudoCasoSalvoId, payload);
+        salvarRascunhoIdLocal(estudoCasoSalvoId);
+      } else {
+        const novoEstudoCasoId = await criarEstudoCaso(payload);
+        setEstudoCasoSalvoId(novoEstudoCasoId);
+        salvarRascunhoIdLocal(novoEstudoCasoId);
+      }
+
+      setFeedback("Rascunho do Estudo de Caso salvo com sucesso.");
+    } catch (error) {
+      console.error("[EstudoCasoPage] Erro ao salvar rascunho", error);
+      setErro("Não foi possível salvar o rascunho. Tente novamente.");
+    } finally {
+      setSalvandoRascunho(false);
+    }
+  };
+
+  const handleNovoEstudo = () => {
+    setMetaEstudo({ ...META_ESTUDO_INICIAL });
+    setIdentificacaoEstudante({ ...IDENTIFICACAO_INICIAL });
+    setPerguntasEstado(criarEstadoInicialPerguntas());
+    setObservacoesObjetivas(criarEstadoObservacoesObjetivas());
+    setBlocosAbertos(criarEstadoInicialBlocosAbertos());
+    setEstudoCasoSalvoId("");
+    removerRascunhoIdLocal();
+    setErro("");
+    setAviso("");
+    setFeedback("Novo rascunho iniciado nesta tela. O rascunho anterior nÃ£o foi excluÃ­do.");
+  };
+
   const cardsResumo = [
     { chave: "respondida", rotulo: "Respondidas", valor: resumoGeral.respondida },
     { chave: "pendente", rotulo: "Pendentes", valor: resumoGeral.pendente },
@@ -535,15 +740,20 @@ function EstudoCasoPage() {
           preenchimento guiado e geração do relatório do Estudo de Caso.
         </p>
         <p className="muted">
-          Nesta etapa ainda não há salvamento no banco, nem integração com outros módulos da
-          plataforma.
+          Nesta etapa o rascunho já pode ser salvo no banco, sem gerar síntese e sem integração
+          com outros módulos da plataforma.
         </p>
       </header>
 
+      {feedback ? <p className="toast-success">{feedback}</p> : null}
+      {aviso ? <p className="muted">{aviso}</p> : null}
+      {erro ? <p className="toast-error">{erro}</p> : null}
+
       <section className="panel estudo-caso-header-panel">
         <div className="estudo-caso-note">
-          Aviso de segurança: esta versão usa apenas estado local para organizar a experiência
-          visual. Nenhuma resposta é persistida e nenhum módulo externo é alterado.
+          Aviso de segurança: esta versão salva apenas o rascunho do Estudo de Caso no Firestore.
+          A tela continua sem síntese automática, sem exportação e sem integração com módulos
+          externos.
         </div>
       </section>
 
@@ -552,7 +762,7 @@ function EstudoCasoPage() {
           <div>
             <h2>Dados iniciais do estudo</h2>
             <p className="muted">
-              Informações gerais do estudo, mantidas apenas localmente nesta etapa visual.
+              Informações gerais do estudo e do rascunho pedagógico desta etapa funcional.
             </p>
           </div>
         </div>
@@ -884,15 +1094,18 @@ function EstudoCasoPage() {
           <div>
             <h2>Próximas ações</h2>
             <p className="muted">
-              Os botões abaixo permanecem apenas como sinalização visual da próxima etapa do
-              módulo.
+              O rascunho já pode ser salvo. As demais ações continuam reservadas para as próximas
+              etapas do módulo.
             </p>
           </div>
         </div>
 
         <div className="form-actions estudo-caso-disabled-actions">
-          <button type="button" disabled title="Recurso futuro">
-            Salvar rascunho
+          <button type="button" onClick={handleSalvarRascunho} disabled={salvandoRascunho}>
+            {salvandoRascunho ? "Salvando rascunho..." : "Salvar rascunho"}
+          </button>
+          <button type="button" className="btn-secondary" onClick={handleNovoEstudo}>
+            Novo estudo
           </button>
           <button type="button" className="btn-secondary" disabled title="Recurso futuro">
             Gerar síntese do Estudo de Caso
@@ -903,8 +1116,8 @@ function EstudoCasoPage() {
         </div>
 
         <p className="estudo-caso-future-note">
-          Recurso futuro: nesta etapa a tela serve apenas para validação visual e preenchimento
-          local guiado, sem salvar no banco.
+          Recurso futuro: gerar síntese do Estudo de Caso e concluir o registro continuam
+          desativados nesta etapa.
         </p>
       </section>
     </main>
