@@ -574,22 +574,208 @@ function removerRascunhoIdLocal() {
   }
 }
 
+const PREVIEW_PREFIXOS_BLOCO = {
+  "escuta-estudante": "Na escuta do estudante",
+  familia: "Nas informações da família/responsáveis",
+  "professor-regente": "Nas informações do professor regente",
+  "barreiras-apoios": "Na análise de barreiras, apoios e acessibilidade",
+  "informacoes-aee": "Nas informações do AEE",
+  "sintese-final": "Na síntese pedagógica final",
+};
+
+const PREVIEW_CONTEXTO_PERGUNTA = {
+  "escuta-estudante:gosta-escola": "o vínculo do estudante com a escola",
+  "escuta-estudante:tem-amigos": "as relações de amizade e convivência do estudante",
+  "escuta-estudante:atividades-preferidas": "as atividades de que o estudante mais gosta",
+  "escuta-estudante:tarefas-dificeis": "as tarefas que o estudante considera mais difíceis",
+  "escuta-estudante:expressa-necessidades":
+    "a forma como o estudante expressa necessidades, desejos e interesses",
+  "escuta-estudante:satisfeito-apoios": "a percepção do estudante sobre os apoios que recebe",
+  "escuta-estudante:gostaria-outros-apoios": "os apoios que o estudante gostaria de receber",
+  "familia:opiniao-familia": "a visão da família sobre a vida escolar do estudante",
+  "familia:participacao-familia":
+    "a participação da família em reuniões e atividades escolares",
+  "familia:habilidades-familia": "as habilidades do estudante percebidas pela família",
+  "familia:necessidades-familia":
+    "as necessidades ou dificuldades percebidas pela família",
+  "familia:expectativas-familia":
+    "as expectativas da família sobre o desenvolvimento e a escolarização",
+  "familia:rotina-casa": "a rotina do estudante em casa",
+  "familia:saude-consideracoes":
+    "as informações de saúde e cuidados que a escola precisa considerar",
+  "professor-regente:participa-turma":
+    "a participação do estudante nas atividades propostas para a turma",
+  "professor-regente:grau-participacao":
+    "o grau de participação do estudante nas atividades da turma",
+  "professor-regente:facilidades": "as atividades realizadas com facilidade",
+  "professor-regente:dificuldades": "as atividades realizadas com dificuldade",
+  "professor-regente:interacao-colegas": "a interação do estudante com os colegas",
+  "professor-regente:reage-comandos":
+    "a reação do estudante a comandos, combinados e mudanças de rotina",
+  "professor-regente:estrategias-funcionaram":
+    "as estratégias que já funcionaram na sala comum",
+  "professor-regente:apoios-sugeridos": "os apoios sugeridos pelo professor regente",
+  "barreiras-apoios:barreiras-ambiente": "as barreiras presentes no ambiente escolar",
+  "barreiras-apoios:barreiras-comunicacao": "as barreiras de comunicação",
+  "barreiras-apoios:barreiras-fisicas": "as barreiras físicas ou de acessibilidade",
+  "barreiras-apoios:barreiras-materiais":
+    "as barreiras relacionadas a materiais, currículo ou avaliações",
+  "barreiras-apoios:barreiras-atitudinais": "as barreiras atitudinais ou sociais",
+  "barreiras-apoios:recursos-acessibilidade":
+    "os recursos de acessibilidade disponíveis na escola",
+  "barreiras-apoios:recursos-necessarios":
+    "os recursos humanos ou materiais ainda necessários",
+  "barreiras-apoios:apoios-revisar":
+    "os apoios que precisam ser mantidos, ampliados ou revistos",
+  "informacoes-aee:potencialidades-aee": "as potencialidades observadas no AEE",
+  "informacoes-aee:interesses-ponto-partida":
+    "os interesses que podem servir de ponto de partida",
+  "informacoes-aee:necessidades-especificas": "as necessidades específicas identificadas",
+  "informacoes-aee:habilidades-consolidadas": "as habilidades já consolidadas",
+  "informacoes-aee:habilidades-desenvolvimento": "as habilidades em desenvolvimento",
+  "informacoes-aee:habilidades-priorizadas":
+    "as habilidades que precisam ser priorizadas",
+  "informacoes-aee:resultado-sondagem": "os resultados apontados pela Sondagem Diagnóstica",
+  "informacoes-aee:estrategias-aee": "as estratégias que devem ser trabalhadas no AEE",
+  "informacoes-aee:orientacoes-regente":
+    "as orientações que devem ser compartilhadas com o professor regente",
+  "sintese-final:potencialidades-principais": "as principais potencialidades do estudante",
+  "sintese-final:barreiras-principais": "as principais barreiras identificadas",
+  "sintese-final:necessidades-prioritarias": "as necessidades prioritárias de apoio",
+  "sintese-final:habilidades-planejamento":
+    "as habilidades que devem orientar o planejamento",
+  "sintese-final:recursos-estrategias": "os recursos e estratégias recomendados",
+  "sintese-final:informacoes-pendentes":
+    "as informações que ainda precisam de aprofundamento",
+  "sintese-final:encaminhamentos-finais": "os encaminhamentos que devem ser realizados",
+  "sintese-final:pronto-para-paee": "a prontidão do estudo para orientar o PAEE",
+};
+
+function removerPontuacaoFinal(texto) {
+  return limparTexto(texto).replace(/[.?!…:]+$/u, "");
+}
+
+function formatarFontePrevia(fonte) {
+  const fonteLimpa = limparTexto(fonte);
+  return fonteLimpa ? ` Fonte da informação: ${fonteLimpa}.` : "";
+}
+
+function obterContextoNarrativoPergunta(registro) {
+  const chave = `${registro?.blocoId || ""}:${registro?.perguntaId || ""}`;
+  const contexto = PREVIEW_CONTEXTO_PERGUNTA[chave];
+
+  if (contexto) {
+    return contexto;
+  }
+
+  return removerPontuacaoFinal(registro?.enunciado || "").toLowerCase() || "o registro informado";
+}
+
 function formatarLinhaPreviaPergunta(registro) {
   const resposta = limparTexto(registro?.resposta);
 
-  if (!resposta || registro?.status === "ignorada") {
+  if (!resposta) {
     return "";
   }
 
-  const conteudo = `${registro.enunciado} ${finalizarFrase(resposta)}`.trim();
-  const fonte = limparTexto(registro.fonte);
-  const sufixoFonte = fonte ? ` Fonte: ${fonte}.` : "";
+  const prefixo = PREVIEW_PREFIXOS_BLOCO[registro?.blocoId] || "No bloco analisado";
+  const contexto = obterContextoNarrativoPergunta(registro);
+  const sufixoFonte = formatarFontePrevia(registro?.fonte);
+  const respostaFinal = finalizarFrase(resposta);
 
-  if (registro.status === "respondida") {
-    return `- ${conteudo}${sufixoFonte}`;
+  if (registro?.status === "revisar") {
+    return `${prefixo}, sobre ${contexto}, foi registrada uma informação para revisão: ${respostaFinal}${sufixoFonte}`;
   }
 
-  return `- Informação registrada para revisão: ${conteudo}${sufixoFonte}`;
+  if (registro?.status === "pendente") {
+    return `${prefixo}, sobre ${contexto}, há um registro parcial: ${respostaFinal}${sufixoFonte}`;
+  }
+
+  if (registro?.status === "ignorada") {
+    return `${prefixo}, sobre ${contexto}, há uma observação marcada como ignorada no preenchimento: ${respostaFinal}${sufixoFonte}`;
+  }
+
+  return `${prefixo}, sobre ${contexto}, foi registrada a seguinte informação: ${respostaFinal}${sufixoFonte}`;
+}
+
+function formatarLinhaObservacaoPedagogica(registro) {
+  const resposta = limparTexto(registro?.resposta);
+
+  if (!resposta) {
+    return "";
+  }
+
+  const rotulo = removerPontuacaoFinal(registro?.enunciado || "Registro objetivo");
+  const sufixoFonte = formatarFontePrevia(registro?.fonte);
+
+  if (registro?.status === "revisar") {
+    return `- ${rotulo}: informação registrada para revisão — ${finalizarFrase(resposta)}${sufixoFonte}`;
+  }
+
+  if (registro?.status === "pendente") {
+    return `- ${rotulo}: registro parcial — ${finalizarFrase(resposta)}${sufixoFonte}`;
+  }
+
+  if (registro?.status === "ignorada") {
+    return `- ${rotulo}: informação ignorada no preenchimento, mas com observação registrada — ${finalizarFrase(
+      resposta,
+    )}${sufixoFonte}`;
+  }
+
+  return `- ${rotulo}: ${finalizarFrase(resposta)}${sufixoFonte}`;
+}
+
+function gerarLinhasApresentacaoGeral(metaEstudo, identificacaoEstudante) {
+  const linhas = [];
+  const aluno = limparTexto(identificacaoEstudante.aluno);
+  const dataNascimento = formatarDataParaTexto(identificacaoEstudante.dataNascimento);
+  const serieAno = limparTexto(identificacaoEstudante.serieAno);
+  const turma = limparTexto(identificacaoEstudante.turma);
+  const turno = limparTexto(identificacaoEstudante.turno);
+  const professorAee = limparTexto(identificacaoEstudante.professorAee);
+  const tituloEstudo = limparTexto(metaEstudo.tituloEstudo);
+  const dataInicio = formatarDataParaTexto(metaEstudo.dataInicio);
+  const periodo = limparTexto(metaEstudo.periodo);
+  const responsavel = limparTexto(metaEstudo.responsavel);
+
+  if (aluno) {
+    linhas.push(`O presente Estudo de Caso refere-se ao estudante ${aluno}.`);
+  }
+
+  const contextoEscolar = [];
+  if (dataNascimento) contextoEscolar.push(`data de nascimento em ${dataNascimento}`);
+  if (serieAno) contextoEscolar.push(`matrícula em ${serieAno}`);
+  if (turma) contextoEscolar.push(`turma ${turma}`);
+  if (turno) contextoEscolar.push(`turno ${turno}`);
+
+  if (contextoEscolar.length) {
+    linhas.push(
+      `Até o momento, constam os seguintes dados gerais do estudante: ${contextoEscolar.join(
+        ", ",
+      )}.`,
+    );
+  }
+
+  if (professorAee) {
+    linhas.push(`O acompanhamento no AEE está registrado com ${professorAee}.`);
+  }
+
+  if (tituloEstudo) {
+    linhas.push(`O estudo foi identificado com o título "${tituloEstudo}".`);
+  }
+
+  if (dataInicio || periodo) {
+    const dadosRegistro = [];
+    if (dataInicio) dadosRegistro.push(`início em ${dataInicio}`);
+    if (periodo) dadosRegistro.push(`referência ao período ${periodo}`);
+    linhas.push(`O registro do estudo apresenta ${dadosRegistro.join(" e ")}.`);
+  }
+
+  if (responsavel) {
+    linhas.push(`O preenchimento está sob responsabilidade de ${responsavel}.`);
+  }
+
+  return linhas;
 }
 
 function obterRegistrosPreviaBloco(perguntasPersistidas, blocoId, opcoes = {}) {
@@ -602,7 +788,7 @@ function obterRegistrosPreviaBloco(perguntasPersistidas, blocoId, opcoes = {}) {
     if (registro.blocoId !== blocoId) return false;
     if (excluirPerguntaIds.has(registro.perguntaId)) return false;
     if (incluirPerguntaIds && !incluirPerguntaIds.has(registro.perguntaId)) return false;
-    return Boolean(limparTexto(registro.resposta)) && registro.status !== "ignorada";
+    return Boolean(limparTexto(registro.resposta));
   });
 }
 
@@ -618,26 +804,37 @@ function gerarTextoPreviaEstudoCaso({
 }) {
   const perguntasPersistidas = montarPerguntasEstadoPersistido(perguntasEstado);
   const registrosIncluidos = Object.values(perguntasPersistidas).filter(
-    (registro) => Boolean(limparTexto(registro.resposta)) && registro.status !== "ignorada",
+    (registro) => Boolean(limparTexto(registro.resposta)),
   );
   const fontesConsideradas = FONTE_INFORMACAO_OPTIONS.filter((fonte) =>
     registrosIncluidos.some((registro) => registro.fonte === fonte),
   );
 
   const linhasIdentificacao = [
-    `- Aluno: ${preencherValorOuPadrao(identificacaoEstudante.aluno)}`,
-    `- Data de nascimento: ${preencherValorOuPadrao(
+    `Aluno: ${preencherValorOuPadrao(identificacaoEstudante.aluno)}`,
+    `Data de nascimento: ${preencherValorOuPadrao(
       formatarDataParaTexto(identificacaoEstudante.dataNascimento),
     )}`,
-    `- Série/Ano: ${preencherValorOuPadrao(identificacaoEstudante.serieAno)}`,
-    `- Turma: ${preencherValorOuPadrao(identificacaoEstudante.turma)}`,
-    `- Turno: ${preencherValorOuPadrao(identificacaoEstudante.turno)}`,
-    `- Professor(a) do AEE: ${preencherValorOuPadrao(identificacaoEstudante.professorAee)}`,
-    `- Título do estudo: ${preencherValorOuPadrao(metaEstudo.tituloEstudo)}`,
-    `- Data de início: ${preencherValorOuPadrao(formatarDataParaTexto(metaEstudo.dataInicio))}`,
-    `- Período: ${preencherValorOuPadrao(metaEstudo.periodo)}`,
-    `- Responsável pelo preenchimento: ${preencherValorOuPadrao(metaEstudo.responsavel)}`,
+    `Série/Ano: ${preencherValorOuPadrao(identificacaoEstudante.serieAno)}`,
+    `Turma: ${preencherValorOuPadrao(identificacaoEstudante.turma)}`,
+    `Turno: ${preencherValorOuPadrao(identificacaoEstudante.turno)}`,
+    `Professor(a) do AEE: ${preencherValorOuPadrao(identificacaoEstudante.professorAee)}`,
+    `Título do estudo: ${preencherValorOuPadrao(metaEstudo.tituloEstudo)}`,
+    `Data de início: ${preencherValorOuPadrao(formatarDataParaTexto(metaEstudo.dataInicio))}`,
+    `Período: ${preencherValorOuPadrao(metaEstudo.periodo)}`,
+    `Responsável pelo preenchimento: ${preencherValorOuPadrao(metaEstudo.responsavel)}`,
   ];
+  const linhasFontes = fontesConsideradas.length
+    ? [
+        `As informações registradas até o momento consideram as seguintes fontes: ${fontesConsideradas.join(
+          ", ",
+        )}.`,
+      ]
+    : ["Não há fontes registradas nas respostas preenchidas até o momento."];
+  const linhasApresentacaoGeral = gerarLinhasApresentacaoGeral(
+    metaEstudo,
+    identificacaoEstudante,
+  );
 
   const linhasEscuta = obterRegistrosPreviaBloco(perguntasPersistidas, "escuta-estudante")
     .map(formatarLinhaPreviaPergunta)
@@ -654,17 +851,26 @@ function gerarTextoPreviaEstudoCaso({
     .map(formatarLinhaPreviaPergunta)
     .filter(Boolean);
 
-  const linhasObservacaoPedagogica = [
-    ...obterRegistrosPreviaBloco(perguntasPersistidas, "observacao-pedagogica")
-      .map(formatarLinhaPreviaPergunta)
-      .filter(Boolean),
-  ];
-
+  const registrosObservacaoPedagogica = obterRegistrosPreviaBloco(
+    perguntasPersistidas,
+    "observacao-pedagogica",
+  )
+    .map(formatarLinhaObservacaoPedagogica)
+    .filter(Boolean);
+  const linhasObservacaoPedagogica = [];
   const observacaoComplementar = limparTexto(observacoesObjetivas["observacao-pedagogica"]);
+
+  if (registrosObservacaoPedagogica.length || observacaoComplementar) {
+    linhasObservacaoPedagogica.push("Na observação pedagógica escolar, foi registrado que:");
+  }
+
+  if (registrosObservacaoPedagogica.length) {
+    linhasObservacaoPedagogica.push(...registrosObservacaoPedagogica);
+  }
 
   if (observacaoComplementar) {
     linhasObservacaoPedagogica.push(
-      `- Observações complementares: ${finalizarFrase(observacaoComplementar)}`,
+      `Observações complementares: ${finalizarFrase(observacaoComplementar)}`,
     );
   }
 
@@ -694,26 +900,25 @@ function gerarTextoPreviaEstudoCaso({
     "1. Identificação do estudante",
     ...linhasIdentificacao,
     "",
-    "2. Fontes de informação consideradas",
-    ...(fontesConsideradas.length
-      ? fontesConsideradas.map((fonte) => `- ${fonte}`)
-      : ["Não há fontes registradas nas respostas preenchidas até o momento."]),
+    montarSecaoPrevia("2. Fontes de informação consideradas", linhasFontes),
     "",
-    montarSecaoPrevia("3. Escuta do estudante", linhasEscuta),
+    montarSecaoPrevia("3. Apresentação geral do estudante", linhasApresentacaoGeral),
     "",
-    montarSecaoPrevia("4. Informações da família/responsáveis", linhasFamilia),
+    montarSecaoPrevia("4. Escuta do estudante", linhasEscuta),
     "",
-    montarSecaoPrevia("5. Informações do professor regente", linhasProfessorRegente),
+    montarSecaoPrevia("5. Informações da família/responsáveis", linhasFamilia),
     "",
-    montarSecaoPrevia("6. Observação pedagógica escolar", linhasObservacaoPedagogica),
+    montarSecaoPrevia("6. Informações do professor regente", linhasProfessorRegente),
     "",
-    montarSecaoPrevia("7. Barreiras, apoios e acessibilidade", linhasBarreiras),
+    montarSecaoPrevia("7. Observação pedagógica escolar", linhasObservacaoPedagogica),
     "",
-    montarSecaoPrevia("8. Informações do AEE", linhasAee),
+    montarSecaoPrevia("8. Barreiras, apoios e acessibilidade", linhasBarreiras),
     "",
-    montarSecaoPrevia("9. Síntese pedagógica final", linhasSinteseFinal),
+    montarSecaoPrevia("9. Informações do AEE", linhasAee),
     "",
-    montarSecaoPrevia("10. Encaminhamentos", linhasEncaminhamentos),
+    montarSecaoPrevia("10. Síntese pedagógica final", linhasSinteseFinal),
+    "",
+    montarSecaoPrevia("11. Encaminhamentos", linhasEncaminhamentos),
   ].join("\n");
 }
 
@@ -782,7 +987,7 @@ function EstudoCasoPage() {
         });
         setBlocosAbertos(criarEstadoInicialBlocosAbertos());
         setEstudoCasoSalvoId(estudoSalvo.id || rascunhoId);
-        setPreviaTexto("");
+        setPreviaTexto(limparTexto(estudoSalvo.sintesePrevia));
         setPreviaVisivel(false);
         setAviso("Rascunho anterior carregado.");
       } catch (error) {
@@ -851,6 +1056,14 @@ function EstudoCasoPage() {
 
   const handleSalvarRascunho = async () => {
     const resumoAtualizado = obterResumoGeral(perguntasEstado, identificacaoEstudante);
+    const sintesePreviaAtual = limparTexto(previaTexto)
+      ? gerarTextoPreviaEstudoCaso({
+          metaEstudo,
+          identificacaoEstudante,
+          perguntasEstado,
+          observacoesObjetivas,
+        })
+      : "";
     const payload = {
       alunoId: null,
       alunoNome: limparTexto(identificacaoEstudante.aluno),
@@ -863,6 +1076,7 @@ function EstudoCasoPage() {
       perguntasEstado: montarPerguntasEstadoPersistido(perguntasEstado),
       observacoesObjetivas: montarObservacoesObjetivasPersistidas(observacoesObjetivas),
       resumo: resumoAtualizado,
+      sintesePrevia: sintesePreviaAtual,
     };
 
     setSalvandoRascunho(true);
@@ -880,6 +1094,9 @@ function EstudoCasoPage() {
         salvarRascunhoIdLocal(novoEstudoCasoId);
       }
 
+      if (sintesePreviaAtual) {
+        setPreviaTexto(sintesePreviaAtual);
+      }
       setFeedback("Rascunho do Estudo de Caso salvo com sucesso.");
     } catch (error) {
       console.error("[EstudoCasoPage] Erro ao salvar rascunho", error);
@@ -958,7 +1175,8 @@ function EstudoCasoPage() {
         </p>
         <p className="muted">
           Nesta etapa o rascunho já pode ser salvo no banco, sem integração com outros módulos
-          da plataforma. A prévia textual continua local na tela.
+          da plataforma. A prévia textual continua local na tela e, quando já gerada, acompanha
+          o próximo salvamento do rascunho.
         </p>
       </header>
 
