@@ -96,6 +96,13 @@ const IDENTIFICACAO_INICIAL = {
   professorAee: "",
 };
 
+const PREVIEW_EMPTY_BLOCK_TEXT = "Não há informações registradas neste bloco até o momento.";
+
+const PERGUNTAS_ENCAMINHAMENTO_IDS = new Set([
+  "encaminhamentos-finais",
+  "pronto-para-paee",
+]);
+
 const BLOCOS_ESTUDO_CASO = [
   {
     id: "identificacao-estudante",
@@ -464,6 +471,29 @@ function limparTexto(valor) {
   return String(valor || "").trim();
 }
 
+function formatarDataParaTexto(valor) {
+  const texto = limparTexto(valor);
+  const match = texto.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if (!match) {
+    return texto;
+  }
+
+  return `${match[3]}/${match[2]}/${match[1]}`;
+}
+
+function preencherValorOuPadrao(valor, padrao = "Não informado") {
+  return limparTexto(valor) || padrao;
+}
+
+function finalizarFrase(valor) {
+  const texto = limparTexto(valor);
+
+  if (!texto) return "";
+
+  return /[.!?…]$/.test(texto) ? texto : `${texto}.`;
+}
+
 function normalizarIdentificacaoEstudante(identificacaoEstudante = {}) {
   return IDENTIFICACAO_FIELDS.reduce((acc, campo) => {
     acc[campo.id] = limparTexto(identificacaoEstudante[campo.id]);
@@ -544,6 +574,149 @@ function removerRascunhoIdLocal() {
   }
 }
 
+function formatarLinhaPreviaPergunta(registro) {
+  const resposta = limparTexto(registro?.resposta);
+
+  if (!resposta || registro?.status === "ignorada") {
+    return "";
+  }
+
+  const conteudo = `${registro.enunciado} ${finalizarFrase(resposta)}`.trim();
+  const fonte = limparTexto(registro.fonte);
+  const sufixoFonte = fonte ? ` Fonte: ${fonte}.` : "";
+
+  if (registro.status === "respondida") {
+    return `- ${conteudo}${sufixoFonte}`;
+  }
+
+  return `- Informação registrada para revisão: ${conteudo}${sufixoFonte}`;
+}
+
+function obterRegistrosPreviaBloco(perguntasPersistidas, blocoId, opcoes = {}) {
+  const excluirPerguntaIds = new Set(opcoes.excluirPerguntaIds || []);
+  const incluirPerguntaIds = opcoes.incluirPerguntaIds
+    ? new Set(opcoes.incluirPerguntaIds)
+    : null;
+
+  return Object.values(perguntasPersistidas).filter((registro) => {
+    if (registro.blocoId !== blocoId) return false;
+    if (excluirPerguntaIds.has(registro.perguntaId)) return false;
+    if (incluirPerguntaIds && !incluirPerguntaIds.has(registro.perguntaId)) return false;
+    return Boolean(limparTexto(registro.resposta)) && registro.status !== "ignorada";
+  });
+}
+
+function montarSecaoPrevia(titulo, linhas, textoVazio = PREVIEW_EMPTY_BLOCK_TEXT) {
+  return [titulo, ...(linhas.length ? linhas : [textoVazio])].join("\n");
+}
+
+function gerarTextoPreviaEstudoCaso({
+  metaEstudo,
+  identificacaoEstudante,
+  perguntasEstado,
+  observacoesObjetivas,
+}) {
+  const perguntasPersistidas = montarPerguntasEstadoPersistido(perguntasEstado);
+  const registrosIncluidos = Object.values(perguntasPersistidas).filter(
+    (registro) => Boolean(limparTexto(registro.resposta)) && registro.status !== "ignorada",
+  );
+  const fontesConsideradas = FONTE_INFORMACAO_OPTIONS.filter((fonte) =>
+    registrosIncluidos.some((registro) => registro.fonte === fonte),
+  );
+
+  const linhasIdentificacao = [
+    `- Aluno: ${preencherValorOuPadrao(identificacaoEstudante.aluno)}`,
+    `- Data de nascimento: ${preencherValorOuPadrao(
+      formatarDataParaTexto(identificacaoEstudante.dataNascimento),
+    )}`,
+    `- Série/Ano: ${preencherValorOuPadrao(identificacaoEstudante.serieAno)}`,
+    `- Turma: ${preencherValorOuPadrao(identificacaoEstudante.turma)}`,
+    `- Turno: ${preencherValorOuPadrao(identificacaoEstudante.turno)}`,
+    `- Professor(a) do AEE: ${preencherValorOuPadrao(identificacaoEstudante.professorAee)}`,
+    `- Título do estudo: ${preencherValorOuPadrao(metaEstudo.tituloEstudo)}`,
+    `- Data de início: ${preencherValorOuPadrao(formatarDataParaTexto(metaEstudo.dataInicio))}`,
+    `- Período: ${preencherValorOuPadrao(metaEstudo.periodo)}`,
+    `- Responsável pelo preenchimento: ${preencherValorOuPadrao(metaEstudo.responsavel)}`,
+  ];
+
+  const linhasEscuta = obterRegistrosPreviaBloco(perguntasPersistidas, "escuta-estudante")
+    .map(formatarLinhaPreviaPergunta)
+    .filter(Boolean);
+
+  const linhasFamilia = obterRegistrosPreviaBloco(perguntasPersistidas, "familia")
+    .map(formatarLinhaPreviaPergunta)
+    .filter(Boolean);
+
+  const linhasProfessorRegente = obterRegistrosPreviaBloco(
+    perguntasPersistidas,
+    "professor-regente",
+  )
+    .map(formatarLinhaPreviaPergunta)
+    .filter(Boolean);
+
+  const linhasObservacaoPedagogica = [
+    ...obterRegistrosPreviaBloco(perguntasPersistidas, "observacao-pedagogica")
+      .map(formatarLinhaPreviaPergunta)
+      .filter(Boolean),
+  ];
+
+  const observacaoComplementar = limparTexto(observacoesObjetivas["observacao-pedagogica"]);
+
+  if (observacaoComplementar) {
+    linhasObservacaoPedagogica.push(
+      `- Observações complementares: ${finalizarFrase(observacaoComplementar)}`,
+    );
+  }
+
+  const linhasBarreiras = obterRegistrosPreviaBloco(perguntasPersistidas, "barreiras-apoios")
+    .map(formatarLinhaPreviaPergunta)
+    .filter(Boolean);
+
+  const linhasAee = obterRegistrosPreviaBloco(perguntasPersistidas, "informacoes-aee")
+    .map(formatarLinhaPreviaPergunta)
+    .filter(Boolean);
+
+  const linhasSinteseFinal = obterRegistrosPreviaBloco(perguntasPersistidas, "sintese-final", {
+    excluirPerguntaIds: Array.from(PERGUNTAS_ENCAMINHAMENTO_IDS),
+  })
+    .map(formatarLinhaPreviaPergunta)
+    .filter(Boolean);
+
+  const linhasEncaminhamentos = obterRegistrosPreviaBloco(perguntasPersistidas, "sintese-final", {
+    incluirPerguntaIds: Array.from(PERGUNTAS_ENCAMINHAMENTO_IDS),
+  })
+    .map(formatarLinhaPreviaPergunta)
+    .filter(Boolean);
+
+  return [
+    "ESTUDO DE CASO",
+    "",
+    "1. Identificação do estudante",
+    ...linhasIdentificacao,
+    "",
+    "2. Fontes de informação consideradas",
+    ...(fontesConsideradas.length
+      ? fontesConsideradas.map((fonte) => `- ${fonte}`)
+      : ["Não há fontes registradas nas respostas preenchidas até o momento."]),
+    "",
+    montarSecaoPrevia("3. Escuta do estudante", linhasEscuta),
+    "",
+    montarSecaoPrevia("4. Informações da família/responsáveis", linhasFamilia),
+    "",
+    montarSecaoPrevia("5. Informações do professor regente", linhasProfessorRegente),
+    "",
+    montarSecaoPrevia("6. Observação pedagógica escolar", linhasObservacaoPedagogica),
+    "",
+    montarSecaoPrevia("7. Barreiras, apoios e acessibilidade", linhasBarreiras),
+    "",
+    montarSecaoPrevia("8. Informações do AEE", linhasAee),
+    "",
+    montarSecaoPrevia("9. Síntese pedagógica final", linhasSinteseFinal),
+    "",
+    montarSecaoPrevia("10. Encaminhamentos", linhasEncaminhamentos),
+  ].join("\n");
+}
+
 function EstudoCasoPage() {
   const { perfil } = useAuth();
   const podeLer = podeVisualizarSondagens(perfil);
@@ -560,6 +733,8 @@ function EstudoCasoPage() {
   const [feedback, setFeedback] = useState("");
   const [aviso, setAviso] = useState("");
   const [erro, setErro] = useState("");
+  const [previaTexto, setPreviaTexto] = useState("");
+  const [previaVisivel, setPreviaVisivel] = useState(false);
 
   const resumoGeral = useMemo(() => {
     return obterResumoGeral(perguntasEstado, identificacaoEstudante);
@@ -580,6 +755,8 @@ function EstudoCasoPage() {
         if (!estudoSalvo) {
           removerRascunhoIdLocal();
           setEstudoCasoSalvoId("");
+          setPreviaTexto("");
+          setPreviaVisivel(false);
           setAviso("Rascunho anterior nÃ£o foi encontrado. Inicie um novo estudo.");
           return;
         }
@@ -605,6 +782,8 @@ function EstudoCasoPage() {
         });
         setBlocosAbertos(criarEstadoInicialBlocosAbertos());
         setEstudoCasoSalvoId(estudoSalvo.id || rascunhoId);
+        setPreviaTexto("");
+        setPreviaVisivel(false);
         setAviso("Rascunho anterior carregado.");
       } catch (error) {
         if (!ativo) return;
@@ -717,10 +896,48 @@ function EstudoCasoPage() {
     setObservacoesObjetivas(criarEstadoObservacoesObjetivas());
     setBlocosAbertos(criarEstadoInicialBlocosAbertos());
     setEstudoCasoSalvoId("");
+    setPreviaTexto("");
+    setPreviaVisivel(false);
     removerRascunhoIdLocal();
     setErro("");
     setAviso("");
     setFeedback("Novo rascunho iniciado nesta tela. O rascunho anterior nÃ£o foi excluÃ­do.");
+  };
+
+  const handleGerarSintesePrevia = () => {
+    const textoGerado = gerarTextoPreviaEstudoCaso({
+      metaEstudo,
+      identificacaoEstudante,
+      perguntasEstado,
+      observacoesObjetivas,
+    });
+
+    setPreviaTexto(textoGerado);
+    setPreviaVisivel(true);
+    setErro("");
+    setFeedback("");
+    setAviso("");
+  };
+
+  const handleCopiarPrevia = async () => {
+    if (!previaTexto || typeof window === "undefined" || !window.navigator?.clipboard) {
+      setErro("Não foi possível copiar o texto da prévia neste navegador.");
+      return;
+    }
+
+    try {
+      await window.navigator.clipboard.writeText(previaTexto);
+      setErro("");
+      setFeedback("Texto da prévia copiado com sucesso.");
+    } catch (error) {
+      console.error("[EstudoCasoPage] Erro ao copiar prévia", error);
+      setFeedback("");
+      setErro("Não foi possível copiar o texto da prévia. Tente novamente.");
+    }
+  };
+
+  const handleOcultarPrevia = () => {
+    setPreviaVisivel(false);
   };
 
   const cardsResumo = [
@@ -740,8 +957,8 @@ function EstudoCasoPage() {
           preenchimento guiado e geração do relatório do Estudo de Caso.
         </p>
         <p className="muted">
-          Nesta etapa o rascunho já pode ser salvo no banco, sem gerar síntese e sem integração
-          com outros módulos da plataforma.
+          Nesta etapa o rascunho já pode ser salvo no banco, sem integração com outros módulos
+          da plataforma. A prévia textual continua local na tela.
         </p>
       </header>
 
@@ -751,8 +968,8 @@ function EstudoCasoPage() {
 
       <section className="panel estudo-caso-header-panel">
         <div className="estudo-caso-note">
-          Aviso de segurança: esta versão salva apenas o rascunho do Estudo de Caso no Firestore.
-          A tela continua sem síntese automática, sem exportação e sem integração com módulos
+          Aviso de segurança: esta versão salva apenas o rascunho do Estudo de Caso no Firestore
+          e gera uma prévia textual local, sem IA, sem exportação e sem integração com módulos
           externos.
         </div>
       </section>
@@ -1094,20 +1311,20 @@ function EstudoCasoPage() {
           <div>
             <h2>Próximas ações</h2>
             <p className="muted">
-              O rascunho já pode ser salvo. As demais ações continuam reservadas para as próximas
-              etapas do módulo.
+              O rascunho já pode ser salvo e a prévia textual pode ser gerada localmente. A
+              conclusão do estudo continua reservada para as próximas etapas do módulo.
             </p>
           </div>
         </div>
 
-        <div className="form-actions estudo-caso-disabled-actions">
+        <div className="form-actions estudo-caso-actions">
           <button type="button" onClick={handleSalvarRascunho} disabled={salvandoRascunho}>
             {salvandoRascunho ? "Salvando rascunho..." : "Salvar rascunho"}
           </button>
           <button type="button" className="btn-secondary" onClick={handleNovoEstudo}>
             Novo estudo
           </button>
-          <button type="button" className="btn-secondary" disabled title="Recurso futuro">
+          <button type="button" className="btn-secondary" onClick={handleGerarSintesePrevia}>
             Gerar síntese do Estudo de Caso
           </button>
           <button type="button" className="btn-secondary" disabled title="Recurso futuro">
@@ -1116,10 +1333,39 @@ function EstudoCasoPage() {
         </div>
 
         <p className="estudo-caso-future-note">
-          Recurso futuro: gerar síntese do Estudo de Caso e concluir o registro continuam
-          desativados nesta etapa.
+          Recurso futuro: concluir o Estudo de Caso permanece desativado nesta etapa.
         </p>
       </section>
+
+      {previaVisivel ? (
+        <section className="panel estudo-caso-preview-panel">
+          <div className="estudo-caso-section-header">
+            <div>
+              <h2>Prévia do texto do Estudo de Caso</h2>
+              <p className="muted">
+                Texto gerado a partir das respostas preenchidas. Revise antes de usar em
+                documentos oficiais.
+              </p>
+            </div>
+
+            <div className="estudo-caso-preview-actions">
+              <button type="button" className="btn-secondary" onClick={handleCopiarPrevia}>
+                Copiar texto
+              </button>
+              <button type="button" className="btn-secondary" onClick={handleOcultarPrevia}>
+                Ocultar prévia
+              </button>
+            </div>
+          </div>
+
+          <textarea
+            className="estudo-caso-preview-textarea"
+            rows={24}
+            value={previaTexto}
+            onChange={(event) => setPreviaTexto(event.target.value)}
+          />
+        </section>
+      ) : null}
     </main>
   );
 }

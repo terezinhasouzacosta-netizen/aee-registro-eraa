@@ -2870,8 +2870,29 @@ textarea:focus {
   color: #ffffff;
 }
 
-.estudo-caso-page .estudo-caso-disabled-actions {
-  opacity: 0.82;
+.estudo-caso-page .estudo-caso-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.estudo-caso-page .estudo-caso-preview-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.estudo-caso-page .estudo-caso-preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.estudo-caso-page .estudo-caso-preview-textarea {
+  min-height: 420px;
+  line-height: 1.65;
+  font-size: 14px;
+  white-space: pre-wrap;
 }
 
 .estudo-caso-page .estudo-caso-future-note {
@@ -2977,7 +2998,8 @@ textarea:focus {
   .estudo-caso-page .estudo-caso-card-toggle,
   .estudo-caso-page .estudo-caso-question-top,
   .estudo-caso-page .estudo-caso-mode-header,
-  .estudo-caso-page .estudo-caso-card-side {
+  .estudo-caso-page .estudo-caso-card-side,
+  .estudo-caso-page .estudo-caso-preview-actions {
     flex-direction: column;
     align-items: flex-start;
   }
