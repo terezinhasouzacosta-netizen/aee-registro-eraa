@@ -8,6 +8,12 @@ import { useAuth } from "../hooks/useAuth";
 import { podeVisualizarSondagens } from "../utils/permissions";
 
 const ESTUDO_CASO_RASCUNHO_ID_KEY = "estudoCasoRascunhoId";
+const COMANDO_REVISAO_CHATGPT =
+  "Reelabore o Estudo de Caso abaixo em linguagem pedagógica, formal, clara e coesa, " +
+  "mantendo todas as informações importantes, sem inventar dados. Organize o texto em " +
+  "seções, reduza repetições, corrija incoerências e transforme em um relatório profissional " +
+  "do AEE. Preserve o sentido das informações registradas e mantenha linguagem adequada para " +
+  "uso escolar.";
 
 const STATUS_ESTUDO_OPTIONS = [
   { value: "em-andamento", label: "Em andamento" },
@@ -572,6 +578,16 @@ function removerRascunhoIdLocal() {
   } catch (error) {
     console.warn("[EstudoCasoPage] Não foi possível remover o rascunho do localStorage.", error);
   }
+}
+
+function montarTextoComComandoChatGPT(previaTexto) {
+  const previaLimpa = limparTexto(previaTexto);
+
+  if (!previaLimpa) {
+    return "";
+  }
+
+  return `${COMANDO_REVISAO_CHATGPT}\n\n${previaLimpa}`;
 }
 
 const PREVIEW_NARRATIVA_BLOCOS = {
@@ -1814,6 +1830,7 @@ function EstudoCasoPage() {
   const [erro, setErro] = useState("");
   const [previaTexto, setPreviaTexto] = useState("");
   const [previaVisivel, setPreviaVisivel] = useState(false);
+  const [textoFinalRevisado, setTextoFinalRevisado] = useState("");
 
   const resumoGeral = useMemo(() => {
     return obterResumoGeral(perguntasEstado, identificacaoEstudante);
@@ -1836,6 +1853,7 @@ function EstudoCasoPage() {
           setEstudoCasoSalvoId("");
           setPreviaTexto("");
           setPreviaVisivel(false);
+          setTextoFinalRevisado("");
           setAviso("Rascunho anterior nÃ£o foi encontrado. Inicie um novo estudo.");
           return;
         }
@@ -1863,6 +1881,7 @@ function EstudoCasoPage() {
         setEstudoCasoSalvoId(estudoSalvo.id || rascunhoId);
         setPreviaTexto(limparTexto(estudoSalvo.sintesePrevia));
         setPreviaVisivel(false);
+        setTextoFinalRevisado(limparTexto(estudoSalvo.textoFinalRevisado));
         setAviso("Rascunho anterior carregado.");
       } catch (error) {
         if (!ativo) return;
@@ -1951,6 +1970,7 @@ function EstudoCasoPage() {
       observacoesObjetivas: montarObservacoesObjetivasPersistidas(observacoesObjetivas),
       resumo: resumoAtualizado,
       sintesePrevia: sintesePreviaAtual,
+      textoFinalRevisado: limparTexto(textoFinalRevisado),
     };
 
     setSalvandoRascunho(true);
@@ -1989,6 +2009,7 @@ function EstudoCasoPage() {
     setEstudoCasoSalvoId("");
     setPreviaTexto("");
     setPreviaVisivel(false);
+    setTextoFinalRevisado("");
     removerRascunhoIdLocal();
     setErro("");
     setAviso("");
@@ -2027,6 +2048,25 @@ function EstudoCasoPage() {
     }
   };
 
+  const handleCopiarPreviaComComando = async () => {
+    const textoParaCopiar = montarTextoComComandoChatGPT(previaTexto);
+
+    if (!textoParaCopiar || typeof window === "undefined" || !window.navigator?.clipboard) {
+      setErro("NÃ£o foi possÃ­vel copiar o texto com comando neste navegador.");
+      return;
+    }
+
+    try {
+      await window.navigator.clipboard.writeText(textoParaCopiar);
+      setErro("");
+      setFeedback("Texto copiado com comando para revisÃ£o no ChatGPT.");
+    } catch (error) {
+      console.error("[EstudoCasoPage] Erro ao copiar prÃ©via com comando", error);
+      setFeedback("");
+      setErro("NÃ£o foi possÃ­vel copiar o texto com comando. Tente novamente.");
+    }
+  };
+
   const handleOcultarPrevia = () => {
     setPreviaVisivel(false);
   };
@@ -2038,6 +2078,7 @@ function EstudoCasoPage() {
     { chave: "revisar", rotulo: "Em revisão", valor: resumoGeral.revisar },
     { chave: "total", rotulo: "Total", valor: resumoGeral.total },
   ];
+  const exibirTextoFinalRevisado = previaVisivel || Boolean(limparTexto(textoFinalRevisado));
 
   return (
     <main className="alunos-page module-page estudo-caso-page">
@@ -2445,6 +2486,13 @@ function EstudoCasoPage() {
               <button type="button" className="btn-secondary" onClick={handleCopiarPrevia}>
                 Copiar texto
               </button>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleCopiarPreviaComComando}
+              >
+                Copiar com comando para ChatGPT
+              </button>
               <button type="button" className="btn-secondary" onClick={handleOcultarPrevia}>
                 Ocultar prévia
               </button>
@@ -2456,6 +2504,33 @@ function EstudoCasoPage() {
             rows={24}
             value={previaTexto}
             onChange={(event) => setPreviaTexto(event.target.value)}
+          />
+        </section>
+      ) : null}
+
+      {exibirTextoFinalRevisado ? (
+        <section className="panel estudo-caso-preview-panel">
+          <div className="estudo-caso-section-header">
+            <div>
+              <h2>Texto final revisado</h2>
+              <p className="muted">
+                Cole aqui a versÃ£o revisada e final do Estudo de Caso apÃ³s conferÃªncia
+                pedagÃ³gica. Este campo pode receber o texto reelaborado no ChatGPT e revisado
+                pela professora do AEE.
+              </p>
+            </div>
+          </div>
+
+          <p className="muted">
+            Use o botÃ£o Salvar rascunho para guardar tambÃ©m o texto final revisado.
+          </p>
+
+          <textarea
+            className="estudo-caso-preview-textarea"
+            rows={20}
+            value={textoFinalRevisado}
+            onChange={(event) => setTextoFinalRevisado(event.target.value)}
+            placeholder="Cole aqui o texto final revisado do Estudo de Caso."
           />
         </section>
       ) : null}
