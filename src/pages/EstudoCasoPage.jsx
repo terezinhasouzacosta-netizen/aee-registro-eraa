@@ -574,128 +574,360 @@ function removerRascunhoIdLocal() {
   }
 }
 
-const PREVIEW_PREFIXOS_BLOCO = {
-  "escuta-estudante": "Na escuta do estudante",
-  familia: "Nas informações da família/responsáveis",
-  "professor-regente": "Nas informações do professor regente",
-  "barreiras-apoios": "Na análise de barreiras, apoios e acessibilidade",
-  "informacoes-aee": "Nas informações do AEE",
-  "sintese-final": "Na síntese pedagógica final",
-};
-
-const PREVIEW_CONTEXTO_PERGUNTA = {
-  "escuta-estudante:gosta-escola": "o vínculo do estudante com a escola",
-  "escuta-estudante:tem-amigos": "as relações de amizade e convivência do estudante",
-  "escuta-estudante:atividades-preferidas": "as atividades de que o estudante mais gosta",
-  "escuta-estudante:tarefas-dificeis": "as tarefas que o estudante considera mais difíceis",
-  "escuta-estudante:expressa-necessidades":
-    "a forma como o estudante expressa necessidades, desejos e interesses",
-  "escuta-estudante:satisfeito-apoios": "a percepção do estudante sobre os apoios que recebe",
-  "escuta-estudante:gostaria-outros-apoios": "os apoios que o estudante gostaria de receber",
-  "familia:opiniao-familia": "a visão da família sobre a vida escolar do estudante",
-  "familia:participacao-familia":
-    "a participação da família em reuniões e atividades escolares",
-  "familia:habilidades-familia": "as habilidades do estudante percebidas pela família",
-  "familia:necessidades-familia":
-    "as necessidades ou dificuldades percebidas pela família",
-  "familia:expectativas-familia":
-    "as expectativas da família sobre o desenvolvimento e a escolarização",
-  "familia:rotina-casa": "a rotina do estudante em casa",
-  "familia:saude-consideracoes":
-    "as informações de saúde e cuidados que a escola precisa considerar",
-  "professor-regente:participa-turma":
-    "a participação do estudante nas atividades propostas para a turma",
-  "professor-regente:grau-participacao":
-    "o grau de participação do estudante nas atividades da turma",
-  "professor-regente:facilidades": "as atividades realizadas com facilidade",
-  "professor-regente:dificuldades": "as atividades realizadas com dificuldade",
-  "professor-regente:interacao-colegas": "a interação do estudante com os colegas",
-  "professor-regente:reage-comandos":
-    "a reação do estudante a comandos, combinados e mudanças de rotina",
-  "professor-regente:estrategias-funcionaram":
-    "as estratégias que já funcionaram na sala comum",
-  "professor-regente:apoios-sugeridos": "os apoios sugeridos pelo professor regente",
-  "barreiras-apoios:barreiras-ambiente": "as barreiras presentes no ambiente escolar",
-  "barreiras-apoios:barreiras-comunicacao": "as barreiras de comunicação",
-  "barreiras-apoios:barreiras-fisicas": "as barreiras físicas ou de acessibilidade",
-  "barreiras-apoios:barreiras-materiais":
-    "as barreiras relacionadas a materiais, currículo ou avaliações",
-  "barreiras-apoios:barreiras-atitudinais": "as barreiras atitudinais ou sociais",
-  "barreiras-apoios:recursos-acessibilidade":
-    "os recursos de acessibilidade disponíveis na escola",
-  "barreiras-apoios:recursos-necessarios":
-    "os recursos humanos ou materiais ainda necessários",
-  "barreiras-apoios:apoios-revisar":
-    "os apoios que precisam ser mantidos, ampliados ou revistos",
-  "informacoes-aee:potencialidades-aee": "as potencialidades observadas no AEE",
-  "informacoes-aee:interesses-ponto-partida":
-    "os interesses que podem servir de ponto de partida",
-  "informacoes-aee:necessidades-especificas": "as necessidades específicas identificadas",
-  "informacoes-aee:habilidades-consolidadas": "as habilidades já consolidadas",
-  "informacoes-aee:habilidades-desenvolvimento": "as habilidades em desenvolvimento",
-  "informacoes-aee:habilidades-priorizadas":
-    "as habilidades que precisam ser priorizadas",
-  "informacoes-aee:resultado-sondagem": "os resultados apontados pela Sondagem Diagnóstica",
-  "informacoes-aee:estrategias-aee": "as estratégias que devem ser trabalhadas no AEE",
-  "informacoes-aee:orientacoes-regente":
-    "as orientações que devem ser compartilhadas com o professor regente",
-  "sintese-final:potencialidades-principais": "as principais potencialidades do estudante",
-  "sintese-final:barreiras-principais": "as principais barreiras identificadas",
-  "sintese-final:necessidades-prioritarias": "as necessidades prioritárias de apoio",
-  "sintese-final:habilidades-planejamento":
-    "as habilidades que devem orientar o planejamento",
-  "sintese-final:recursos-estrategias": "os recursos e estratégias recomendados",
-  "sintese-final:informacoes-pendentes":
-    "as informações que ainda precisam de aprofundamento",
-  "sintese-final:encaminhamentos-finais": "os encaminhamentos que devem ser realizados",
-  "sintese-final:pronto-para-paee": "a prontidão do estudo para orientar o PAEE",
+const PREVIEW_NARRATIVA_BLOCOS = {
+  "escuta-estudante": {
+    introducao: "Na escuta do estudante",
+    descritores: [
+      {
+        perguntaId: "gosta-escola",
+        contexto: "ao vínculo do estudante com a escola",
+        respondida: "quanto ao vínculo do estudante com a escola, observou-se",
+      },
+      {
+        perguntaId: "tem-amigos",
+        contexto: "às relações de amizade e convivência do estudante",
+        respondida: "em relação aos colegas e amizades, foi relatado",
+      },
+      {
+        perguntaId: "atividades-preferidas",
+        contexto: "às atividades de maior interesse do estudante",
+        respondida: "sobre as atividades de maior interesse, foram citadas",
+      },
+      {
+        perguntaId: "tarefas-dificeis",
+        contexto: "às tarefas consideradas mais difíceis pelo estudante",
+        respondida: "quanto às tarefas consideradas mais difíceis, foi registrado",
+      },
+      {
+        perguntaId: "expressa-necessidades",
+        contexto: "à forma de expressão de necessidades, desejos e interesses",
+        respondida: "sobre a expressão de necessidades, desejos e interesses, foi registrado",
+      },
+      {
+        perguntaId: "satisfeito-apoios",
+        contexto: "à percepção do estudante sobre os apoios que recebe",
+        respondida: "quanto aos apoios já recebidos, foi registrado",
+      },
+      {
+        perguntaId: "gostaria-outros-apoios",
+        contexto: "aos apoios que o estudante gostaria de receber",
+        respondida: "em relação a outros apoios desejados, foi registrado",
+      },
+    ],
+  },
+  familia: {
+    introducao: "Nas informações da família/responsáveis",
+    descritores: [
+      {
+        perguntaId: "opiniao-familia",
+        contexto: "à visão da família sobre a vida escolar do estudante",
+        respondida: "quanto à visão da família sobre a vida escolar do estudante, foi informado",
+      },
+      {
+        perguntaId: "participacao-familia",
+        contexto: "à participação da família em reuniões e atividades escolares",
+        respondida: "sobre a participação da família em reuniões e atividades escolares, foi registrado",
+      },
+      {
+        perguntaId: "habilidades-familia",
+        contexto: "às habilidades percebidas pela família",
+        respondida: "em relação às habilidades percebidas pela família, foi relatado",
+      },
+      {
+        perguntaId: "necessidades-familia",
+        contexto: "às necessidades ou dificuldades percebidas pela família",
+        respondida: "quanto às necessidades ou dificuldades percebidas pela família, foi informado",
+      },
+      {
+        perguntaId: "expectativas-familia",
+        contexto: "às expectativas da família sobre o desenvolvimento e a escolarização",
+        respondida: "sobre as expectativas da família quanto ao desenvolvimento e à escolarização, foi registrado",
+      },
+      {
+        perguntaId: "rotina-casa",
+        contexto: "à rotina do estudante em casa",
+        respondida: "em relação à rotina do estudante em casa, foi relatado",
+      },
+      {
+        perguntaId: "saude-consideracoes",
+        contexto: "às informações de saúde e cuidados que a escola precisa considerar",
+        respondida: "quanto às informações de saúde e cuidados a serem considerados pela escola, foi registrado",
+      },
+    ],
+  },
+  "professor-regente": {
+    introducao: "Nas informações do professor regente",
+    descritores: [
+      {
+        perguntaId: "participa-turma",
+        contexto: "à participação do estudante nas atividades propostas para a turma",
+        respondida: "quanto à participação do estudante nas atividades propostas para a turma, foi observado",
+      },
+      {
+        perguntaId: "grau-participacao",
+        contexto: "ao grau de participação do estudante nas atividades da turma",
+        respondida: "sobre o grau de participação do estudante nas atividades da turma, foi registrado",
+      },
+      {
+        perguntaId: "facilidades",
+        contexto: "às atividades realizadas com facilidade",
+        respondida: "em relação às atividades realizadas com facilidade, foi relatado",
+      },
+      {
+        perguntaId: "dificuldades",
+        contexto: "às atividades realizadas com dificuldade",
+        respondida: "quanto às atividades realizadas com dificuldade, foi informado",
+      },
+      {
+        perguntaId: "interacao-colegas",
+        contexto: "à interação do estudante com os colegas",
+        respondida: "sobre a interação do estudante com os colegas, foi registrado",
+      },
+      {
+        perguntaId: "reage-comandos",
+        contexto: "à reação do estudante a comandos, combinados e mudanças de rotina",
+        respondida: "quanto à reação do estudante a comandos, combinados e mudanças de rotina, foi observado",
+      },
+      {
+        perguntaId: "estrategias-funcionaram",
+        contexto: "às estratégias que já funcionaram na sala comum",
+        respondida: "em relação às estratégias que já funcionaram na sala comum, foi relatado",
+      },
+      {
+        perguntaId: "apoios-sugeridos",
+        contexto: "aos apoios sugeridos pelo professor regente",
+        respondida: "sobre os apoios sugeridos pelo professor regente, foi registrado",
+      },
+    ],
+  },
+  "barreiras-apoios": {
+    introducao: "Na análise de barreiras, apoios e acessibilidade",
+    descritores: [
+      {
+        perguntaId: "barreiras-ambiente",
+        contexto: "às barreiras presentes no ambiente escolar",
+        respondida: "quanto às barreiras presentes no ambiente escolar, foi registrado",
+      },
+      {
+        perguntaId: "barreiras-comunicacao",
+        contexto: "às barreiras de comunicação",
+        respondida: "em relação às barreiras de comunicação, foi relatado",
+      },
+      {
+        perguntaId: "barreiras-fisicas",
+        contexto: "às barreiras físicas ou de acessibilidade",
+        respondida: "sobre as barreiras físicas ou de acessibilidade, foi informado",
+      },
+      {
+        perguntaId: "barreiras-materiais",
+        contexto: "às barreiras relacionadas a materiais, currículo ou avaliações",
+        respondida: "quanto às barreiras relacionadas a materiais, currículo ou avaliações, foi registrado",
+      },
+      {
+        perguntaId: "barreiras-atitudinais",
+        contexto: "às barreiras atitudinais ou sociais",
+        respondida: "em relação às barreiras atitudinais ou sociais, foi relatado",
+      },
+      {
+        perguntaId: "recursos-acessibilidade",
+        contexto: "aos recursos de acessibilidade disponíveis na escola",
+        respondida: "sobre os recursos de acessibilidade disponíveis na escola, foi registrado",
+      },
+      {
+        perguntaId: "recursos-necessarios",
+        contexto: "aos recursos humanos ou materiais ainda necessários",
+        respondida: "quanto aos recursos humanos ou materiais ainda necessários, foi informado",
+      },
+      {
+        perguntaId: "apoios-revisar",
+        contexto: "aos apoios que precisam ser mantidos, ampliados ou revistos",
+        respondida: "em relação aos apoios que precisam ser mantidos, ampliados ou revistos, foi registrado",
+      },
+    ],
+  },
+  "informacoes-aee": {
+    introducao: "Nas informações do AEE",
+    descritores: [
+      {
+        perguntaId: "potencialidades-aee",
+        contexto: "às potencialidades observadas no AEE",
+        respondida: "quanto às potencialidades observadas no AEE, foi registrado",
+      },
+      {
+        perguntaId: "interesses-ponto-partida",
+        contexto: "aos interesses que podem servir de ponto de partida",
+        respondida: "em relação aos interesses que podem servir de ponto de partida, foi relatado",
+      },
+      {
+        perguntaId: "necessidades-especificas",
+        contexto: "às necessidades específicas identificadas",
+        respondida: "sobre as necessidades específicas identificadas, foi informado",
+      },
+      {
+        perguntaId: "habilidades-consolidadas",
+        contexto: "às habilidades já consolidadas",
+        respondida: "quanto às habilidades já consolidadas, foi registrado",
+      },
+      {
+        perguntaId: "habilidades-desenvolvimento",
+        contexto: "às habilidades em desenvolvimento",
+        respondida: "em relação às habilidades em desenvolvimento, foi relatado",
+      },
+      {
+        perguntaId: "habilidades-priorizadas",
+        contexto: "às habilidades que precisam ser priorizadas",
+        respondida: "sobre as habilidades que precisam ser priorizadas, foi registrado",
+      },
+      {
+        perguntaId: "resultado-sondagem",
+        contexto: "aos resultados apontados pela Sondagem Diagnóstica",
+        respondida: "quanto aos resultados apontados pela Sondagem Diagnóstica, foi informado",
+      },
+      {
+        perguntaId: "estrategias-aee",
+        contexto: "às estratégias que devem ser trabalhadas no AEE",
+        respondida: "em relação às estratégias que devem ser trabalhadas no AEE, foi registrado",
+      },
+      {
+        perguntaId: "orientacoes-regente",
+        contexto: "às orientações que devem ser compartilhadas com o professor regente",
+        respondida: "sobre as orientações que devem ser compartilhadas com o professor regente, foi informado",
+      },
+    ],
+  },
+  "sintese-final": {
+    introducao: "Na síntese pedagógica final",
+    descritores: [
+      {
+        perguntaId: "potencialidades-principais",
+        contexto: "às principais potencialidades do estudante",
+        respondida: "quanto às principais potencialidades do estudante, foi registrado",
+      },
+      {
+        perguntaId: "barreiras-principais",
+        contexto: "às principais barreiras identificadas",
+        respondida: "em relação às principais barreiras identificadas, foi relatado",
+      },
+      {
+        perguntaId: "necessidades-prioritarias",
+        contexto: "às necessidades prioritárias de apoio",
+        respondida: "sobre as necessidades prioritárias de apoio, foi informado",
+      },
+      {
+        perguntaId: "habilidades-planejamento",
+        contexto: "às habilidades que devem orientar o planejamento",
+        respondida: "quanto às habilidades que devem orientar o planejamento, foi registrado",
+      },
+      {
+        perguntaId: "recursos-estrategias",
+        contexto: "aos recursos e estratégias recomendados",
+        respondida: "em relação aos recursos e estratégias recomendados, foi relatado",
+      },
+      {
+        perguntaId: "informacoes-pendentes",
+        contexto: "às informações que ainda precisam de aprofundamento",
+        respondida: "sobre as informações que ainda precisam de aprofundamento, foi informado",
+      },
+    ],
+  },
+  encaminhamentos: {
+    introducao: "Nos encaminhamentos",
+    descritores: [
+      {
+        perguntaId: "encaminhamentos-finais",
+        contexto: "aos encaminhamentos a serem realizados",
+        respondida: "quanto aos encaminhamentos a serem realizados, foi registrado",
+      },
+      {
+        perguntaId: "pronto-para-paee",
+        contexto: "à prontidão do estudo para orientar o PAEE",
+        respondida: "em relação à prontidão do estudo para orientar o PAEE, foi informado",
+      },
+    ],
+  },
 };
 
 function removerPontuacaoFinal(texto) {
   return limparTexto(texto).replace(/[.?!…:]+$/u, "");
 }
 
-function formatarFontePrevia(fonte) {
-  const fonteLimpa = limparTexto(fonte);
-  return fonteLimpa ? ` Fonte da informação: ${fonteLimpa}.` : "";
+function capitalizarInicio(texto) {
+  const textoLimpo = limparTexto(texto);
+  if (!textoLimpo) return "";
+  return `${textoLimpo.charAt(0).toUpperCase()}${textoLimpo.slice(1)}`;
 }
 
-function obterContextoNarrativoPergunta(registro) {
-  const chave = `${registro?.blocoId || ""}:${registro?.perguntaId || ""}`;
-  const contexto = PREVIEW_CONTEXTO_PERGUNTA[chave];
-
-  if (contexto) {
-    return contexto;
-  }
-
-  return removerPontuacaoFinal(registro?.enunciado || "").toLowerCase() || "o registro informado";
+function decapitalizarInicio(texto) {
+  const textoLimpo = limparTexto(texto);
+  if (!textoLimpo) return "";
+  return `${textoLimpo.charAt(0).toLowerCase()}${textoLimpo.slice(1)}`;
 }
 
-function formatarLinhaPreviaPergunta(registro) {
+function formatarListaNatural(itens) {
+  const valores = itens.map(limparTexto).filter(Boolean);
+
+  if (!valores.length) return "";
+  if (valores.length === 1) return valores[0];
+  if (valores.length === 2) return `${valores[0]} e ${valores[1]}`;
+
+  return `${valores.slice(0, -1).join(", ")} e ${valores.at(-1)}`;
+}
+
+function obterFontesDosRegistros(registros) {
+  return [...new Set(registros.map((registro) => limparTexto(registro?.fonte)).filter(Boolean))];
+}
+
+function criarFragmentoNarrativo(registro, descritor) {
   const resposta = limparTexto(registro?.resposta);
 
   if (!resposta) {
     return "";
   }
 
-  const prefixo = PREVIEW_PREFIXOS_BLOCO[registro?.blocoId] || "No bloco analisado";
-  const contexto = obterContextoNarrativoPergunta(registro);
-  const sufixoFonte = formatarFontePrevia(registro?.fonte);
   const respostaFinal = finalizarFrase(resposta);
+  const status = registro?.status || "pendente";
+  const contexto = descritor.contexto;
 
-  if (registro?.status === "revisar") {
-    return `${prefixo}, sobre ${contexto}, foi registrada uma informação para revisão: ${respostaFinal}${sufixoFonte}`;
+  if (status === "revisar") {
+    return `no que se refere ${contexto}, há informação registrada para revisão: ${respostaFinal}`;
   }
 
-  if (registro?.status === "pendente") {
-    return `${prefixo}, sobre ${contexto}, há um registro parcial: ${respostaFinal}${sufixoFonte}`;
+  if (status === "pendente") {
+    return `no que se refere ${contexto}, há registro parcial: ${respostaFinal}`;
   }
 
-  if (registro?.status === "ignorada") {
-    return `${prefixo}, sobre ${contexto}, há uma observação marcada como ignorada no preenchimento: ${respostaFinal}${sufixoFonte}`;
+  if (status === "ignorada") {
+    return `no que se refere ${contexto}, há observação marcada como ignorada no preenchimento: ${respostaFinal}`;
   }
 
-  return `${prefixo}, sobre ${contexto}, foi registrada a seguinte informação: ${respostaFinal}${sufixoFonte}`;
+  return `${descritor.respondida}: ${respostaFinal}`;
+}
+
+function montarLinhasNarrativasBloco(registros, configuracaoBloco) {
+  const registrosPorPergunta = Object.fromEntries(
+    registros.map((registro) => [registro.perguntaId, registro]),
+  );
+  const fragmentos = configuracaoBloco.descritores
+    .map((descritor) => criarFragmentoNarrativo(registrosPorPergunta[descritor.perguntaId], descritor))
+    .filter(Boolean);
+
+  if (!fragmentos.length) {
+    return [];
+  }
+
+  const [primeiroFragmento, ...demaisFragmentos] = fragmentos;
+  const paragrafo = [
+    `${configuracaoBloco.introducao}, ${decapitalizarInicio(primeiroFragmento)}`,
+    ...demaisFragmentos.map(capitalizarInicio),
+  ].join(" ");
+  const fontes = obterFontesDosRegistros(registros);
+  const linhas = [paragrafo];
+
+  if (fontes.length) {
+    linhas.push(`Fontes consideradas neste bloco: ${formatarListaNatural(fontes)}.`);
+  }
+
+  return linhas;
 }
 
 function formatarLinhaObservacaoPedagogica(registro) {
@@ -706,23 +938,22 @@ function formatarLinhaObservacaoPedagogica(registro) {
   }
 
   const rotulo = removerPontuacaoFinal(registro?.enunciado || "Registro objetivo");
-  const sufixoFonte = formatarFontePrevia(registro?.fonte);
 
   if (registro?.status === "revisar") {
-    return `- ${rotulo}: informação registrada para revisão — ${finalizarFrase(resposta)}${sufixoFonte}`;
+    return `- ${rotulo}: informação registrada para revisão — ${finalizarFrase(resposta)}`;
   }
 
   if (registro?.status === "pendente") {
-    return `- ${rotulo}: registro parcial — ${finalizarFrase(resposta)}${sufixoFonte}`;
+    return `- ${rotulo}: registro parcial — ${finalizarFrase(resposta)}`;
   }
 
   if (registro?.status === "ignorada") {
     return `- ${rotulo}: informação ignorada no preenchimento, mas com observação registrada — ${finalizarFrase(
       resposta,
-    )}${sufixoFonte}`;
+    )}`;
   }
 
-  return `- ${rotulo}: ${finalizarFrase(resposta)}${sufixoFonte}`;
+  return `- ${rotulo}: ${finalizarFrase(resposta)}`;
 }
 
 function gerarLinhasApresentacaoGeral(metaEstudo, identificacaoEstudante) {
@@ -778,6 +1009,11 @@ function gerarLinhasApresentacaoGeral(metaEstudo, identificacaoEstudante) {
   return linhas;
 }
 
+function gerarLinhasApresentacaoGeralNarrativa(metaEstudo, identificacaoEstudante) {
+  const linhas = gerarLinhasApresentacaoGeral(metaEstudo, identificacaoEstudante);
+  return linhas.length ? [linhas.join(" ")] : [];
+}
+
 function obterRegistrosPreviaBloco(perguntasPersistidas, blocoId, opcoes = {}) {
   const excluirPerguntaIds = new Set(opcoes.excluirPerguntaIds || []);
   const incluirPerguntaIds = opcoes.incluirPerguntaIds
@@ -826,39 +1062,47 @@ function gerarTextoPreviaEstudoCaso({
   ];
   const linhasFontes = fontesConsideradas.length
     ? [
-        `As informações registradas até o momento consideram as seguintes fontes: ${fontesConsideradas.join(
-          ", ",
+        `As informações registradas até o momento consideram as seguintes fontes: ${formatarListaNatural(
+          fontesConsideradas,
         )}.`,
       ]
     : ["Não há fontes registradas nas respostas preenchidas até o momento."];
-  const linhasApresentacaoGeral = gerarLinhasApresentacaoGeral(
+  const linhasApresentacaoGeral = gerarLinhasApresentacaoGeralNarrativa(
     metaEstudo,
     identificacaoEstudante,
   );
 
-  const linhasEscuta = obterRegistrosPreviaBloco(perguntasPersistidas, "escuta-estudante")
-    .map(formatarLinhaPreviaPergunta)
-    .filter(Boolean);
+  const registrosEscuta = obterRegistrosPreviaBloco(perguntasPersistidas, "escuta-estudante");
+  const linhasEscuta = montarLinhasNarrativasBloco(
+    registrosEscuta,
+    PREVIEW_NARRATIVA_BLOCOS["escuta-estudante"],
+  );
 
-  const linhasFamilia = obterRegistrosPreviaBloco(perguntasPersistidas, "familia")
-    .map(formatarLinhaPreviaPergunta)
-    .filter(Boolean);
+  const registrosFamilia = obterRegistrosPreviaBloco(perguntasPersistidas, "familia");
+  const linhasFamilia = montarLinhasNarrativasBloco(
+    registrosFamilia,
+    PREVIEW_NARRATIVA_BLOCOS.familia,
+  );
 
-  const linhasProfessorRegente = obterRegistrosPreviaBloco(
+  const registrosProfessorRegente = obterRegistrosPreviaBloco(
     perguntasPersistidas,
     "professor-regente",
-  )
-    .map(formatarLinhaPreviaPergunta)
-    .filter(Boolean);
+  );
+  const linhasProfessorRegente = montarLinhasNarrativasBloco(
+    registrosProfessorRegente,
+    PREVIEW_NARRATIVA_BLOCOS["professor-regente"],
+  );
 
-  const registrosObservacaoPedagogica = obterRegistrosPreviaBloco(
+  const registrosObservacaoPedagogicaBrutos = obterRegistrosPreviaBloco(
     perguntasPersistidas,
     "observacao-pedagogica",
-  )
+  );
+  const registrosObservacaoPedagogica = registrosObservacaoPedagogicaBrutos
     .map(formatarLinhaObservacaoPedagogica)
     .filter(Boolean);
   const linhasObservacaoPedagogica = [];
   const observacaoComplementar = limparTexto(observacoesObjetivas["observacao-pedagogica"]);
+  const fontesObservacaoPedagogica = obterFontesDosRegistros(registrosObservacaoPedagogicaBrutos);
 
   if (registrosObservacaoPedagogica.length || observacaoComplementar) {
     linhasObservacaoPedagogica.push("Na observação pedagógica escolar, foi registrado que:");
@@ -870,29 +1114,43 @@ function gerarTextoPreviaEstudoCaso({
 
   if (observacaoComplementar) {
     linhasObservacaoPedagogica.push(
-      `Observações complementares: ${finalizarFrase(observacaoComplementar)}`,
+      `Nas observações complementares, foi registrado que ${finalizarFrase(observacaoComplementar)}`,
     );
   }
 
-  const linhasBarreiras = obterRegistrosPreviaBloco(perguntasPersistidas, "barreiras-apoios")
-    .map(formatarLinhaPreviaPergunta)
-    .filter(Boolean);
+  if (fontesObservacaoPedagogica.length) {
+    linhasObservacaoPedagogica.push(
+      `Fontes consideradas neste bloco: ${formatarListaNatural(fontesObservacaoPedagogica)}.`,
+    );
+  }
 
-  const linhasAee = obterRegistrosPreviaBloco(perguntasPersistidas, "informacoes-aee")
-    .map(formatarLinhaPreviaPergunta)
-    .filter(Boolean);
+  const registrosBarreiras = obterRegistrosPreviaBloco(perguntasPersistidas, "barreiras-apoios");
+  const linhasBarreiras = montarLinhasNarrativasBloco(
+    registrosBarreiras,
+    PREVIEW_NARRATIVA_BLOCOS["barreiras-apoios"],
+  );
 
-  const linhasSinteseFinal = obterRegistrosPreviaBloco(perguntasPersistidas, "sintese-final", {
+  const registrosAee = obterRegistrosPreviaBloco(perguntasPersistidas, "informacoes-aee");
+  const linhasAee = montarLinhasNarrativasBloco(
+    registrosAee,
+    PREVIEW_NARRATIVA_BLOCOS["informacoes-aee"],
+  );
+
+  const registrosSinteseFinal = obterRegistrosPreviaBloco(perguntasPersistidas, "sintese-final", {
     excluirPerguntaIds: Array.from(PERGUNTAS_ENCAMINHAMENTO_IDS),
-  })
-    .map(formatarLinhaPreviaPergunta)
-    .filter(Boolean);
+  });
+  const linhasSinteseFinal = montarLinhasNarrativasBloco(
+    registrosSinteseFinal,
+    PREVIEW_NARRATIVA_BLOCOS["sintese-final"],
+  );
 
-  const linhasEncaminhamentos = obterRegistrosPreviaBloco(perguntasPersistidas, "sintese-final", {
+  const registrosEncaminhamentos = obterRegistrosPreviaBloco(perguntasPersistidas, "sintese-final", {
     incluirPerguntaIds: Array.from(PERGUNTAS_ENCAMINHAMENTO_IDS),
-  })
-    .map(formatarLinhaPreviaPergunta)
-    .filter(Boolean);
+  });
+  const linhasEncaminhamentos = montarLinhasNarrativasBloco(
+    registrosEncaminhamentos,
+    PREVIEW_NARRATIVA_BLOCOS.encaminhamentos,
+  );
 
   return [
     "ESTUDO DE CASO",
