@@ -576,272 +576,682 @@ function removerRascunhoIdLocal() {
 
 const PREVIEW_NARRATIVA_BLOCOS = {
   "escuta-estudante": {
-    introducao: "Na escuta do estudante",
+    abertura: "Na escuta do estudante",
     descritores: [
       {
         perguntaId: "gosta-escola",
-        contexto: "ao vínculo do estudante com a escola",
-        respondida: "quanto ao vínculo do estudante com a escola, observou-se",
+        render: criarRenderPorMarcador({
+          comDetalhePorMarcador: {
+            sim: ({ detalhe }) =>
+              `observa-se vínculo positivo com a escola. ${fraseComQue(
+                "O estudante relata",
+                detalhe,
+              )}`,
+            nao: ({ detalhe }) =>
+              `o vínculo com a escola não se apresenta de forma positiva. ${fraseComQue(
+                "Ao explicar esse aspecto, o estudante afirma",
+                detalhe,
+              )}`,
+            as_vezes: ({ detalhe }) =>
+              `o vínculo com a escola aparece de forma oscilante. ${fraseComQue(
+                "Ao falar sobre esse aspecto, o estudante comenta",
+                detalhe,
+              )}`,
+            raramente: ({ detalhe }) =>
+              `o vínculo com a escola aparece de forma pouco frequente. ${fraseComQue(
+                "Ao falar sobre esse aspecto, o estudante comenta",
+                detalhe,
+              )}`,
+            frequentemente: ({ detalhe }) =>
+              `há vínculo frequente com a escola. ${fraseComQue(
+                "Ao comentar esse aspecto, o estudante relata",
+                detalhe,
+              )}`,
+          },
+          comDetalhe: ({ detalhe }) => fraseComQue("O estudante relata", detalhe),
+          apenasMarcador: {
+            sim: "observa-se vínculo positivo com a escola.",
+            nao: "não foi indicado vínculo positivo com a escola.",
+            as_vezes: "o vínculo com a escola aparece de forma oscilante.",
+            raramente: "o vínculo com a escola aparece de forma pouco frequente.",
+            frequentemente: "há vínculo frequente com a escola.",
+          },
+        }),
       },
       {
         perguntaId: "tem-amigos",
-        contexto: "às relações de amizade e convivência do estudante",
-        respondida: "em relação aos colegas e amizades, foi relatado",
+        render: criarRenderPorMarcador({
+          comDetalhePorMarcador: {
+            sim: ({ detalhe }) =>
+              `também menciona possuir colegas na sala. ${fraseComQue(
+                "Ao falar dessa convivência, o estudante informa",
+                detalhe,
+              )}`,
+            nao: ({ detalhe }) =>
+              `não indica vínculos consistentes com os colegas. ${fraseComQue(
+                "Ao tratar dessa convivência, o estudante explica",
+                detalhe,
+              )}`,
+          },
+          comDetalhe: ({ detalhe }) =>
+            fraseComQue("Ao falar de seus colegas, o estudante informa", detalhe),
+          apenasMarcador: {
+            sim: "também menciona possuir colegas na sala e vínculos com os pares.",
+            nao: "não indica vínculos consistentes com os colegas da turma.",
+            as_vezes: "a convivência com os colegas aparece de forma oscilante.",
+            raramente: "a convivência com os colegas aparece de forma pouco frequente.",
+            frequentemente: "a convivência com os colegas aparece de forma frequente.",
+          },
+        }),
       },
       {
         perguntaId: "atividades-preferidas",
-        contexto: "às atividades de maior interesse do estudante",
-        respondida: "sobre as atividades de maior interesse, foram citadas",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) => fraseDireta("Entre seus interesses, aparecem", detalhe),
+          apenasMarcador: {
+            sim: "há interesses bem definidos em atividades escolares e lúdicas.",
+            nao: "não foram indicados interesses específicos neste momento.",
+            as_vezes: "os interesses do estudante aparecem de forma oscilante.",
+            raramente: "os interesses do estudante foram descritos de forma pouco frequente.",
+            frequentemente: "os interesses do estudante aparecem de forma frequente.",
+          },
+        }),
       },
       {
         perguntaId: "tarefas-dificeis",
-        contexto: "às tarefas consideradas mais difíceis pelo estudante",
-        respondida: "quanto às tarefas consideradas mais difíceis, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) => fraseDireta("Quanto às dificuldades, menciona", detalhe),
+          apenasMarcador: {
+            sim: "foram indicadas dificuldades relevantes em tarefas escolares.",
+            nao: "não foram indicadas dificuldades relevantes em tarefas escolares.",
+            as_vezes: "as dificuldades aparecem de forma pontual.",
+            raramente: "as dificuldades aparecem de forma pouco frequente.",
+            frequentemente: "as dificuldades aparecem de forma frequente.",
+          },
+        }),
       },
       {
         perguntaId: "expressa-necessidades",
-        contexto: "à forma de expressão de necessidades, desejos e interesses",
-        respondida: "sobre a expressão de necessidades, desejos e interesses, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseComQue(
+              "Em relação à expressão de necessidades, desejos e interesses, relata",
+              detalhe,
+            ),
+          apenasMarcador: {
+            sim: "há indicação afirmativa quanto à expressão de necessidades, desejos e interesses.",
+            nao: "não há indicação de expressão clara de necessidades, desejos e interesses.",
+            as_vezes:
+              "a expressão de necessidades, desejos e interesses ocorre de forma oscilante.",
+            raramente:
+              "a expressão de necessidades, desejos e interesses ocorre de forma pouco frequente.",
+            frequentemente:
+              "a expressão de necessidades, desejos e interesses ocorre com frequência.",
+          },
+        }),
       },
       {
         perguntaId: "satisfeito-apoios",
-        contexto: "à percepção do estudante sobre os apoios que recebe",
-        respondida: "quanto aos apoios já recebidos, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseComQue("Sobre os apoios que recebe, informa", detalhe),
+          apenasMarcador: {
+            sim: "há indicação de satisfação com os apoios recebidos.",
+            nao: "não há indicação de satisfação com os apoios recebidos.",
+            as_vezes: "a satisfação com os apoios recebidos aparece de forma oscilante.",
+            raramente: "a satisfação com os apoios recebidos aparece de forma pouco frequente.",
+            frequentemente: "a satisfação com os apoios recebidos aparece de forma frequente.",
+          },
+        }),
       },
       {
         perguntaId: "gostaria-outros-apoios",
-        contexto: "aos apoios que o estudante gostaria de receber",
-        respondida: "em relação a outros apoios desejados, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Quanto a outros apoios desejados, menciona", detalhe),
+          apenasMarcador: {
+            sim: "há indicação de desejo por outros apoios.",
+            nao: "não foram indicados outros apoios desejados neste momento.",
+            as_vezes: "o desejo por outros apoios aparece de forma oscilante.",
+            raramente: "o desejo por outros apoios foi indicado de forma pouco frequente.",
+            frequentemente: "o desejo por outros apoios aparece de forma frequente.",
+          },
+        }),
       },
     ],
   },
   familia: {
-    introducao: "Nas informações da família/responsáveis",
+    abertura: "Nas informações da família/responsáveis",
     descritores: [
       {
         perguntaId: "opiniao-familia",
-        contexto: "à visão da família sobre a vida escolar do estudante",
-        respondida: "quanto à visão da família sobre a vida escolar do estudante, foi informado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) => fraseComQue("considera-se", detalhe),
+          apenasMarcador: {
+            sim: "há uma percepção positiva da família sobre a vida escolar do estudante.",
+            nao: "não há uma percepção positiva da família sobre a vida escolar do estudante.",
+            as_vezes: "a percepção da família sobre a vida escolar do estudante é oscilante.",
+            raramente:
+              "a percepção da família sobre a vida escolar do estudante foi descrita de forma pouco frequente.",
+            frequentemente:
+              "a percepção da família sobre a vida escolar do estudante aparece de forma frequente.",
+          },
+        }),
       },
       {
         perguntaId: "participacao-familia",
-        contexto: "à participação da família em reuniões e atividades escolares",
-        respondida: "sobre a participação da família em reuniões e atividades escolares, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) => fraseComQue("Também se informa", detalhe),
+          apenasMarcador: {
+            sim: "há participação da família em reuniões e atividades escolares.",
+            nao: "não há participação regular da família em reuniões e atividades escolares.",
+            as_vezes:
+              "a participação da família em reuniões e atividades escolares ocorre de forma oscilante.",
+            raramente:
+              "a participação da família em reuniões e atividades escolares ocorre de forma pouco frequente.",
+            frequentemente:
+              "a participação da família em reuniões e atividades escolares ocorre com frequência.",
+          },
+        }),
       },
       {
         perguntaId: "habilidades-familia",
-        contexto: "às habilidades percebidas pela família",
-        respondida: "em relação às habilidades percebidas pela família, foi relatado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Como potencialidades, a família destaca", detalhe),
+          apenasMarcador: {
+            sim: "a família reconhece potencialidades no estudante.",
+            nao: "a família não indicou potencialidades específicas neste momento.",
+            as_vezes: "as potencialidades do estudante são percebidas de forma parcial pela família.",
+            raramente:
+              "as potencialidades do estudante foram apontadas de forma pouco frequente pela família.",
+            frequentemente:
+              "as potencialidades do estudante são reconhecidas com frequência pela família.",
+          },
+        }),
       },
       {
         perguntaId: "necessidades-familia",
-        contexto: "às necessidades ou dificuldades percebidas pela família",
-        respondida: "quanto às necessidades ou dificuldades percebidas pela família, foi informado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) => fraseDireta("Como dificuldades, aponta", detalhe),
+          apenasMarcador: {
+            sim: "a família identifica dificuldades ou necessidades no estudante.",
+            nao: "a família não identificou dificuldades ou necessidades neste momento.",
+            as_vezes:
+              "as dificuldades ou necessidades são percebidas de forma parcial pela família.",
+            raramente:
+              "as dificuldades ou necessidades foram apontadas de forma pouco frequente pela família.",
+            frequentemente:
+              "as dificuldades ou necessidades são percebidas com frequência pela família.",
+          },
+        }),
       },
       {
         perguntaId: "expectativas-familia",
-        contexto: "às expectativas da família sobre o desenvolvimento e a escolarização",
-        respondida: "sobre as expectativas da família quanto ao desenvolvimento e à escolarização, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseComQue("Em relação às expectativas, a família espera", detalhe),
+          apenasMarcador: {
+            sim: "a família apresenta expectativas positivas em relação ao desenvolvimento e à escolarização.",
+            nao: "a família não explicitou expectativas quanto ao desenvolvimento e à escolarização.",
+            as_vezes:
+              "as expectativas da família em relação ao desenvolvimento e à escolarização aparecem de forma oscilante.",
+            raramente:
+              "as expectativas da família em relação ao desenvolvimento e à escolarização foram pouco explicitadas.",
+            frequentemente:
+              "as expectativas da família em relação ao desenvolvimento e à escolarização aparecem de forma frequente.",
+          },
+        }),
       },
       {
         perguntaId: "rotina-casa",
-        contexto: "à rotina do estudante em casa",
-        respondida: "em relação à rotina do estudante em casa, foi relatado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseComQue("Sobre a rotina em casa, a família informa", detalhe),
+          apenasMarcador: {
+            sim: "a rotina do estudante em casa foi descrita de forma afirmativa.",
+            nao: "a rotina do estudante em casa não foi detalhada neste momento.",
+            as_vezes: "a rotina do estudante em casa foi descrita apenas parcialmente.",
+            raramente: "a rotina do estudante em casa foi pouco descrita.",
+            frequentemente: "a rotina do estudante em casa foi descrita de forma recorrente.",
+          },
+        }),
       },
       {
         perguntaId: "saude-consideracoes",
-        contexto: "às informações de saúde e cuidados que a escola precisa considerar",
-        respondida: "quanto às informações de saúde e cuidados a serem considerados pela escola, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseComQue("Quanto às informações de saúde e cuidados, a família informa", detalhe),
+          apenasMarcador: {
+            sim: "há informações de saúde e cuidados que a escola precisa considerar.",
+            nao: "não foram indicadas, neste momento, informações adicionais de saúde e cuidados.",
+            as_vezes: "as informações de saúde e cuidados aparecem de forma parcial.",
+            raramente: "as informações de saúde e cuidados foram pouco explicitadas.",
+            frequentemente: "as informações de saúde e cuidados aparecem de forma recorrente.",
+          },
+        }),
       },
     ],
   },
   "professor-regente": {
-    introducao: "Nas informações do professor regente",
+    abertura: "Nas informações do professor regente",
     descritores: [
       {
         perguntaId: "participa-turma",
-        contexto: "à participação do estudante nas atividades propostas para a turma",
-        respondida: "quanto à participação do estudante nas atividades propostas para a turma, foi observado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseComQue("o professor regente observa", detalhe),
+          apenasMarcador: {
+            sim: "o estudante participa das atividades propostas para a turma.",
+            nao: "o estudante não participa das atividades propostas para a turma de forma consistente.",
+            as_vezes: "a participação do estudante nas atividades da turma ocorre de forma oscilante.",
+            raramente: "a participação do estudante nas atividades da turma ocorre de forma pouco frequente.",
+            frequentemente: "a participação do estudante nas atividades da turma ocorre com frequência.",
+          },
+        }),
       },
       {
         perguntaId: "grau-participacao",
-        contexto: "ao grau de participação do estudante nas atividades da turma",
-        respondida: "sobre o grau de participação do estudante nas atividades da turma, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Quanto ao grau de participação, indica", detalhe),
+          apenasMarcador: {
+            sim: "o grau de participação foi indicado como satisfatório.",
+            nao: "o grau de participação foi indicado como insuficiente.",
+            as_vezes: "o grau de participação foi descrito como oscilante.",
+            raramente: "o grau de participação foi descrito como pouco frequente.",
+            frequentemente: "o grau de participação foi descrito como frequente.",
+          },
+        }),
       },
       {
         perguntaId: "facilidades",
-        contexto: "às atividades realizadas com facilidade",
-        respondida: "em relação às atividades realizadas com facilidade, foi relatado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Apresenta maior facilidade em", detalhe),
+          apenasMarcador: {
+            sim: "foram identificadas facilidades relevantes no percurso escolar.",
+            nao: "não foram identificadas facilidades específicas neste momento.",
+            as_vezes: "as facilidades aparecem de forma pontual.",
+            raramente: "as facilidades aparecem de forma pouco frequente.",
+            frequentemente: "as facilidades aparecem de forma frequente.",
+          },
+        }),
       },
       {
         perguntaId: "dificuldades",
-        contexto: "às atividades realizadas com dificuldade",
-        respondida: "quanto às atividades realizadas com dificuldade, foi informado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("As principais dificuldades aparecem em", detalhe),
+          apenasMarcador: {
+            sim: "foram apontadas dificuldades relevantes no cotidiano escolar.",
+            nao: "não foram apontadas dificuldades relevantes neste momento.",
+            as_vezes: "as dificuldades aparecem de forma pontual.",
+            raramente: "as dificuldades aparecem de forma pouco frequente.",
+            frequentemente: "as dificuldades aparecem de forma frequente.",
+          },
+        }),
       },
       {
         perguntaId: "interacao-colegas",
-        contexto: "à interação do estudante com os colegas",
-        respondida: "sobre a interação do estudante com os colegas, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseComQue("Na convivência com os colegas, o professor observa", detalhe),
+          apenasMarcador: {
+            sim: "há interação positiva do estudante com os colegas.",
+            nao: "não há interação consistente do estudante com os colegas.",
+            as_vezes: "a interação do estudante com os colegas ocorre de forma oscilante.",
+            raramente: "a interação do estudante com os colegas ocorre de forma pouco frequente.",
+            frequentemente: "a interação do estudante com os colegas ocorre com frequência.",
+          },
+        }),
       },
       {
         perguntaId: "reage-comandos",
-        contexto: "à reação do estudante a comandos, combinados e mudanças de rotina",
-        respondida: "quanto à reação do estudante a comandos, combinados e mudanças de rotina, foi observado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseComQue(
+              "Diante de comandos, combinados e mudanças de rotina, observa",
+              detalhe,
+            ),
+          apenasMarcador: {
+            sim: "há resposta satisfatória a comandos, combinados e mudanças de rotina.",
+            nao: "não há resposta satisfatória a comandos, combinados e mudanças de rotina.",
+            as_vezes:
+              "a resposta a comandos, combinados e mudanças de rotina ocorre de forma oscilante.",
+            raramente:
+              "a resposta a comandos, combinados e mudanças de rotina ocorre de forma pouco frequente.",
+            frequentemente:
+              "a resposta a comandos, combinados e mudanças de rotina ocorre com frequência.",
+          },
+        }),
       },
       {
         perguntaId: "estrategias-funcionaram",
-        contexto: "às estratégias que já funcionaram na sala comum",
-        respondida: "em relação às estratégias que já funcionaram na sala comum, foi relatado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta(
+              "Entre as estratégias que já favoreceram sua participação, destacam-se",
+              detalhe,
+            ),
+          apenasMarcador: {
+            sim: "há estratégias já identificadas como favoráveis à participação do estudante.",
+            nao: "não foram identificadas estratégias eficazes neste momento.",
+            as_vezes: "as estratégias favoráveis aparecem de forma pontual.",
+            raramente: "as estratégias favoráveis aparecem de forma pouco frequente.",
+            frequentemente: "as estratégias favoráveis aparecem de forma recorrente.",
+          },
+        }),
       },
       {
         perguntaId: "apoios-sugeridos",
-        contexto: "aos apoios sugeridos pelo professor regente",
-        respondida: "sobre os apoios sugeridos pelo professor regente, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Como apoios sugeridos pelo professor regente, aparecem", detalhe),
+          apenasMarcador: {
+            sim: "há apoios sugeridos pelo professor regente para favorecer a participação do estudante.",
+            nao: "não foram indicados novos apoios pelo professor regente neste momento.",
+            as_vezes: "os apoios sugeridos aparecem de forma parcial.",
+            raramente: "os apoios sugeridos foram pouco explicitados.",
+            frequentemente: "os apoios sugeridos aparecem de forma recorrente.",
+          },
+        }),
       },
     ],
   },
   "barreiras-apoios": {
-    introducao: "Na análise de barreiras, apoios e acessibilidade",
+    abertura: "Na análise de barreiras, apoios e acessibilidade",
     descritores: [
       {
         perguntaId: "barreiras-ambiente",
-        contexto: "às barreiras presentes no ambiente escolar",
-        respondida: "quanto às barreiras presentes no ambiente escolar, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Em relação ao ambiente escolar, foram identificadas", detalhe),
+          apenasMarcador: {
+            sim: "foram identificadas barreiras no ambiente escolar.",
+            nao: "não foram identificadas barreiras relevantes no ambiente escolar.",
+          },
+        }),
       },
       {
         perguntaId: "barreiras-comunicacao",
-        contexto: "às barreiras de comunicação",
-        respondida: "em relação às barreiras de comunicação, foi relatado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("No campo da comunicação, aparecem", detalhe),
+          apenasMarcador: {
+            sim: "foram identificadas barreiras de comunicação.",
+            nao: "não foram identificadas barreiras de comunicação neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "barreiras-fisicas",
-        contexto: "às barreiras físicas ou de acessibilidade",
-        respondida: "sobre as barreiras físicas ou de acessibilidade, foi informado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Quanto à acessibilidade física, observam-se", detalhe),
+          apenasMarcador: {
+            sim: "foram identificadas barreiras físicas ou de acessibilidade.",
+            nao: "não foram identificadas barreiras físicas ou de acessibilidade neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "barreiras-materiais",
-        contexto: "às barreiras relacionadas a materiais, currículo ou avaliações",
-        respondida: "quanto às barreiras relacionadas a materiais, currículo ou avaliações, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Nos materiais, currículo ou avaliações, destacam-se", detalhe),
+          apenasMarcador: {
+            sim: "foram identificadas barreiras ligadas a materiais, currículo ou avaliações.",
+            nao: "não foram identificadas barreiras relevantes em materiais, currículo ou avaliações.",
+          },
+        }),
       },
       {
         perguntaId: "barreiras-atitudinais",
-        contexto: "às barreiras atitudinais ou sociais",
-        respondida: "em relação às barreiras atitudinais ou sociais, foi relatado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("No campo atitudinal e social, observam-se", detalhe),
+          apenasMarcador: {
+            sim: "foram identificadas barreiras atitudinais ou sociais.",
+            nao: "não foram identificadas barreiras atitudinais ou sociais neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "recursos-acessibilidade",
-        contexto: "aos recursos de acessibilidade disponíveis na escola",
-        respondida: "sobre os recursos de acessibilidade disponíveis na escola, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseComQue("Quanto aos recursos de acessibilidade já disponíveis, informa-se", detalhe),
+          apenasMarcador: {
+            sim: "há recursos de acessibilidade disponíveis na escola para o estudante.",
+            nao: "não foram identificados recursos de acessibilidade disponíveis neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "recursos-necessarios",
-        contexto: "aos recursos humanos ou materiais ainda necessários",
-        respondida: "quanto aos recursos humanos ou materiais ainda necessários, foi informado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Ainda se mostram necessários", detalhe),
+          apenasMarcador: {
+            sim: "há recursos humanos ou materiais ainda necessários.",
+            nao: "não foram indicados recursos adicionais neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "apoios-revisar",
-        contexto: "aos apoios que precisam ser mantidos, ampliados ou revistos",
-        respondida: "em relação aos apoios que precisam ser mantidos, ampliados ou revistos, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Quanto aos apoios a manter, ampliar ou rever, destacam-se", detalhe),
+          apenasMarcador: {
+            sim: "há apoios que precisam ser mantidos, ampliados ou revistos.",
+            nao: "não foram apontados apoios a revisar neste momento.",
+          },
+        }),
       },
     ],
   },
   "informacoes-aee": {
-    introducao: "Nas informações do AEE",
+    abertura: "Nas informações do AEE",
     descritores: [
       {
         perguntaId: "potencialidades-aee",
-        contexto: "às potencialidades observadas no AEE",
-        respondida: "quanto às potencialidades observadas no AEE, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("No AEE, destacam-se como potencialidades", detalhe),
+          apenasMarcador: {
+            sim: "foram identificadas potencialidades importantes no AEE.",
+            nao: "não foram descritas potencialidades específicas no AEE neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "interesses-ponto-partida",
-        contexto: "aos interesses que podem servir de ponto de partida",
-        respondida: "em relação aos interesses que podem servir de ponto de partida, foi relatado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Como interesses que podem servir de ponto de partida, aparecem", detalhe),
+          apenasMarcador: {
+            sim: "foram identificados interesses que podem orientar o trabalho pedagógico.",
+            nao: "não foram identificados interesses específicos como ponto de partida neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "necessidades-especificas",
-        contexto: "às necessidades específicas identificadas",
-        respondida: "sobre as necessidades específicas identificadas, foi informado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Entre as necessidades específicas identificadas, destacam-se", detalhe),
+          apenasMarcador: {
+            sim: "foram identificadas necessidades específicas de apoio.",
+            nao: "não foram descritas necessidades específicas neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "habilidades-consolidadas",
-        contexto: "às habilidades já consolidadas",
-        respondida: "quanto às habilidades já consolidadas, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Já se observam como habilidades consolidadas", detalhe),
+          apenasMarcador: {
+            sim: "há habilidades já consolidadas no percurso do estudante.",
+            nao: "não foram descritas habilidades consolidadas neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "habilidades-desenvolvimento",
-        contexto: "às habilidades em desenvolvimento",
-        respondida: "em relação às habilidades em desenvolvimento, foi relatado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Também se verificam, em desenvolvimento", detalhe),
+          apenasMarcador: {
+            sim: "há habilidades em desenvolvimento no percurso do estudante.",
+            nao: "não foram descritas habilidades em desenvolvimento neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "habilidades-priorizadas",
-        contexto: "às habilidades que precisam ser priorizadas",
-        respondida: "sobre as habilidades que precisam ser priorizadas, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Como necessidade prioritária, identificam-se", detalhe),
+          apenasMarcador: {
+            sim: "há habilidades que precisam ser priorizadas no atendimento.",
+            nao: "não foram indicadas habilidades prioritárias neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "resultado-sondagem",
-        contexto: "aos resultados apontados pela Sondagem Diagnóstica",
-        respondida: "quanto aos resultados apontados pela Sondagem Diagnóstica, foi informado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseComQue("A Sondagem Diagnóstica indica", detalhe),
+          apenasMarcador: {
+            sim: "a Sondagem Diagnóstica apresentou indicação afirmativa de necessidades ou avanços relevantes.",
+            nao: "a Sondagem Diagnóstica não apresentou indicação adicional neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "estrategias-aee",
-        contexto: "às estratégias que devem ser trabalhadas no AEE",
-        respondida: "em relação às estratégias que devem ser trabalhadas no AEE, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Para o AEE, mostram-se pertinentes as seguintes estratégias", detalhe),
+          apenasMarcador: {
+            sim: "foram indicadas estratégias pertinentes para o trabalho no AEE.",
+            nao: "não foram indicadas estratégias adicionais para o AEE neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "orientacoes-regente",
-        contexto: "às orientações que devem ser compartilhadas com o professor regente",
-        respondida: "sobre as orientações que devem ser compartilhadas com o professor regente, foi informado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Ao professor regente, recomenda-se", detalhe),
+          apenasMarcador: {
+            sim: "foram indicadas orientações ao professor regente.",
+            nao: "não foram indicadas orientações adicionais ao professor regente neste momento.",
+          },
+        }),
       },
     ],
   },
   "sintese-final": {
-    introducao: "Na síntese pedagógica final",
+    abertura: "Na síntese pedagógica final",
     descritores: [
       {
         perguntaId: "potencialidades-principais",
-        contexto: "às principais potencialidades do estudante",
-        respondida: "quanto às principais potencialidades do estudante, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("De modo geral, destacam-se como potencialidades", detalhe),
+          apenasMarcador: {
+            sim: "há potencialidades principais claramente identificadas.",
+            nao: "não foram explicitadas potencialidades principais neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "barreiras-principais",
-        contexto: "às principais barreiras identificadas",
-        respondida: "em relação às principais barreiras identificadas, foi relatado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Entre as principais barreiras identificadas, aparecem", detalhe),
+          apenasMarcador: {
+            sim: "há barreiras principais já identificadas.",
+            nao: "não foram explicitadas barreiras principais neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "necessidades-prioritarias",
-        contexto: "às necessidades prioritárias de apoio",
-        respondida: "sobre as necessidades prioritárias de apoio, foi informado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Como necessidades prioritárias de apoio, destacam-se", detalhe),
+          apenasMarcador: {
+            sim: "há necessidades prioritárias de apoio já identificadas.",
+            nao: "não foram explicitadas necessidades prioritárias de apoio neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "habilidades-planejamento",
-        contexto: "às habilidades que devem orientar o planejamento",
-        respondida: "quanto às habilidades que devem orientar o planejamento, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Para orientar o planejamento, sugerem-se as habilidades relacionadas a", detalhe),
+          apenasMarcador: {
+            sim: "há habilidades identificadas para orientar o planejamento.",
+            nao: "não foram explicitadas habilidades para orientar o planejamento neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "recursos-estrategias",
-        contexto: "aos recursos e estratégias recomendados",
-        respondida: "em relação aos recursos e estratégias recomendados, foi relatado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Entre os recursos e estratégias recomendados, incluem-se", detalhe),
+          apenasMarcador: {
+            sim: "há recursos e estratégias recomendados para o acompanhamento do estudante.",
+            nao: "não foram explicitados recursos ou estratégias adicionais neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "informacoes-pendentes",
-        contexto: "às informações que ainda precisam de aprofundamento",
-        respondida: "sobre as informações que ainda precisam de aprofundamento, foi informado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Ainda demandam aprofundamento as seguintes informações", detalhe),
+          apenasMarcador: {
+            sim: "ainda há informações pendentes de aprofundamento.",
+            nao: "não foram indicadas informações pendentes de aprofundamento neste momento.",
+          },
+        }),
       },
     ],
   },
   encaminhamentos: {
-    introducao: "Nos encaminhamentos",
+    abertura: "Nos encaminhamentos",
     descritores: [
       {
         perguntaId: "encaminhamentos-finais",
-        contexto: "aos encaminhamentos a serem realizados",
-        respondida: "quanto aos encaminhamentos a serem realizados, foi registrado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseDireta("Como encaminhamentos, indicam-se", detalhe),
+          apenasMarcador: {
+            sim: "há encaminhamentos definidos para continuidade do acompanhamento.",
+            nao: "não foram definidos encaminhamentos neste momento.",
+          },
+        }),
       },
       {
         perguntaId: "pronto-para-paee",
-        contexto: "à prontidão do estudo para orientar o PAEE",
-        respondida: "em relação à prontidão do estudo para orientar o PAEE, foi informado",
+        render: criarRenderPorMarcador({
+          comDetalhe: ({ detalhe }) =>
+            fraseComQue("Em relação à possibilidade de orientar o PAEE, considera-se", detalhe),
+          apenasMarcador: {
+            sim: "considera-se que o estudo já reúne elementos para orientar o PAEE.",
+            nao: "considera-se que o estudo ainda não reúne elementos suficientes para orientar o PAEE.",
+            as_vezes: "a possibilidade de orientar o PAEE aparece de forma parcial neste momento.",
+          },
+        }),
       },
     ],
   },
@@ -849,6 +1259,34 @@ const PREVIEW_NARRATIVA_BLOCOS = {
 
 function removerPontuacaoFinal(texto) {
   return limparTexto(texto).replace(/[.?!…:]+$/u, "");
+}
+
+function extrairMarcadorRespostaObjetiva(texto) {
+  const resposta = limparTexto(texto);
+
+  if (!resposta) {
+    return { marcador: "", detalhe: "" };
+  }
+
+  const marcadores = [
+    { marcador: "sim", regex: /^sim\b[\s:.,;-]*/i },
+    { marcador: "nao", regex: /^(não|nao)\b[\s:.,;-]*/i },
+    { marcador: "as_vezes", regex: /^(às vezes|as vezes)\b[\s:.,;-]*/i },
+    { marcador: "raramente", regex: /^raramente\b[\s:.,;-]*/i },
+    { marcador: "frequentemente", regex: /^frequentemente\b[\s:.,;-]*/i },
+  ];
+
+  for (const item of marcadores) {
+    const match = resposta.match(item.regex);
+    if (match) {
+      return {
+        marcador: item.marcador,
+        detalhe: limparTexto(resposta.slice(match[0].length)),
+      };
+    }
+  }
+
+  return { marcador: "", detalhe: resposta };
 }
 
 function capitalizarInicio(texto) {
@@ -873,34 +1311,130 @@ function formatarListaNatural(itens) {
   return `${valores.slice(0, -1).join(", ")} e ${valores.at(-1)}`;
 }
 
-function obterFontesDosRegistros(registros) {
-  return [...new Set(registros.map((registro) => limparTexto(registro?.fonte)).filter(Boolean))];
+function formatarCitacaoNarrativa(texto) {
+  const conteudo = limparTexto(texto).replace(/^["“”']+|["“”']+$/gu, "");
+  if (!conteudo) return "";
+  return `“${finalizarFrase(conteudo)}”`;
 }
 
-function criarFragmentoNarrativo(registro, descritor) {
-  const resposta = limparTexto(registro?.resposta);
+function parecePrimeiraPessoa(texto) {
+  return /^(eu|gosto|tenho|quero|prefiro|consigo|preciso|acho|vejo|gostaria|participo|brinco|converso|aprendo|sei|vou|faço|faco|posso|sinto|fico|peço|peco|uso|leio|escrevo|estudo|conto|ajudo)\b/i.test(
+    limparTexto(texto),
+  );
+}
 
-  if (!resposta) {
+function fraseComQue(prefixo, detalhe) {
+  const textoLimpo = removerPontuacaoFinal(detalhe);
+  if (!textoLimpo) {
     return "";
   }
 
-  const respostaFinal = finalizarFrase(resposta);
-  const status = registro?.status || "pendente";
-  const contexto = descritor.contexto;
-
-  if (status === "revisar") {
-    return `no que se refere ${contexto}, há informação registrada para revisão: ${respostaFinal}`;
+  if (parecePrimeiraPessoa(textoLimpo)) {
+    return `${prefixo}: ${formatarCitacaoNarrativa(textoLimpo)}`;
   }
 
-  if (status === "pendente") {
-    return `no que se refere ${contexto}, há registro parcial: ${respostaFinal}`;
+  return `${prefixo} que ${decapitalizarInicio(textoLimpo)}.`;
+}
+
+function fraseDireta(prefixo, detalhe) {
+  const textoLimpo = removerPontuacaoFinal(detalhe);
+  if (!textoLimpo) {
+    return "";
   }
 
-  if (status === "ignorada") {
-    return `no que se refere ${contexto}, há observação marcada como ignorada no preenchimento: ${respostaFinal}`;
+  if (parecePrimeiraPessoa(textoLimpo)) {
+    return `${prefixo}: ${formatarCitacaoNarrativa(textoLimpo)}`;
   }
 
-  return `${descritor.respondida}: ${respostaFinal}`;
+  return `${prefixo} ${decapitalizarInicio(textoLimpo)}.`;
+}
+
+function fallbackMarcadorPadrao(marcador) {
+  switch (marcador) {
+    case "sim":
+      return "houve indicação afirmativa.";
+    case "nao":
+      return "não houve indicação afirmativa.";
+    case "as_vezes":
+      return "a ocorrência aparece às vezes.";
+    case "raramente":
+      return "a ocorrência foi apontada como rara.";
+    case "frequentemente":
+      return "a ocorrência foi apontada como frequente.";
+    default:
+      return "";
+  }
+}
+
+function resolverTemplateNarrativo(template, contexto) {
+  return typeof template === "function" ? template(contexto) : template || "";
+}
+
+function aplicarStatusAoTrechoNarrativo(texto, status) {
+  const conteudo = limparTexto(texto);
+  if (!conteudo) return "";
+
+  switch (status) {
+    case "revisar":
+      return `Como informação ainda em revisão, ${finalizarFrase(
+        decapitalizarInicio(removerPontuacaoFinal(conteudo)),
+      )}`;
+    case "pendente":
+      return `De forma parcial, ${finalizarFrase(
+        decapitalizarInicio(removerPontuacaoFinal(conteudo)),
+      )}`;
+    case "ignorada":
+      return `Embora marcada como ignorada no preenchimento, ${finalizarFrase(
+        decapitalizarInicio(removerPontuacaoFinal(conteudo)),
+      )}`;
+    default:
+      return conteudo;
+  }
+}
+
+function criarRenderPorMarcador({
+  comDetalhe = null,
+  comDetalhePorMarcador = {},
+  apenasMarcador = {},
+}) {
+  return (registro) => {
+    const { marcador, detalhe } = extrairMarcadorRespostaObjetiva(registro?.resposta);
+
+    if (!marcador && !detalhe) {
+      return "";
+    }
+
+    let texto = "";
+
+    if (detalhe) {
+      const renderer =
+        comDetalhePorMarcador[marcador] ||
+        comDetalhePorMarcador.default ||
+        comDetalhe;
+
+      texto = resolverTemplateNarrativo(renderer, {
+        detalhe,
+        marcador,
+        registro,
+      });
+    } else {
+      const fallback =
+        apenasMarcador[marcador] ||
+        apenasMarcador.default ||
+        fallbackMarcadorPadrao(marcador);
+
+      texto = resolverTemplateNarrativo(fallback, {
+        marcador,
+        registro,
+      });
+    }
+
+    return aplicarStatusAoTrechoNarrativo(texto, registro?.status || "pendente");
+  };
+}
+
+function obterFontesDosRegistros(registros) {
+  return [...new Set(registros.map((registro) => limparTexto(registro?.fonte)).filter(Boolean))];
 }
 
 function montarLinhasNarrativasBloco(registros, configuracaoBloco) {
@@ -908,7 +1442,7 @@ function montarLinhasNarrativasBloco(registros, configuracaoBloco) {
     registros.map((registro) => [registro.perguntaId, registro]),
   );
   const fragmentos = configuracaoBloco.descritores
-    .map((descritor) => criarFragmentoNarrativo(registrosPorPergunta[descritor.perguntaId], descritor))
+    .map((descritor) => descritor.render(registrosPorPergunta[descritor.perguntaId]))
     .filter(Boolean);
 
   if (!fragmentos.length) {
@@ -917,7 +1451,7 @@ function montarLinhasNarrativasBloco(registros, configuracaoBloco) {
 
   const [primeiroFragmento, ...demaisFragmentos] = fragmentos;
   const paragrafo = [
-    `${configuracaoBloco.introducao}, ${decapitalizarInicio(primeiroFragmento)}`,
+    `${configuracaoBloco.abertura}, ${decapitalizarInicio(primeiroFragmento)}`,
     ...demaisFragmentos.map(capitalizarInicio),
   ].join(" ");
   const fontes = obterFontesDosRegistros(registros);
