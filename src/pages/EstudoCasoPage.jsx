@@ -2516,15 +2516,15 @@ function EstudoCasoPage() {
             <div>
               <h2>Texto final revisado</h2>
               <p className="muted">
-                Cole aqui a versÃ£o revisada e final do Estudo de Caso apÃ³s conferÃªncia
-                pedagÃ³gica. Este campo pode receber o texto reelaborado no ChatGPT e revisado
+                Cole aqui a versão revisada e final do Estudo de Caso após conferência
+                pedagógica. Este campo pode receber o texto reelaborado no ChatGPT e revisado
                 pela professora do AEE.
               </p>
             </div>
           </div>
 
           <p className="muted">
-            Use o botÃ£o Salvar rascunho para guardar tambÃ©m o texto final revisado.
+            Use o botão Salvar rascunho para guardar também o texto final revisado.
           </p>
 
           <textarea
