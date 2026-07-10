@@ -10,10 +10,12 @@ import { podeVisualizarSondagens } from "../utils/permissions";
 const ESTUDO_CASO_RASCUNHO_ID_KEY = "estudoCasoRascunhoId";
 const COMANDO_REVISAO_CHATGPT =
   "Reelabore o Estudo de Caso abaixo em linguagem pedagógica, formal, clara e coesa, " +
-  "mantendo todas as informações importantes, sem inventar dados. Organize o texto em " +
-  "seções, reduza repetições, corrija incoerências e transforme em um relatório profissional " +
-  "do AEE. Preserve o sentido das informações registradas e mantenha linguagem adequada para " +
-  "uso escolar.";
+  "mantendo todas as informações importantes, sem inventar dados. Importante: mantenha " +
+  "a seção 'Identificação do estudante' exatamente no formato de lista/campos, como veio da " +
+  "plataforma. Não transforme os dados de identificação em parágrafo. Nas demais seções, " +
+  "organize o texto em linguagem pedagógica, reduza repetições, corrija incoerências e " +
+  "transforme em um relatório profissional do AEE. Preserve o sentido das informações " +
+  "registradas e mantenha linguagem adequada para uso escolar.";
 
 const STATUS_ESTUDO_OPTIONS = [
   { value: "em-andamento", label: "Em andamento" },
