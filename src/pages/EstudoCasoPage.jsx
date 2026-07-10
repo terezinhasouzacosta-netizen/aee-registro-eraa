@@ -726,7 +726,7 @@ const PREVIEW_NARRATIVA_BLOCOS = {
       {
         perguntaId: "opiniao-familia",
         render: criarRenderPorMarcador({
-          comDetalhe: ({ detalhe }) => fraseComQue("considera-se", detalhe),
+          comDetalhe: ({ detalhe }) => fraseComQue("A família considera", detalhe),
           apenasMarcador: {
             sim: "há uma percepção positiva da família sobre a vida escolar do estudante.",
             nao: "não há uma percepção positiva da família sobre a vida escolar do estudante.",
@@ -741,7 +741,7 @@ const PREVIEW_NARRATIVA_BLOCOS = {
       {
         perguntaId: "participacao-familia",
         render: criarRenderPorMarcador({
-          comDetalhe: ({ detalhe }) => fraseComQue("Também se informa", detalhe),
+          comDetalhe: ({ detalhe }) => fraseComQue("A família informa", detalhe),
           apenasMarcador: {
             sim: "há participação da família em reuniões e atividades escolares.",
             nao: "não há participação regular da família em reuniões e atividades escolares.",
@@ -1318,32 +1318,114 @@ function formatarCitacaoNarrativa(texto) {
 }
 
 function parecePrimeiraPessoa(texto) {
-  return /^(eu|gosto|tenho|quero|prefiro|consigo|preciso|acho|vejo|gostaria|participo|brinco|converso|aprendo|sei|vou|faço|faco|posso|sinto|fico|peço|peco|uso|leio|escrevo|estudo|conto|ajudo)\b/i.test(
+  return /^(eu|gosto|tenho|quero|prefiro|consigo|preciso|acho|vejo|gostaria|participo|brinco|converso|aprendo|sei|vou|faço|faco|posso|sinto|fico|peço|peco|uso|leio|escrevo|estudo|conto|ajudo|estou|expresso|não compreendo|nao compreendo|desejo)\b/i.test(
     limparTexto(texto),
   );
 }
 
-function fraseComQue(prefixo, detalhe) {
-  const textoLimpo = removerPontuacaoFinal(detalhe);
-  if (!textoLimpo) {
+function normalizarRespostaNarrativa(texto) {
+  let resposta = limparTexto(texto);
+
+  if (!resposta) {
     return "";
   }
 
-  if (parecePrimeiraPessoa(textoLimpo)) {
-    return `${prefixo}: ${formatarCitacaoNarrativa(textoLimpo)}`;
+  resposta = resposta.replace(/^["“”']+|["“”']+$/gu, "");
+
+  const padroesRemocaoInicial = [
+    /^(a família considera que|a familia considera que)\s+/i,
+    /^(a família considera|a familia considera)\s+/i,
+    /^(a família identifica que|a familia identifica que)\s+/i,
+    /^(a família identifica|a familia identifica)\s+/i,
+    /^(a família percebe que|a familia percebe que)\s+/i,
+    /^(a família percebe|a familia percebe)\s+/i,
+    /^(a família espera que|a familia espera que)\s+/i,
+    /^(a família espera|a familia espera)\s+/i,
+    /^(a família informa que|a familia informa que)\s+/i,
+    /^(a família informa|a familia informa)\s+/i,
+    /^(a família destaca que|a familia destaca que)\s+/i,
+    /^(a família destaca|a familia destaca)\s+/i,
+    /^(o professor sugere que|o professor sugere)\s+/i,
+    /^(o professor regente sugere que|o professor regente sugere)\s+/i,
+    /^(o professor regente observa que|o professor regente observa)\s+/i,
+    /^(recomenda-se que|recomenda-se)\s+/i,
+    /^(foram identificados|foram identificadas|foram observados|foram observadas)\s+/i,
+    /^(são necessários|sao necessarios|são necessárias|sao necessarias|é necessário|e necessario)\s+/i,
+    /^(devem ser priorizados|devem ser priorizadas)\s+/i,
+    /^(no aee[,:\-\s]*)/i,
+  ];
+
+  let alterou = true;
+  while (alterou && resposta) {
+    alterou = false;
+
+    for (const padrao of padroesRemocaoInicial) {
+      if (padrao.test(resposta)) {
+        resposta = resposta.replace(padrao, "");
+        resposta = resposta.replace(/^[,:;\-\s]+/u, "");
+        resposta = resposta.replace(/^que\s+/i, "");
+        alterou = true;
+      }
+    }
+  }
+
+  if (parecePrimeiraPessoa(resposta)) {
+    const substituicoes = [
+      [/^eu\s+/i, ""],
+      [/\bgeralmente expresso minhas necessidades\b/gi, "geralmente expressa suas necessidades"],
+      [/\bexpresso minhas necessidades\b/gi, "expressa suas necessidades"],
+      [/\bexpresso meus desejos\b/gi, "expressa seus desejos"],
+      [/\bexpresso meus interesses\b/gi, "expressa seus interesses"],
+      [/\bestou satisfeito\b/gi, "está satisfeito"],
+      [/\bestou satisfeita\b/gi, "está satisfeita"],
+      [/\bgosto de\b/gi, "gosta de"],
+      [/\btenho\b/gi, "tem"],
+      [/\bpreciso de ajuda\b/gi, "precisa de ajuda"],
+      [/\bnão compreendo\b/gi, "não compreende"],
+      [/\bnao compreendo\b/gi, "não compreende"],
+      [/\bdesejo participar\b/gi, "deseja participar"],
+      [/\bfico quieto\b/gi, "fica quieto"],
+      [/\bestou\b/gi, "está"],
+      [/\bquero\b/gi, "quer"],
+      [/\bconsigo\b/gi, "consegue"],
+      [/\bpreciso\b/gi, "precisa"],
+      [/\bparticipo\b/gi, "participa"],
+      [/\bbrinco\b/gi, "brinca"],
+      [/\bconverso\b/gi, "conversa"],
+      [/\baprendo\b/gi, "aprende"],
+      [/\bposso\b/gi, "pode"],
+      [/\bsou\b/gi, "é"],
+      [/\bminhas\b/gi, "suas"],
+      [/\bmeus\b/gi, "seus"],
+      [/\bminha\b/gi, "sua"],
+      [/\bmeu\b/gi, "seu"],
+    ];
+
+    substituicoes.forEach(([padrao, valor]) => {
+      resposta = resposta.replace(padrao, valor);
+    });
+  }
+
+  resposta = resposta.replace(/^[,:;\-\s]+/u, "");
+  resposta = resposta.replace(/^que\s+/i, "");
+  resposta = resposta.replace(/\s{2,}/g, " ");
+
+  return limparTexto(resposta);
+}
+
+function fraseComQue(prefixo, detalhe) {
+  const textoLimpo = removerPontuacaoFinal(normalizarRespostaNarrativa(detalhe));
+  if (!textoLimpo) {
+    return "";
   }
 
   return `${prefixo} que ${decapitalizarInicio(textoLimpo)}.`;
 }
 
 function fraseDireta(prefixo, detalhe) {
-  const textoLimpo = removerPontuacaoFinal(detalhe);
+  const textoLimpo = removerPontuacaoFinal(normalizarRespostaNarrativa(detalhe));
   if (!textoLimpo) {
     return "";
-  }
-
-  if (parecePrimeiraPessoa(textoLimpo)) {
-    return `${prefixo}: ${formatarCitacaoNarrativa(textoLimpo)}`;
   }
 
   return `${prefixo} ${decapitalizarInicio(textoLimpo)}.`;
