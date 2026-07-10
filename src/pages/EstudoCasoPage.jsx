@@ -2435,8 +2435,9 @@ function EstudoCasoPage() {
             <div>
               <h2>Prévia do texto do Estudo de Caso</h2>
               <p className="muted">
-                Texto gerado a partir das respostas preenchidas. Revise antes de usar em
-                documentos oficiais.
+                Texto preliminar gerado a partir das respostas preenchidas. Use esta prévia
+                como base para revisão pedagógica. Para uma versão final mais coesa, copie o
+                texto e reelabore no ChatGPT antes de utilizar em documentos oficiais.
               </p>
             </div>
 
