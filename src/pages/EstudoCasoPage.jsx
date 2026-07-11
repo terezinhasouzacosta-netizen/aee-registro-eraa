@@ -490,6 +490,14 @@ function formatarDataParaTexto(valor) {
   return `${match[3]}/${match[2]}/${match[1]}`;
 }
 
+function obterDataAtualIsoLocal() {
+  const agora = new Date();
+  const ano = agora.getFullYear();
+  const mes = String(agora.getMonth() + 1).padStart(2, "0");
+  const dia = String(agora.getDate()).padStart(2, "0");
+  return `${ano}-${mes}-${dia}`;
+}
+
 function preencherValorOuPadrao(valor, padrao = "Não informado") {
   return limparTexto(valor) || padrao;
 }
@@ -1827,6 +1835,7 @@ function EstudoCasoPage() {
   );
   const [blocosAbertos, setBlocosAbertos] = useState(criarEstadoInicialBlocosAbertos);
   const [salvandoRascunho, setSalvandoRascunho] = useState(false);
+  const [concluindoEstudo, setConcluindoEstudo] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [aviso, setAviso] = useState("");
   const [erro, setErro] = useState("");
@@ -1949,7 +1958,7 @@ function EstudoCasoPage() {
     }));
   };
 
-  const handleSalvarRascunho = async () => {
+  const montarPayloadEstudoCaso = ({ statusGeral = metaEstudo.status, dataConclusao } = {}) => {
     const resumoAtualizado = obterResumoGeral(perguntasEstado, identificacaoEstudante);
     const sintesePreviaAtual = limparTexto(previaTexto)
       ? gerarTextoPreviaEstudoCaso({
@@ -1959,6 +1968,7 @@ function EstudoCasoPage() {
           observacoesObjetivas,
         })
       : "";
+
     const payload = {
       alunoId: null,
       alunoNome: limparTexto(identificacaoEstudante.aluno),
@@ -1966,7 +1976,7 @@ function EstudoCasoPage() {
       dataInicio: metaEstudo.dataInicio || "",
       periodo: limparTexto(metaEstudo.periodo),
       responsavel: limparTexto(metaEstudo.responsavel),
-      statusGeral: metaEstudo.status,
+      statusGeral,
       identificacaoEstudante: normalizarIdentificacaoEstudante(identificacaoEstudante),
       perguntasEstado: montarPerguntasEstadoPersistido(perguntasEstado),
       observacoesObjetivas: montarObservacoesObjetivasPersistidas(observacoesObjetivas),
@@ -1974,6 +1984,16 @@ function EstudoCasoPage() {
       sintesePrevia: sintesePreviaAtual,
       textoFinalRevisado: limparTexto(textoFinalRevisado),
     };
+
+    if (dataConclusao) {
+      payload.dataConclusao = dataConclusao;
+    }
+
+    return { payload, sintesePreviaAtual };
+  };
+
+  const handleSalvarRascunho = async () => {
+    const { payload, sintesePreviaAtual } = montarPayloadEstudoCaso();
 
     setSalvandoRascunho(true);
     setErro("");
@@ -2066,6 +2086,64 @@ function EstudoCasoPage() {
       console.error("[EstudoCasoPage] Erro ao copiar prÃ©via com comando", error);
       setFeedback("");
       setErro("NÃ£o foi possÃ­vel copiar o texto com comando. Tente novamente.");
+    }
+  };
+
+  const handleConcluirEstudoCaso = async () => {
+    if (!limparTexto(textoFinalRevisado)) {
+      setErro("");
+      setFeedback("");
+      setAviso("Antes de concluir, cole ou revise o texto final do Estudo de Caso.");
+      return;
+    }
+
+    const confirmouConclusao =
+      typeof window === "undefined"
+        ? true
+        : window.confirm(
+            "Deseja concluir este Estudo de Caso? Confira se o texto final revisado foi validado pela professora do AEE.",
+          );
+
+    if (!confirmouConclusao) {
+      return;
+    }
+
+    const dataConclusao = obterDataAtualIsoLocal();
+    const { payload, sintesePreviaAtual } = montarPayloadEstudoCaso({
+      statusGeral: "concluido",
+      dataConclusao,
+    });
+
+    setConcluindoEstudo(true);
+    setErro("");
+    setFeedback("");
+    setAviso("");
+
+    try {
+      if (estudoCasoSalvoId) {
+        await atualizarEstudoCaso(estudoCasoSalvoId, payload);
+        salvarRascunhoIdLocal(estudoCasoSalvoId);
+      } else {
+        const novoEstudoCasoId = await criarEstudoCaso(payload);
+        setEstudoCasoSalvoId(novoEstudoCasoId);
+        salvarRascunhoIdLocal(novoEstudoCasoId);
+      }
+
+      setMetaEstudo((prev) => ({
+        ...prev,
+        status: "concluido",
+      }));
+
+      if (sintesePreviaAtual) {
+        setPreviaTexto(sintesePreviaAtual);
+      }
+
+      setFeedback("Estudo de Caso concluído com sucesso.");
+    } catch (error) {
+      console.error("[EstudoCasoPage] Erro ao concluir estudo de caso", error);
+      setErro("Não foi possível concluir o Estudo de Caso. Tente novamente.");
+    } finally {
+      setConcluindoEstudo(false);
     }
   };
 
@@ -2446,29 +2524,49 @@ function EstudoCasoPage() {
           <div>
             <h2>Próximas ações</h2>
             <p className="muted">
-              O rascunho já pode ser salvo e a prévia textual pode ser gerada localmente. A
-              conclusão do estudo continua reservada para as próximas etapas do módulo.
+              O rascunho já pode ser salvo, a prévia textual pode ser gerada localmente e a
+              conclusão simples do estudo já está disponível nesta etapa.
             </p>
           </div>
         </div>
 
         <div className="form-actions estudo-caso-actions">
-          <button type="button" onClick={handleSalvarRascunho} disabled={salvandoRascunho}>
+          <button
+            type="button"
+            onClick={handleSalvarRascunho}
+            disabled={salvandoRascunho || concluindoEstudo}
+          >
             {salvandoRascunho ? "Salvando rascunho..." : "Salvar rascunho"}
           </button>
-          <button type="button" className="btn-secondary" onClick={handleNovoEstudo}>
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={handleNovoEstudo}
+            disabled={salvandoRascunho || concluindoEstudo}
+          >
             Novo estudo
           </button>
-          <button type="button" className="btn-secondary" onClick={handleGerarSintesePrevia}>
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={handleGerarSintesePrevia}
+            disabled={salvandoRascunho || concluindoEstudo}
+          >
             Gerar síntese do Estudo de Caso
           </button>
-          <button type="button" className="btn-secondary" disabled title="Recurso futuro">
-            Concluir Estudo de Caso
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={handleConcluirEstudoCaso}
+            disabled={salvandoRascunho || concluindoEstudo}
+          >
+            {concluindoEstudo ? "Concluindo estudo..." : "Concluir Estudo de Caso"}
           </button>
         </div>
 
         <p className="estudo-caso-future-note">
-          Recurso futuro: concluir o Estudo de Caso permanece desativado nesta etapa.
+          A conclusão simples atualiza o status para Concluído e mantém o estudo editável para
+          ajustes posteriores, se necessário.
         </p>
       </section>
 
