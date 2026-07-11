@@ -2158,6 +2158,7 @@ function EstudoCasoPage() {
     { chave: "revisar", rotulo: "Em revisão", valor: resumoGeral.revisar },
     { chave: "total", rotulo: "Total", valor: resumoGeral.total },
   ];
+  const estudoConcluido = metaEstudo.status === "concluido";
   const exibirTextoFinalRevisado = previaVisivel || Boolean(limparTexto(textoFinalRevisado));
 
   return (
@@ -2614,12 +2615,18 @@ function EstudoCasoPage() {
             <div>
               <h2>Texto final revisado</h2>
               <p className="muted">
-                Cole aqui a versão revisada e final do Estudo de Caso após conferência
-                pedagógica. Este campo pode receber o texto reelaborado no ChatGPT e revisado
-                pela professora do AEE.
+                Este é o campo considerado para a conclusão do Estudo de Caso. Cole aqui a
+                versão revisada, conferida e validada pela professora do AEE.
               </p>
             </div>
           </div>
+
+          {estudoConcluido ? (
+            <div className="estudo-caso-note">
+              Este Estudo de Caso está marcado como Concluído. O texto final revisado abaixo é
+              a versão validada para uso pedagógico.
+            </div>
+          ) : null}
 
           <p className="muted">
             Use o botão Salvar rascunho para guardar também o texto final revisado.
