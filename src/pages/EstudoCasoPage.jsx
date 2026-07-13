@@ -2303,10 +2303,13 @@ function EstudoCasoPage() {
         </div>
       </section>
 
-      <section className="panel">
+      <section
+        className="panel estudo-caso-salvos-panel"
+        aria-labelledby="estudos-caso-salvos-titulo"
+      >
         <div className="estudo-caso-section-header">
           <div>
-            <h2>Estudos de Caso salvos</h2>
+            <h2 id="estudos-caso-salvos-titulo">Estudos de Caso salvos</h2>
             <p className="muted">
               Lista simples dos estudos já registrados na coleção estudosCaso para retomada do
               preenchimento.
@@ -2317,7 +2320,7 @@ function EstudoCasoPage() {
         {carregandoEstudosSalvos ? (
           <p className="muted">Carregando estudos salvos...</p>
         ) : estudosSalvos.length ? (
-          <div className="estudo-caso-question-list">
+          <div className="estudo-caso-question-list estudo-caso-salvos-list">
             {estudosSalvos.map((estudo) => {
               const nomeAluno = obterNomeEstudoSalvo(estudo);
               const statusLabel = obterLabelStatusEstudo(estudo.statusGeral);
@@ -2325,7 +2328,10 @@ function EstudoCasoPage() {
               const abrindoEstudoAtual = abrindoEstudoId === estudo.id;
 
               return (
-                <article key={estudo.id} className="estudo-caso-question-card">
+                <article
+                  key={estudo.id}
+                  className="estudo-caso-question-card estudo-caso-salvo-card"
+                >
                   <div className="estudo-caso-question-top">
                     <div>
                       <p className="estudo-caso-question-text">{nomeAluno}</p>
@@ -2375,6 +2381,7 @@ function EstudoCasoPage() {
                   <div className="form-actions estudo-caso-actions">
                     <button
                       type="button"
+                      className="btn-primary estudo-caso-abrir-button"
                       onClick={() => handleAbrirEstudoSalvo(estudo.id)}
                       disabled={
                         abrindoEstudoAtual ||
@@ -2391,7 +2398,9 @@ function EstudoCasoPage() {
             })}
           </div>
         ) : (
-          <p className="muted">Nenhum Estudo de Caso salvo até o momento.</p>
+          <p className="estudo-caso-salvos-empty">
+            Nenhum Estudo de Caso salvo até o momento.
+          </p>
         )}
       </section>
 
