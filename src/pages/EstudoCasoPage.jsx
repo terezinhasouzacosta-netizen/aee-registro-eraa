@@ -3,6 +3,7 @@ import {
   atualizarEstudoCaso,
   buscarEstudoCasoPorId,
   criarEstudoCaso,
+  listarEstudosCaso,
 } from "../services/estudosCasoService";
 import { useAuth } from "../hooks/useAuth";
 import { podeVisualizarSondagens } from "../utils/permissions";
@@ -496,6 +497,62 @@ function obterDataAtualIsoLocal() {
   const mes = String(agora.getMonth() + 1).padStart(2, "0");
   const dia = String(agora.getDate()).padStart(2, "0");
   return `${ano}-${mes}-${dia}`;
+}
+
+function formatarDataListaEstudo(valor, incluirHora = false) {
+  if (!valor) return "";
+
+  if (valor?.toDate) {
+    const data = valor.toDate();
+    const dataFormatada = data.toLocaleDateString("pt-BR");
+
+    if (!incluirHora) {
+      return dataFormatada;
+    }
+
+    return `${dataFormatada} ${data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
+  }
+
+  const texto = limparTexto(valor);
+  if (!texto) return "";
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(texto)) {
+    return formatarDataParaTexto(texto);
+  }
+
+  const data = new Date(texto);
+  if (Number.isNaN(data.getTime())) {
+    return texto;
+  }
+
+  const dataFormatada = data.toLocaleDateString("pt-BR");
+  if (!incluirHora) {
+    return dataFormatada;
+  }
+
+  return `${dataFormatada} ${data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
+}
+
+function obterNomeEstudoSalvo(estudo = {}) {
+  return (
+    limparTexto(estudo.alunoNome) ||
+    limparTexto(estudo.identificacaoEstudante?.aluno) ||
+    "Aluno não informado"
+  );
+}
+
+function obterLabelStatusEstudo(statusGeral) {
+  return (
+    STATUS_ESTUDO_OPTIONS.find((status) => status.value === statusGeral)?.label ||
+    "Sem status informado"
+  );
+}
+
+function obterClasseStatusEstudo(statusGeral) {
+  if (statusGeral === "concluido") return "respondida";
+  if (statusGeral === "pronto-para-sintese") return "revisar";
+  if (statusGeral === "pendente-informacoes") return "pendente";
+  return "ignorada";
 }
 
 function preencherValorOuPadrao(valor, padrao = "Não informado") {
@@ -1842,10 +1899,85 @@ function EstudoCasoPage() {
   const [previaTexto, setPreviaTexto] = useState("");
   const [previaVisivel, setPreviaVisivel] = useState(false);
   const [textoFinalRevisado, setTextoFinalRevisado] = useState("");
+  const [estudosSalvos, setEstudosSalvos] = useState([]);
+  const [carregandoEstudosSalvos, setCarregandoEstudosSalvos] = useState(false);
+  const [abrindoEstudoId, setAbrindoEstudoId] = useState("");
 
   const resumoGeral = useMemo(() => {
     return obterResumoGeral(perguntasEstado, identificacaoEstudante);
   }, [identificacaoEstudante, perguntasEstado]);
+  const carregarListaEstudosSalvos = async () => {
+    setCarregandoEstudosSalvos(true);
+    try {
+      const lista = await listarEstudosCaso();
+      setEstudosSalvos(lista);
+    } catch (error) {
+      console.error("[EstudoCasoPage] Erro ao listar estudos de caso salvos", error);
+    } finally {
+      setCarregandoEstudosSalvos(false);
+    }
+  };
+  const aplicarEstudoSalvoNaTela = (
+    estudoSalvo,
+    { idFallback = "", mensagemAviso = "" } = {},
+  ) => {
+    if (!estudoSalvo) return;
+    const estudoId = estudoSalvo.id || idFallback;
+    setMetaEstudo({
+      tituloEstudo: estudoSalvo.tituloEstudo || "",
+      dataInicio: estudoSalvo.dataInicio || "",
+      periodo: estudoSalvo.periodo || "",
+      responsavel: estudoSalvo.responsavel || "",
+      status: estudoSalvo.statusGeral || META_ESTUDO_INICIAL.status,
+    });
+    setIdentificacaoEstudante({
+      ...IDENTIFICACAO_INICIAL,
+      ...(estudoSalvo.identificacaoEstudante || {}),
+    });
+    setPerguntasEstado({
+      ...criarEstadoInicialPerguntas(),
+      ...(estudoSalvo.perguntasEstado || {}),
+    });
+    setObservacoesObjetivas({
+      ...criarEstadoObservacoesObjetivas(),
+      ...(estudoSalvo.observacoesObjetivas || {}),
+    });
+    setBlocosAbertos(criarEstadoInicialBlocosAbertos());
+    setEstudoCasoSalvoId(estudoId);
+    setPreviaTexto(limparTexto(estudoSalvo.sintesePrevia));
+    setPreviaVisivel(false);
+    setTextoFinalRevisado(limparTexto(estudoSalvo.textoFinalRevisado));
+    if (estudoId) {
+      salvarRascunhoIdLocal(estudoId);
+    }
+    setErro("");
+    setFeedback("");
+    setAviso(mensagemAviso);
+  };
+  const handleAbrirEstudoSalvo = async (estudoId) => {
+    if (!estudoId) return;
+    setAbrindoEstudoId(estudoId);
+    setErro("");
+    setFeedback("");
+    setAviso("");
+    try {
+      const estudoSalvo = await buscarEstudoCasoPorId(estudoId);
+      if (!estudoSalvo) {
+        setAviso("O Estudo de Caso selecionado não foi encontrado.");
+        await carregarListaEstudosSalvos();
+        return;
+      }
+      aplicarEstudoSalvoNaTela(estudoSalvo, {
+        idFallback: estudoId,
+        mensagemAviso: "Estudo de Caso carregado com sucesso.",
+      });
+    } catch (error) {
+      console.error("[EstudoCasoPage] Erro ao abrir estudo de caso salvo", error);
+      setErro("Não foi possível abrir o Estudo de Caso selecionado. Tente novamente.");
+    } finally {
+      setAbrindoEstudoId("");
+    }
+  };
 
   useEffect(() => {
     let ativo = true;
@@ -1865,41 +1997,21 @@ function EstudoCasoPage() {
           setPreviaTexto("");
           setPreviaVisivel(false);
           setTextoFinalRevisado("");
-          setAviso("Rascunho anterior nÃ£o foi encontrado. Inicie um novo estudo.");
+          setAviso("Rascunho anterior não foi encontrado. Inicie um novo estudo.");
           return;
         }
 
-        setMetaEstudo({
-          tituloEstudo: estudoSalvo.tituloEstudo || "",
-          dataInicio: estudoSalvo.dataInicio || "",
-          periodo: estudoSalvo.periodo || "",
-          responsavel: estudoSalvo.responsavel || "",
-          status: estudoSalvo.statusGeral || META_ESTUDO_INICIAL.status,
+        aplicarEstudoSalvoNaTela(estudoSalvo, {
+          idFallback: rascunhoId,
+          mensagemAviso: "Rascunho anterior carregado.",
         });
-        setIdentificacaoEstudante({
-          ...IDENTIFICACAO_INICIAL,
-          ...(estudoSalvo.identificacaoEstudante || {}),
-        });
-        setPerguntasEstado({
-          ...criarEstadoInicialPerguntas(),
-          ...(estudoSalvo.perguntasEstado || {}),
-        });
-        setObservacoesObjetivas({
-          ...criarEstadoObservacoesObjetivas(),
-          ...(estudoSalvo.observacoesObjetivas || {}),
-        });
-        setBlocosAbertos(criarEstadoInicialBlocosAbertos());
-        setEstudoCasoSalvoId(estudoSalvo.id || rascunhoId);
-        setPreviaTexto(limparTexto(estudoSalvo.sintesePrevia));
-        setPreviaVisivel(false);
-        setTextoFinalRevisado(limparTexto(estudoSalvo.textoFinalRevisado));
-        setAviso("Rascunho anterior carregado.");
       } catch (error) {
         if (!ativo) return;
         console.error("[EstudoCasoPage] Erro ao carregar rascunho anterior", error);
       }
     }
 
+    carregarListaEstudosSalvos();
     carregarRascunhoAnterior();
 
     return () => {
@@ -2013,6 +2125,8 @@ function EstudoCasoPage() {
       if (sintesePreviaAtual) {
         setPreviaTexto(sintesePreviaAtual);
       }
+
+      await carregarListaEstudosSalvos();
       setFeedback("Rascunho do Estudo de Caso salvo com sucesso.");
     } catch (error) {
       console.error("[EstudoCasoPage] Erro ao salvar rascunho", error);
@@ -2035,7 +2149,7 @@ function EstudoCasoPage() {
     removerRascunhoIdLocal();
     setErro("");
     setAviso("");
-    setFeedback("Novo rascunho iniciado nesta tela. O rascunho anterior nÃ£o foi excluÃ­do.");
+    setFeedback("Novo rascunho iniciado nesta tela. O rascunho anterior não foi excluído.");
   };
 
   const handleGerarSintesePrevia = () => {
@@ -2138,6 +2252,7 @@ function EstudoCasoPage() {
         setPreviaTexto(sintesePreviaAtual);
       }
 
+      await carregarListaEstudosSalvos();
       setFeedback("Estudo de Caso concluído com sucesso.");
     } catch (error) {
       console.error("[EstudoCasoPage] Erro ao concluir estudo de caso", error);
@@ -2186,6 +2301,98 @@ function EstudoCasoPage() {
           e gera uma prévia textual local, sem IA, sem exportação e sem integração com módulos
           externos.
         </div>
+      </section>
+
+      <section className="panel">
+        <div className="estudo-caso-section-header">
+          <div>
+            <h2>Estudos de Caso salvos</h2>
+            <p className="muted">
+              Lista simples dos estudos já registrados na coleção estudosCaso para retomada do
+              preenchimento.
+            </p>
+          </div>
+        </div>
+
+        {carregandoEstudosSalvos ? (
+          <p className="muted">Carregando estudos salvos...</p>
+        ) : estudosSalvos.length ? (
+          <div className="estudo-caso-question-list">
+            {estudosSalvos.map((estudo) => {
+              const nomeAluno = obterNomeEstudoSalvo(estudo);
+              const statusLabel = obterLabelStatusEstudo(estudo.statusGeral);
+              const statusClasse = obterClasseStatusEstudo(estudo.statusGeral);
+              const abrindoEstudoAtual = abrindoEstudoId === estudo.id;
+
+              return (
+                <article key={estudo.id} className="estudo-caso-question-card">
+                  <div className="estudo-caso-question-top">
+                    <div>
+                      <p className="estudo-caso-question-text">{nomeAluno}</p>
+                      <p className="muted">
+                        {preencherValorOuPadrao(
+                          limparTexto(estudo.tituloEstudo),
+                          "Estudo de Caso sem título informado.",
+                        )}
+                      </p>
+                    </div>
+                    <span className={`estudo-caso-status-chip is-${statusClasse}`}>
+                      {statusLabel}
+                    </span>
+                  </div>
+
+                  <div className="estudo-caso-identificacao-grid">
+                    <div className="estudo-caso-question-field">
+                      <span className="muted">Período</span>
+                      <strong>{preencherValorOuPadrao(limparTexto(estudo.periodo))}</strong>
+                    </div>
+                    <div className="estudo-caso-question-field">
+                      <span className="muted">Data de início</span>
+                      <strong>
+                        {preencherValorOuPadrao(formatarDataListaEstudo(estudo.dataInicio))}
+                      </strong>
+                    </div>
+                    <div className="estudo-caso-question-field">
+                      <span className="muted">Data de conclusão</span>
+                      <strong>
+                        {preencherValorOuPadrao(formatarDataListaEstudo(estudo.dataConclusao))}
+                      </strong>
+                    </div>
+                    <div className="estudo-caso-question-field">
+                      <span className="muted">Atualizado em</span>
+                      <strong>
+                        {preencherValorOuPadrao(
+                          formatarDataListaEstudo(estudo.atualizadoEm, true),
+                        )}
+                      </strong>
+                    </div>
+                    <div className="estudo-caso-question-field">
+                      <span className="muted">Status geral</span>
+                      <strong>{statusLabel}</strong>
+                    </div>
+                  </div>
+
+                  <div className="form-actions estudo-caso-actions">
+                    <button
+                      type="button"
+                      onClick={() => handleAbrirEstudoSalvo(estudo.id)}
+                      disabled={
+                        abrindoEstudoAtual ||
+                        salvandoRascunho ||
+                        concluindoEstudo ||
+                        carregandoEstudosSalvos
+                      }
+                    >
+                      {abrindoEstudoAtual ? "Abrindo..." : "Abrir"}
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="muted">Nenhum Estudo de Caso salvo até o momento.</p>
+        )}
       </section>
 
       <section className="panel">
