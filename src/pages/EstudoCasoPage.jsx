@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { flushSync } from "react-dom";
 import {
   atualizarEstudoCaso,
   buscarEstudoCasoPorId,
@@ -1899,6 +1900,7 @@ function EstudoCasoPage() {
   const [previaTexto, setPreviaTexto] = useState("");
   const [previaVisivel, setPreviaVisivel] = useState(false);
   const [textoFinalRevisado, setTextoFinalRevisado] = useState("");
+  const [dataImpressao, setDataImpressao] = useState("");
   const [estudosSalvos, setEstudosSalvos] = useState([]);
   const [carregandoEstudosSalvos, setCarregandoEstudosSalvos] = useState(false);
   const [abrindoEstudoId, setAbrindoEstudoId] = useState("");
@@ -2201,6 +2203,33 @@ function EstudoCasoPage() {
       setFeedback("");
       setErro("NÃ£o foi possÃ­vel copiar o texto com comando. Tente novamente.");
     }
+  };
+
+  const handleImprimirEstudoCaso = () => {
+    if (!limparTexto(textoFinalRevisado)) {
+      setErro("");
+      setFeedback("");
+      setAviso(
+        "Antes de imprimir, preencha ou cole o texto final revisado do Estudo de Caso.",
+      );
+      return;
+    }
+
+    if (typeof window === "undefined") return;
+
+    flushSync(() => {
+      setErro("");
+      setFeedback("");
+      setAviso("");
+      setDataImpressao(
+        new Date().toLocaleString("pt-BR", {
+          dateStyle: "long",
+          timeStyle: "short",
+        }),
+      );
+    });
+
+    window.print();
   };
 
   const handleConcluirEstudoCaso = async () => {
@@ -2779,6 +2808,9 @@ function EstudoCasoPage() {
           >
             {concluindoEstudo ? "Concluindo estudo..." : "Concluir Estudo de Caso"}
           </button>
+          <button type="button" className="btn-secondary" onClick={handleImprimirEstudoCaso}>
+            Imprimir Estudo de Caso
+          </button>
         </div>
 
         <p className="estudo-caso-future-note">
@@ -2855,8 +2887,25 @@ function EstudoCasoPage() {
             onChange={(event) => setTextoFinalRevisado(event.target.value)}
             placeholder="Cole aqui o texto final revisado do Estudo de Caso."
           />
+
+          <div className="form-actions estudo-caso-final-actions no-print">
+            <button type="button" className="btn-secondary" onClick={handleImprimirEstudoCaso}>
+              Imprimir Estudo de Caso
+            </button>
+          </div>
         </section>
       ) : null}
+
+      <section className="estudo-caso-print-area">
+        <header className="estudo-caso-print-header">
+          <p className="estudo-caso-print-brand">AEE Registro</p>
+          <h1>Estudo de Caso</h1>
+        </header>
+        <div className="estudo-caso-print-text">{textoFinalRevisado}</div>
+        <footer className="estudo-caso-print-footer">
+          Data de impressão: {dataImpressao}
+        </footer>
+      </section>
     </main>
   );
 }

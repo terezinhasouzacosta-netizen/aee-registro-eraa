@@ -2929,10 +2929,75 @@ textarea:focus {
   white-space: pre-wrap;
 }
 
+.estudo-caso-page .estudo-caso-final-actions {
+  justify-content: flex-end;
+}
+
+.estudo-caso-page .estudo-caso-print-area {
+  display: none;
+}
+
 .estudo-caso-page .estudo-caso-future-note {
   margin-top: 0.8rem;
   color: #64748b;
   font-size: 14px;
+}
+
+@media print {
+  .estudo-caso-page > :not(.estudo-caso-print-area) {
+    display: none !important;
+  }
+
+  .estudo-caso-page .estudo-caso-print-area {
+    display: block !important;
+    width: 100%;
+    max-width: 180mm;
+    margin: 0 auto;
+    padding: 0;
+    background: #ffffff;
+    color: #111827;
+  }
+
+  .estudo-caso-page .estudo-caso-print-header {
+    padding-bottom: 8mm;
+    margin-bottom: 8mm;
+    border-bottom: 1px solid #cbd5e1;
+    text-align: center;
+  }
+
+  .estudo-caso-page .estudo-caso-print-brand {
+    margin: 0 0 2mm;
+    color: #1d4f75;
+    font-size: 10pt;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .estudo-caso-page .estudo-caso-print-header h1 {
+    margin: 0;
+    color: #111827;
+    font-size: 20pt;
+  }
+
+  .estudo-caso-page .estudo-caso-print-text {
+    color: #111827;
+    font-family: Arial, sans-serif;
+    font-size: 12pt;
+    line-height: 1.65;
+    text-align: justify;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .estudo-caso-page .estudo-caso-print-footer {
+    padding-top: 8mm;
+    margin-top: 10mm;
+    border-top: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 9pt;
+    text-align: right;
+  }
 }
 
 .painel-coordenacao input,
