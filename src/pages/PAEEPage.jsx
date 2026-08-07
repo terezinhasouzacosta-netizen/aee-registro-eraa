@@ -64,6 +64,12 @@ function criarFormularioInicial(currentUser) {
       municipio: "",
       localizacao: "",
     },
+    basePedagogica: {
+      potencialidades: "",
+      barreiras: "",
+      necessidadesEspecificas: "",
+      resumoEstudoCaso: "",
+    },
     sinteseDiagnostica: "",
     objetivos: criarObjetivosIniciais(),
     estrategiasPedagogicas: "",
@@ -166,6 +172,10 @@ function normalizarPaeeParaFormulario(paee, currentUser) {
       ...criarFormularioInicial(currentUser).identificacaoEstudante,
       ...(paee?.identificacaoEstudante || {}),
     },
+    basePedagogica: {
+      ...criarFormularioInicial(currentUser).basePedagogica,
+      ...(paee?.basePedagogica || {}),
+    },
     sinteseDiagnostica: sinteseSalva || "",
     objetivos: normalizarObjetivos(paee?.objetivos),
     organizacaoAtendimento: {
@@ -227,6 +237,12 @@ function montarPayload(form, currentUser) {
       nomeEscola: limparTexto(identificacao.nomeEscola),
       municipio: limparTexto(identificacao.municipio),
       localizacao: limparTexto(identificacao.localizacao),
+    },
+    basePedagogica: {
+      potencialidades: limparTexto(form.basePedagogica.potencialidades),
+      barreiras: limparTexto(form.basePedagogica.barreiras),
+      necessidadesEspecificas: limparTexto(form.basePedagogica.necessidadesEspecificas),
+      resumoEstudoCaso: limparTexto(form.basePedagogica.resumoEstudoCaso),
     },
     sinteseDiagnostica: {
       texto: limparTexto(form.sinteseDiagnostica),
@@ -397,6 +413,17 @@ function PAEEPage() {
       alunoNome: name === "nome" ? value : prev.alunoNome,
       identificacaoEstudante: {
         ...prev.identificacaoEstudante,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleBasePedagogica = (event) => {
+    const { name, value } = event.target;
+    setForm((prev) => ({
+      ...prev,
+      basePedagogica: {
+        ...prev.basePedagogica,
         [name]: value,
       },
     }));
@@ -845,6 +872,63 @@ function PAEEPage() {
             <div className="paee-card-header">
               <span className="paee-card-index">2</span>
               <div>
+                <h2>Base pedagógica do PAEE</h2>
+                <p className="muted">
+                  Registre de forma resumida as informações essenciais que orientam este PAEE, sem
+                  repetir todo o Estudo de Caso.
+                </p>
+              </div>
+            </div>
+            <div className="paee-fields-grid">
+              <div className="paee-field-span-2">
+                <label htmlFor="potencialidades">Potencialidades do estudante</label>
+                <textarea
+                  id="potencialidades"
+                  name="potencialidades"
+                  rows="4"
+                  value={form.basePedagogica.potencialidades}
+                  onChange={handleBasePedagogica}
+                />
+              </div>
+              <div className="paee-field-span-2">
+                <label htmlFor="barreiras">Barreiras identificadas</label>
+                <textarea
+                  id="barreiras"
+                  name="barreiras"
+                  rows="4"
+                  value={form.basePedagogica.barreiras}
+                  onChange={handleBasePedagogica}
+                />
+              </div>
+              <div className="paee-field-span-2">
+                <label htmlFor="necessidadesEspecificas">Necessidades educacionais específicas</label>
+                <textarea
+                  id="necessidadesEspecificas"
+                  name="necessidadesEspecificas"
+                  rows="4"
+                  value={form.basePedagogica.necessidadesEspecificas}
+                  onChange={handleBasePedagogica}
+                />
+              </div>
+              <div className="paee-field-span-2">
+                <label htmlFor="resumoEstudoCaso">
+                  Resumo do Estudo de Caso que orienta este PAEE
+                </label>
+                <textarea
+                  id="resumoEstudoCaso"
+                  name="resumoEstudoCaso"
+                  rows="5"
+                  value={form.basePedagogica.resumoEstudoCaso}
+                  onChange={handleBasePedagogica}
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="panel paee-card">
+            <div className="paee-card-header">
+              <span className="paee-card-index">3</span>
+              <div>
                 <h2>Síntese Diagnóstica</h2>
                 <p className="muted">Registro manual da síntese pedagógica que orientará o plano.</p>
               </div>
@@ -862,7 +946,7 @@ function PAEEPage() {
 
           <section className="panel paee-card">
             <div className="paee-card-header">
-              <span className="paee-card-index">3</span>
+              <span className="paee-card-index">4</span>
               <div>
                 <h2>Objetivos do Atendimento AEE</h2>
                 <p className="muted">Três objetivos editáveis para o período atual.</p>
@@ -959,7 +1043,7 @@ function PAEEPage() {
 
           <section className="panel paee-card">
             <div className="paee-card-header">
-              <span className="paee-card-index">4</span>
+              <span className="paee-card-index">5</span>
               <div>
                 <h2>Estratégias Pedagógicas</h2>
                 <p className="muted">Metodologias, mediações e adaptações previstas.</p>
@@ -978,7 +1062,7 @@ function PAEEPage() {
 
           <section className="panel paee-card">
             <div className="paee-card-header">
-              <span className="paee-card-index">5</span>
+              <span className="paee-card-index">6</span>
               <div>
                 <h2>Recursos e Tecnologia Assistiva</h2>
                 <p className="muted">Materiais, recursos acessíveis e apoios específicos.</p>
@@ -1002,7 +1086,7 @@ function PAEEPage() {
 
           <section className="panel paee-card">
             <div className="paee-card-header">
-              <span className="paee-card-index">6</span>
+              <span className="paee-card-index">7</span>
               <div>
                 <h2>Organização do Atendimento</h2>
                 <p className="muted">Frequência, duração, modalidade e articulação pedagógica.</p>
@@ -1056,7 +1140,7 @@ function PAEEPage() {
 
           <section className="panel paee-card">
             <div className="paee-card-header">
-              <span className="paee-card-index">7</span>
+              <span className="paee-card-index">8</span>
               <div>
                 <h2>Critérios de Acompanhamento</h2>
                 <p className="muted">Indicadores para observar avanços e necessidades de revisão.</p>
@@ -1075,7 +1159,7 @@ function PAEEPage() {
 
           <section className="panel paee-card">
             <div className="paee-card-header">
-              <span className="paee-card-index">8</span>
+              <span className="paee-card-index">9</span>
               <div>
                 <h2>Encaminhamentos</h2>
                 <p className="muted">Orientações, articulações e ações complementares.</p>
