@@ -1,140 +1,399 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { listarAlunos } from "../services/alunosService";
+import {
+  atualizarPaee,
+  buscarPaeePorId,
+  criarPaee,
+} from "../services/paeesService";
 import { podeVisualizarMetas } from "../utils/permissions";
 
-const SECOES_PAEE = [
-  {
-    titulo: "Identificação do estudante",
-    descricao: "Estrutura inicial para futura integração com o cadastro mestre do aluno.",
-    campos: [
-      { label: "Aluno", placeholder: "Seleção do aluno será integrada em etapa futura." },
-      { label: "Data de nascimento", placeholder: "Preenchimento automático futuro." },
-      { label: "Série/Ano", placeholder: "Virá do cadastro do aluno." },
-      { label: "Turma", placeholder: "Virá do cadastro do aluno." },
-      { label: "Turno", placeholder: "Virá do cadastro do aluno." },
-      { label: "Professor(a) do AEE", placeholder: "Virá do cadastro ou contexto do atendimento." },
-    ],
-  },
-  {
-    titulo: "Síntese Diagnóstica",
-    descricao: "Área reservada para consolidação pedagógica das informações do estudante.",
-    campos: [
-      {
-        label: "Potencialidades, interesses e necessidades educacionais",
-        placeholder: "Campo visual inicial, sem leitura automática da sondagem nesta etapa.",
-        tipo: "textarea",
-        span: 2,
-        rows: 5,
-      },
-    ],
-  },
-  {
-    titulo: "Objetivos do Atendimento AEE",
-    descricao: "Planejamento dos objetivos prioritários a serem trabalhados no período.",
-    campos: [
-      {
-        label: "Objetivos pedagógicos prioritários",
-        placeholder: "Aqui ficarão os objetivos do PAEE, definidos pela professora do AEE.",
-        tipo: "textarea",
-        span: 2,
-        rows: 5,
-      },
-    ],
-  },
-  {
-    titulo: "Estratégias Pedagógicas",
-    descricao: "Metodologias, mediações e adaptações pedagógicas previstas para o atendimento.",
-    campos: [
-      {
-        label: "Estratégias e intervenções",
-        placeholder: "Descrever estratégias de mediação, organização e apoio pedagógico.",
-        tipo: "textarea",
-        span: 2,
-        rows: 5,
-      },
-    ],
-  },
-  {
-    titulo: "Recursos e Tecnologia Assistiva",
-    descricao: "Espaço visual para previsão de materiais, recursos acessíveis e apoios específicos.",
-    campos: [
-      {
-        label: "Recursos pedagógicos, acessibilidade e tecnologia assistiva",
-        placeholder: "Listagem futura de recursos, materiais adaptados e apoios tecnológicos.",
-        tipo: "textarea",
-        span: 2,
-        rows: 4,
-      },
-    ],
-  },
-  {
-    titulo: "Organização do Atendimento",
-    descricao: "Definição visual inicial sobre frequência, organização e articulação do atendimento.",
-    campos: [
-      { label: "Período de vigência", placeholder: "Ex.: 1º bimestre / semestre letivo." },
-      { label: "Frequência do atendimento", placeholder: "Ex.: 2 vezes por semana." },
-      { label: "Duração média", placeholder: "Ex.: 50 minutos." },
-      { label: "Modalidade do atendimento", placeholder: "Ex.: Individual / pequeno grupo." },
-      {
-        label: "Articulação com sala comum e família",
-        placeholder: "Observações sobre alinhamento pedagógico e rede de apoio.",
-        tipo: "textarea",
-        span: 2,
-        rows: 4,
-      },
-    ],
-  },
-  {
-    titulo: "Critérios de Acompanhamento",
-    descricao: "Indicadores visuais para futura análise de avanços e necessidades de revisão.",
-    campos: [
-      {
-        label: "Critérios e indicadores de acompanhamento",
-        placeholder: "Espaço para descrever como os avanços do PAEE serão observados.",
-        tipo: "textarea",
-        span: 2,
-        rows: 4,
-      },
-    ],
-  },
-  {
-    titulo: "Encaminhamentos",
-    descricao: "Registro visual de orientações, encaminhamentos pedagógicos e articulações necessárias.",
-    campos: [
-      {
-        label: "Encaminhamentos e observações complementares",
-        placeholder: "Campo reservado para futuras ações pedagógicas e encaminhamentos.",
-        tipo: "textarea",
-        span: 2,
-        rows: 4,
-      },
-    ],
-  },
+const PAEE_RASCUNHO_ID_KEY = "paeeRascunhoId";
+
+const STATUS_GERAL_OPTIONS = [
+  { value: "rascunho", label: "Rascunho" },
+  { value: "em_elaboracao", label: "Em elaboração" },
+  { value: "concluido", label: "Concluído" },
 ];
 
-function renderCampo(campo, indice) {
-  const key = `${campo.label}-${indice}`;
-  const classeSpan = campo.span === 2 ? "paee-field-span-2" : "";
+const STATUS_OBJETIVO_OPTIONS = [
+  { value: "planejado", label: "Planejado" },
+  { value: "em_andamento", label: "Em andamento" },
+  { value: "concluido", label: "Concluído" },
+  { value: "pausado", label: "Pausado" },
+];
 
-  if (campo.tipo === "textarea") {
-    return (
-      <div key={key} className={classeSpan}>
-        <label>{campo.label}</label>
-        <textarea rows={campo.rows || 4} value="" placeholder={campo.placeholder} readOnly />
-      </div>
-    );
+function criarObjetivosIniciais(quantidade = 3) {
+  return Array.from({ length: quantidade }, (_, indice) => ({
+    id: `objetivo-${indice + 1}`,
+    areaEixo: "",
+    objetivoEspecifico: "",
+    estrategias: "",
+    recursos: "",
+    prazo: "",
+    criterioAcompanhamento: "",
+    status: "planejado",
+  }));
+}
+
+function criarFormularioInicial(currentUser) {
+  return {
+    alunoId: "",
+    alunoNome: "",
+    anoLetivo: String(new Date().getFullYear()),
+    periodo: "",
+    dataInicio: "",
+    dataFim: "",
+    statusGeral: "rascunho",
+    responsavel: {
+      uid: currentUser?.uid || "",
+      nome: currentUser?.displayName || currentUser?.email || "",
+      email: currentUser?.email || "",
+    },
+    identificacaoEstudante: {
+      nome: "",
+      dataNascimento: "",
+      serieAno: "",
+      turma: "",
+      turno: "",
+      professorAee: "",
+      nomeEscola: "",
+      municipio: "",
+      localizacao: "",
+    },
+    sinteseDiagnostica: "",
+    objetivos: criarObjetivosIniciais(),
+    estrategiasPedagogicas: "",
+    recursosTecnologiaAssistiva: "",
+    organizacaoAtendimento: {
+      frequencia: "",
+      duracaoMedia: "",
+      modalidade: "",
+      articulacaoSalaComumFamilia: "",
+    },
+    criteriosAcompanhamento: "",
+    encaminhamentos: "",
+    schemaVersao: 1,
+    dataConclusao: null,
+  };
+}
+
+function limparTexto(valor) {
+  return String(valor || "").trim();
+}
+
+function normalizarObjetivos(objetivos) {
+  const objetivosSalvos = Array.isArray(objetivos) ? objetivos : [];
+  const quantidade = Math.max(3, objetivosSalvos.length);
+
+  return criarObjetivosIniciais(quantidade).map((objetivoInicial, indice) => ({
+    ...objetivoInicial,
+    ...(objetivosSalvos[indice] || {}),
+    id: objetivosSalvos[indice]?.id || objetivoInicial.id,
+  }));
+}
+
+function normalizarPaeeParaFormulario(paee, currentUser) {
+  const responsavelSalvo =
+    paee?.responsavel && typeof paee.responsavel === "object"
+      ? paee.responsavel
+      : { nome: paee?.responsavel || "" };
+  const sinteseSalva =
+    paee?.sinteseDiagnostica && typeof paee.sinteseDiagnostica === "object"
+      ? paee.sinteseDiagnostica.texto
+      : paee?.sinteseDiagnostica;
+
+  return {
+    ...criarFormularioInicial(currentUser),
+    ...paee,
+    alunoId: paee?.alunoId || "",
+    alunoNome: paee?.alunoNome || paee?.identificacaoEstudante?.nome || "",
+    responsavel: {
+      uid: responsavelSalvo.uid || currentUser?.uid || "",
+      nome:
+        responsavelSalvo.nome ||
+        currentUser?.displayName ||
+        currentUser?.email ||
+        "",
+      email: responsavelSalvo.email || currentUser?.email || "",
+    },
+    identificacaoEstudante: {
+      ...criarFormularioInicial(currentUser).identificacaoEstudante,
+      ...(paee?.identificacaoEstudante || {}),
+    },
+    sinteseDiagnostica: sinteseSalva || "",
+    objetivos: normalizarObjetivos(paee?.objetivos),
+    organizacaoAtendimento: {
+      ...criarFormularioInicial(currentUser).organizacaoAtendimento,
+      ...(paee?.organizacaoAtendimento || {}),
+    },
+    dataConclusao: paee?.dataConclusao || null,
+  };
+}
+
+function salvarPaeeIdLocal(paeeId) {
+  try {
+    window.localStorage.setItem(PAEE_RASCUNHO_ID_KEY, paeeId);
+  } catch (error) {
+    console.warn("[PAEEPage] Não foi possível salvar o id local do PAEE.", error);
   }
+}
 
-  return (
-    <div key={key} className={classeSpan}>
-      <label>{campo.label}</label>
-      <input value="" placeholder={campo.placeholder} readOnly />
-    </div>
-  );
+function lerPaeeIdLocal() {
+  try {
+    return window.localStorage.getItem(PAEE_RASCUNHO_ID_KEY) || "";
+  } catch (error) {
+    console.warn("[PAEEPage] Não foi possível ler o id local do PAEE.", error);
+    return "";
+  }
+}
+
+function removerPaeeIdLocal() {
+  try {
+    window.localStorage.removeItem(PAEE_RASCUNHO_ID_KEY);
+  } catch (error) {
+    console.warn("[PAEEPage] Não foi possível remover o id local do PAEE.", error);
+  }
+}
+
+function montarPayload(form, currentUser) {
+  const identificacao = form.identificacaoEstudante;
+
+  return {
+    alunoId: limparTexto(form.alunoId),
+    alunoNome: limparTexto(identificacao.nome || form.alunoNome),
+    anoLetivo: limparTexto(form.anoLetivo),
+    periodo: limparTexto(form.periodo),
+    dataInicio: form.dataInicio || "",
+    dataFim: form.dataFim || "",
+    statusGeral: form.statusGeral || "rascunho",
+    responsavel: {
+      uid: form.responsavel.uid || currentUser?.uid || "",
+      nome: limparTexto(form.responsavel.nome),
+      email: limparTexto(form.responsavel.email || currentUser?.email),
+    },
+    identificacaoEstudante: {
+      nome: limparTexto(identificacao.nome),
+      dataNascimento: identificacao.dataNascimento || "",
+      serieAno: limparTexto(identificacao.serieAno),
+      turma: limparTexto(identificacao.turma),
+      turno: limparTexto(identificacao.turno),
+      professorAee: limparTexto(identificacao.professorAee),
+      nomeEscola: limparTexto(identificacao.nomeEscola),
+      municipio: limparTexto(identificacao.municipio),
+      localizacao: limparTexto(identificacao.localizacao),
+    },
+    sinteseDiagnostica: {
+      texto: limparTexto(form.sinteseDiagnostica),
+      origem: "manual",
+    },
+    objetivos: form.objetivos.map((objetivo, indice) => ({
+      id: objetivo.id || `objetivo-${indice + 1}`,
+      areaEixo: limparTexto(objetivo.areaEixo),
+      objetivoEspecifico: limparTexto(objetivo.objetivoEspecifico),
+      estrategias: limparTexto(objetivo.estrategias),
+      recursos: limparTexto(objetivo.recursos),
+      prazo: objetivo.prazo || "",
+      criterioAcompanhamento: limparTexto(objetivo.criterioAcompanhamento),
+      status: objetivo.status || "planejado",
+    })),
+    estrategiasPedagogicas: limparTexto(form.estrategiasPedagogicas),
+    recursosTecnologiaAssistiva: limparTexto(form.recursosTecnologiaAssistiva),
+    organizacaoAtendimento: {
+      frequencia: limparTexto(form.organizacaoAtendimento.frequencia),
+      duracaoMedia: limparTexto(form.organizacaoAtendimento.duracaoMedia),
+      modalidade: limparTexto(form.organizacaoAtendimento.modalidade),
+      articulacaoSalaComumFamilia: limparTexto(
+        form.organizacaoAtendimento.articulacaoSalaComumFamilia,
+      ),
+    },
+    criteriosAcompanhamento: limparTexto(form.criteriosAcompanhamento),
+    encaminhamentos: limparTexto(form.encaminhamentos),
+    schemaVersao: 1,
+    dataConclusao: form.dataConclusao || null,
+  };
 }
 
 function PAEEPage() {
-  const { perfil } = useAuth();
+  const { currentUser, perfil } = useAuth();
   const podeLer = podeVisualizarMetas(perfil);
+  const [form, setForm] = useState(() => criarFormularioInicial(currentUser));
+  const [alunos, setAlunos] = useState([]);
+  const [paeeId, setPaeeId] = useState("");
+  const [carregando, setCarregando] = useState(true);
+  const [salvando, setSalvando] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [aviso, setAviso] = useState("");
+  const [erro, setErro] = useState("");
+
+  useEffect(() => {
+    if (!currentUser || !podeLer) return undefined;
+
+    let ativo = true;
+
+    async function carregarPagina() {
+      setCarregando(true);
+      setErro("");
+
+      try {
+        const alunosData = await listarAlunos();
+        if (ativo) setAlunos(alunosData);
+      } catch (error) {
+        console.error("[PAEEPage] Erro ao carregar alunos", error);
+        if (ativo) setErro("Não foi possível carregar os alunos cadastrados.");
+      }
+
+      const rascunhoId = lerPaeeIdLocal();
+
+      if (rascunhoId) {
+        try {
+          const paeeSalvo = await buscarPaeePorId(rascunhoId);
+
+          if (!ativo) return;
+
+          if (paeeSalvo) {
+            setForm(normalizarPaeeParaFormulario(paeeSalvo, currentUser));
+            setPaeeId(paeeSalvo.id || rascunhoId);
+            setAviso("Rascunho anterior do PAEE carregado.");
+          } else {
+            removerPaeeIdLocal();
+            setAviso("Não foi possível carregar o rascunho anterior do PAEE.");
+          }
+        } catch (error) {
+          console.error("[PAEEPage] Erro ao carregar rascunho anterior", error);
+          if (ativo) {
+            removerPaeeIdLocal();
+            setAviso("Não foi possível carregar o rascunho anterior do PAEE.");
+          }
+        }
+      } else if (ativo) {
+        setForm(criarFormularioInicial(currentUser));
+      }
+
+      if (ativo) setCarregando(false);
+    }
+
+    carregarPagina();
+
+    return () => {
+      ativo = false;
+    };
+  }, [currentUser?.uid, podeLer]);
+
+  const handleCampoPrincipal = (event) => {
+    const { name, value } = event.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleResponsavel = (event) => {
+    setForm((prev) => ({
+      ...prev,
+      responsavel: { ...prev.responsavel, nome: event.target.value },
+    }));
+  };
+
+  const handleAlunoSelecionado = (event) => {
+    const alunoId = event.target.value;
+    const aluno = alunos.find((item) => item.id === alunoId) || null;
+
+    setForm((prev) => {
+      if (!aluno) {
+        return {
+          ...prev,
+          alunoId: "",
+          alunoNome: prev.identificacaoEstudante.nome,
+        };
+      }
+
+      return {
+        ...prev,
+        alunoId: aluno.id,
+        alunoNome: aluno.nome || "",
+        identificacaoEstudante: {
+          ...prev.identificacaoEstudante,
+          nome: aluno.nome || "",
+          dataNascimento: aluno.dataNascimento || "",
+          serieAno: aluno.serieAno || "",
+          turma: aluno.turma || "",
+          turno: aluno.turno || "",
+          professorAee: aluno.professorAee || "",
+          nomeEscola: aluno.nomeEscola || "",
+          municipio: aluno.municipio || "",
+          localizacao: aluno.localizacao || "",
+        },
+      };
+    });
+  };
+
+  const handleIdentificacao = (event) => {
+    const { name, value } = event.target;
+    setForm((prev) => ({
+      ...prev,
+      alunoNome: name === "nome" ? value : prev.alunoNome,
+      identificacaoEstudante: {
+        ...prev.identificacaoEstudante,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleOrganizacao = (event) => {
+    const { name, value } = event.target;
+    setForm((prev) => ({
+      ...prev,
+      organizacaoAtendimento: {
+        ...prev.organizacaoAtendimento,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleObjetivo = (indice, campo, valor) => {
+    setForm((prev) => ({
+      ...prev,
+      objetivos: prev.objetivos.map((objetivo, objetivoIndice) =>
+        objetivoIndice === indice ? { ...objetivo, [campo]: valor } : objetivo,
+      ),
+    }));
+  };
+
+  const handleSalvarRascunho = async (event) => {
+    event.preventDefault();
+    if (!currentUser || salvando) return;
+
+    setSalvando(true);
+    setFeedback("");
+    setAviso("");
+    setErro("");
+
+    try {
+      const payload = montarPayload(form, currentUser);
+
+      if (paeeId) {
+        await atualizarPaee(paeeId, payload);
+      } else {
+        const novoPaeeId = await criarPaee(payload);
+        setPaeeId(novoPaeeId);
+        salvarPaeeIdLocal(novoPaeeId);
+      }
+
+      setFeedback("Rascunho do PAEE salvo com sucesso.");
+    } catch (error) {
+      console.error("[PAEEPage] Erro ao salvar rascunho", error);
+      setErro("Não foi possível salvar o rascunho do PAEE. Tente novamente.");
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  const handleNovoPaee = () => {
+    setForm(criarFormularioInicial(currentUser));
+    setPaeeId("");
+    removerPaeeIdLocal();
+    setErro("");
+    setAviso("");
+    setFeedback("Novo PAEE iniciado.");
+  };
 
   if (!podeLer) {
     return (
@@ -150,85 +409,489 @@ function PAEEPage() {
   return (
     <main className="alunos-page module-page paee-page">
       <header className="page-header">
-        <h1>PAEE — Plano de Atendimento Educacional Especializado</h1>
-        <p>Estrutura visual inicial do planejamento, sem integração, sem salvamento e sem impacto no banco.</p>
-        <p className="muted">
-          Esta etapa cria apenas a base visual do PAEE para validação da organização da tela e dos
-          blocos pedagógicos futuros da plataforma.
-        </p>
+        <div>
+          <h1>PAEE — Plano de Atendimento Educacional Especializado</h1>
+          <p>Primeira versão funcional para preenchimento manual e salvamento de rascunho.</p>
+        </div>
+        <button type="button" className="btn-secondary" onClick={handleNovoPaee}>
+          Novo PAEE
+        </button>
       </header>
 
-      <div className="module-layout paee-layout">
-        <section className="panel module-form-panel">
-          <h2>Estrutura inicial do PAEE</h2>
-          <div className="paee-note">
-            Tela visual segura: nesta versão não há leitura de cadastro, sondagem, habilidades,
-            banco de dados ou qualquer rotina de salvamento.
-          </div>
+      {feedback ? <p className="toast-success">{feedback}</p> : null}
+      {erro ? <p className="toast-error">{erro}</p> : null}
+      {aviso ? <div className="paee-note">{aviso}</div> : null}
 
-          <div className="aluno-form paee-form">
-            {SECOES_PAEE.map((secao, indice) => (
-              <section key={secao.titulo} className="form-section paee-card">
-                <div className="paee-card-header">
-                  <span className="paee-card-index">{indice + 1}</span>
-                  <div>
-                    <h3>{secao.titulo}</h3>
-                    <p className="muted">{secao.descricao}</p>
-                  </div>
-                </div>
-
-                <div className="paee-fields-grid">
-                  {secao.campos.map((campo, campoIndex) => renderCampo(campo, campoIndex))}
-                </div>
-              </section>
-            ))}
-          </div>
+      {carregando ? (
+        <section className="panel">
+          <p>Carregando PAEE...</p>
         </section>
+      ) : (
+        <form className="paee-form" onSubmit={handleSalvarRascunho}>
+          <section className="panel paee-header-panel">
+            <div className="paee-section-heading">
+              <div>
+                <h2>Dados gerais do plano</h2>
+                <p className="muted">
+                  O rascunho atual será atualizado nas próximas vezes em que for salvo.
+                </p>
+              </div>
+              <span className="paee-status-chip">
+                {STATUS_GERAL_OPTIONS.find((item) => item.value === form.statusGeral)?.label ||
+                  "Rascunho"}
+              </span>
+            </div>
 
-        <aside className="panel module-list-panel">
-          <h2>Prévia funcional</h2>
-
-          <section className="form-section">
-            <h3>O que esta versão já entrega</h3>
-            <ul className="paee-list">
-              <li>Organização visual dos 8 blocos principais do PAEE.</li>
-              <li>Layout no padrão atual da plataforma.</li>
-              <li>Campos apenas ilustrativos para validação pedagógica da estrutura.</li>
-            </ul>
+            <div className="paee-fields-grid">
+              <div>
+                <label htmlFor="anoLetivo">Ano letivo</label>
+                <input
+                  id="anoLetivo"
+                  name="anoLetivo"
+                  value={form.anoLetivo}
+                  onChange={handleCampoPrincipal}
+                />
+              </div>
+              <div>
+                <label htmlFor="periodo">Período</label>
+                <input
+                  id="periodo"
+                  name="periodo"
+                  value={form.periodo}
+                  placeholder="Ex.: 1º semestre"
+                  onChange={handleCampoPrincipal}
+                />
+              </div>
+              <div>
+                <label htmlFor="dataInicio">Data de início</label>
+                <input
+                  id="dataInicio"
+                  name="dataInicio"
+                  type="date"
+                  value={form.dataInicio}
+                  onChange={handleCampoPrincipal}
+                />
+              </div>
+              <div>
+                <label htmlFor="dataFim">Data final prevista</label>
+                <input
+                  id="dataFim"
+                  name="dataFim"
+                  type="date"
+                  value={form.dataFim}
+                  onChange={handleCampoPrincipal}
+                />
+              </div>
+              <div>
+                <label htmlFor="statusGeral">Status geral</label>
+                <select
+                  id="statusGeral"
+                  name="statusGeral"
+                  value={form.statusGeral}
+                  onChange={handleCampoPrincipal}
+                >
+                  {STATUS_GERAL_OPTIONS.map((status) => (
+                    <option key={status.value} value={status.value}>
+                      {status.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="responsavelPaee">Responsável pelo preenchimento</label>
+                <input
+                  id="responsavelPaee"
+                  value={form.responsavel.nome}
+                  onChange={handleResponsavel}
+                />
+              </div>
+            </div>
           </section>
 
-          <section className="form-section">
-            <h3>O que ainda não faz</h3>
-            <ul className="paee-list">
-              <li>Não busca dados do cadastro do aluno.</li>
-              <li>Não lê a sondagem diagnóstica.</li>
-              <li>Não gera habilidades nem objetivos automáticos.</li>
-              <li>Não salva, edita, imprime ou exporta.</li>
-            </ul>
+          <section className="panel paee-card">
+            <div className="paee-card-header">
+              <span className="paee-card-index">1</span>
+              <div>
+                <h2>Identificação do estudante</h2>
+                <p className="muted">
+                  Selecione um aluno cadastrado ou utilize o preenchimento manual provisório.
+                </p>
+              </div>
+            </div>
+
+            <div className="paee-fields-grid">
+              <div className="paee-field-span-2">
+                <label htmlFor="alunoIdPaee">Aluno cadastrado</label>
+                <select id="alunoIdPaee" value={form.alunoId} onChange={handleAlunoSelecionado}>
+                  <option value="">Preenchimento manual provisório</option>
+                  {form.alunoId && !alunos.some((aluno) => aluno.id === form.alunoId) ? (
+                    <option value={form.alunoId}>
+                      {form.alunoNome || "Aluno anteriormente vinculado"}
+                    </option>
+                  ) : null}
+                  {alunos.map((aluno) => (
+                    <option key={aluno.id} value={aluno.id}>
+                      {aluno.nome}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="paee-field-span-2">
+                <label htmlFor="nome">Nome do estudante</label>
+                <input
+                  id="nome"
+                  name="nome"
+                  value={form.identificacaoEstudante.nome}
+                  onChange={handleIdentificacao}
+                />
+              </div>
+              <div>
+                <label htmlFor="dataNascimento">Data de nascimento</label>
+                <input
+                  id="dataNascimento"
+                  name="dataNascimento"
+                  type="date"
+                  value={form.identificacaoEstudante.dataNascimento}
+                  onChange={handleIdentificacao}
+                />
+              </div>
+              <div>
+                <label htmlFor="serieAno">Série/Ano</label>
+                <input
+                  id="serieAno"
+                  name="serieAno"
+                  value={form.identificacaoEstudante.serieAno}
+                  onChange={handleIdentificacao}
+                />
+              </div>
+              <div>
+                <label htmlFor="turma">Turma</label>
+                <input
+                  id="turma"
+                  name="turma"
+                  value={form.identificacaoEstudante.turma}
+                  onChange={handleIdentificacao}
+                />
+              </div>
+              <div>
+                <label htmlFor="turno">Turno</label>
+                <input
+                  id="turno"
+                  name="turno"
+                  value={form.identificacaoEstudante.turno}
+                  onChange={handleIdentificacao}
+                />
+              </div>
+              <div className="paee-field-span-2">
+                <label htmlFor="professorAee">Professor(a) do AEE</label>
+                <input
+                  id="professorAee"
+                  name="professorAee"
+                  value={form.identificacaoEstudante.professorAee}
+                  onChange={handleIdentificacao}
+                />
+              </div>
+              <div className="paee-field-span-2">
+                <label htmlFor="nomeEscola">Nome da escola</label>
+                <input
+                  id="nomeEscola"
+                  name="nomeEscola"
+                  value={form.identificacaoEstudante.nomeEscola}
+                  onChange={handleIdentificacao}
+                />
+              </div>
+              <div>
+                <label htmlFor="municipio">Município</label>
+                <input
+                  id="municipio"
+                  name="municipio"
+                  value={form.identificacaoEstudante.municipio}
+                  onChange={handleIdentificacao}
+                />
+              </div>
+              <div>
+                <label htmlFor="localizacao">Localização</label>
+                <input
+                  id="localizacao"
+                  name="localizacao"
+                  value={form.identificacaoEstudante.localizacao}
+                  onChange={handleIdentificacao}
+                />
+              </div>
+            </div>
           </section>
 
-          <section className="form-section">
-            <h3>Posição planejada do módulo</h3>
-            <p className="muted">
-              O PAEE foi preparado como tela inicial do eixo de planejamento e poderá futuramente
-              ser integrado abaixo de <strong>Habilidades</strong>, quando a lógica pedagógica e o
-              fluxo de dados forem definidos.
-            </p>
+          <section className="panel paee-card">
+            <div className="paee-card-header">
+              <span className="paee-card-index">2</span>
+              <div>
+                <h2>Síntese Diagnóstica</h2>
+                <p className="muted">Registro manual da síntese pedagógica que orientará o plano.</p>
+              </div>
+            </div>
+            <label htmlFor="sinteseDiagnostica">Síntese diagnóstica</label>
+            <textarea
+              id="sinteseDiagnostica"
+              rows="7"
+              value={form.sinteseDiagnostica}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, sinteseDiagnostica: event.target.value }))
+              }
+            />
           </section>
 
-          <section className="form-section">
-            <h3>Ações futuras</h3>
-            <div className="form-actions paee-disabled-actions">
-              <button type="button" disabled>
-                Salvar PAEE
+          <section className="panel paee-card">
+            <div className="paee-card-header">
+              <span className="paee-card-index">3</span>
+              <div>
+                <h2>Objetivos do Atendimento AEE</h2>
+                <p className="muted">Três objetivos editáveis para o período atual.</p>
+              </div>
+            </div>
+
+            <div className="paee-objectives-grid">
+              {form.objetivos.map((objetivo, indice) => (
+                <article key={objetivo.id || indice} className="paee-objective-card">
+                  <h3>Objetivo {indice + 1}</h3>
+                  <div className="paee-fields-grid">
+                    <div>
+                      <label htmlFor={`objetivo-eixo-${indice}`}>Área/Eixo</label>
+                      <input
+                        id={`objetivo-eixo-${indice}`}
+                        value={objetivo.areaEixo}
+                        onChange={(event) =>
+                          handleObjetivo(indice, "areaEixo", event.target.value)
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor={`objetivo-status-${indice}`}>Status</label>
+                      <select
+                        id={`objetivo-status-${indice}`}
+                        value={objetivo.status}
+                        onChange={(event) => handleObjetivo(indice, "status", event.target.value)}
+                      >
+                        {STATUS_OBJETIVO_OPTIONS.map((status) => (
+                          <option key={status.value} value={status.value}>
+                            {status.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="paee-field-span-2">
+                      <label htmlFor={`objetivo-especifico-${indice}`}>Objetivo específico</label>
+                      <textarea
+                        id={`objetivo-especifico-${indice}`}
+                        rows="3"
+                        value={objetivo.objetivoEspecifico}
+                        onChange={(event) =>
+                          handleObjetivo(indice, "objetivoEspecifico", event.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="paee-field-span-2">
+                      <label htmlFor={`objetivo-estrategias-${indice}`}>Estratégias</label>
+                      <textarea
+                        id={`objetivo-estrategias-${indice}`}
+                        rows="3"
+                        value={objetivo.estrategias}
+                        onChange={(event) =>
+                          handleObjetivo(indice, "estrategias", event.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="paee-field-span-2">
+                      <label htmlFor={`objetivo-recursos-${indice}`}>Recursos</label>
+                      <textarea
+                        id={`objetivo-recursos-${indice}`}
+                        rows="3"
+                        value={objetivo.recursos}
+                        onChange={(event) => handleObjetivo(indice, "recursos", event.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor={`objetivo-prazo-${indice}`}>Prazo</label>
+                      <input
+                        id={`objetivo-prazo-${indice}`}
+                        type="date"
+                        value={objetivo.prazo}
+                        onChange={(event) => handleObjetivo(indice, "prazo", event.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor={`objetivo-criterio-${indice}`}>
+                        Critério de acompanhamento
+                      </label>
+                      <textarea
+                        id={`objetivo-criterio-${indice}`}
+                        rows="3"
+                        value={objetivo.criterioAcompanhamento}
+                        onChange={(event) =>
+                          handleObjetivo(indice, "criterioAcompanhamento", event.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="panel paee-card">
+            <div className="paee-card-header">
+              <span className="paee-card-index">4</span>
+              <div>
+                <h2>Estratégias Pedagógicas</h2>
+                <p className="muted">Metodologias, mediações e adaptações previstas.</p>
+              </div>
+            </div>
+            <label htmlFor="estrategiasPedagogicas">Estratégias pedagógicas gerais</label>
+            <textarea
+              id="estrategiasPedagogicas"
+              rows="6"
+              value={form.estrategiasPedagogicas}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, estrategiasPedagogicas: event.target.value }))
+              }
+            />
+          </section>
+
+          <section className="panel paee-card">
+            <div className="paee-card-header">
+              <span className="paee-card-index">5</span>
+              <div>
+                <h2>Recursos e Tecnologia Assistiva</h2>
+                <p className="muted">Materiais, recursos acessíveis e apoios específicos.</p>
+              </div>
+            </div>
+            <label htmlFor="recursosTecnologiaAssistiva">
+              Recursos pedagógicos, acessibilidade e tecnologia assistiva
+            </label>
+            <textarea
+              id="recursosTecnologiaAssistiva"
+              rows="6"
+              value={form.recursosTecnologiaAssistiva}
+              onChange={(event) =>
+                setForm((prev) => ({
+                  ...prev,
+                  recursosTecnologiaAssistiva: event.target.value,
+                }))
+              }
+            />
+          </section>
+
+          <section className="panel paee-card">
+            <div className="paee-card-header">
+              <span className="paee-card-index">6</span>
+              <div>
+                <h2>Organização do Atendimento</h2>
+                <p className="muted">Frequência, duração, modalidade e articulação pedagógica.</p>
+              </div>
+            </div>
+            <div className="paee-fields-grid">
+              <div>
+                <label htmlFor="frequencia">Frequência do atendimento</label>
+                <input
+                  id="frequencia"
+                  name="frequencia"
+                  value={form.organizacaoAtendimento.frequencia}
+                  placeholder="Ex.: 2 vezes por semana"
+                  onChange={handleOrganizacao}
+                />
+              </div>
+              <div>
+                <label htmlFor="duracaoMedia">Duração média</label>
+                <input
+                  id="duracaoMedia"
+                  name="duracaoMedia"
+                  value={form.organizacaoAtendimento.duracaoMedia}
+                  placeholder="Ex.: 50 minutos"
+                  onChange={handleOrganizacao}
+                />
+              </div>
+              <div className="paee-field-span-2">
+                <label htmlFor="modalidade">Modalidade do atendimento</label>
+                <input
+                  id="modalidade"
+                  name="modalidade"
+                  value={form.organizacaoAtendimento.modalidade}
+                  placeholder="Ex.: Individual ou pequeno grupo"
+                  onChange={handleOrganizacao}
+                />
+              </div>
+              <div className="paee-field-span-2">
+                <label htmlFor="articulacaoSalaComumFamilia">
+                  Articulação com sala comum e família
+                </label>
+                <textarea
+                  id="articulacaoSalaComumFamilia"
+                  name="articulacaoSalaComumFamilia"
+                  rows="5"
+                  value={form.organizacaoAtendimento.articulacaoSalaComumFamilia}
+                  onChange={handleOrganizacao}
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="panel paee-card">
+            <div className="paee-card-header">
+              <span className="paee-card-index">7</span>
+              <div>
+                <h2>Critérios de Acompanhamento</h2>
+                <p className="muted">Indicadores para observar avanços e necessidades de revisão.</p>
+              </div>
+            </div>
+            <label htmlFor="criteriosAcompanhamento">Critérios e indicadores</label>
+            <textarea
+              id="criteriosAcompanhamento"
+              rows="6"
+              value={form.criteriosAcompanhamento}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, criteriosAcompanhamento: event.target.value }))
+              }
+            />
+          </section>
+
+          <section className="panel paee-card">
+            <div className="paee-card-header">
+              <span className="paee-card-index">8</span>
+              <div>
+                <h2>Encaminhamentos</h2>
+                <p className="muted">Orientações, articulações e ações complementares.</p>
+              </div>
+            </div>
+            <label htmlFor="encaminhamentos">Encaminhamentos e observações complementares</label>
+            <textarea
+              id="encaminhamentos"
+              rows="6"
+              value={form.encaminhamentos}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, encaminhamentos: event.target.value }))
+              }
+            />
+          </section>
+
+          <section className="panel paee-save-panel">
+            <div>
+              <h2>Salvar rascunho</h2>
+              <p className="muted">
+                {paeeId
+                  ? "Este botão atualizará o mesmo documento salvo anteriormente."
+                  : "O primeiro salvamento criará um documento na coleção paees."}
+              </p>
+            </div>
+            <div className="form-actions">
+              <button type="button" className="btn-secondary" onClick={handleNovoPaee}>
+                Novo PAEE
               </button>
-              <button type="button" className="btn-secondary" disabled>
-                Emitir documento
+              <button type="submit" disabled={salvando}>
+                {salvando ? "Salvando..." : "Salvar rascunho do PAEE"}
               </button>
             </div>
           </section>
-        </aside>
-      </div>
+        </form>
+      )}
     </main>
   );
 }

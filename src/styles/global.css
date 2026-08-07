@@ -2509,6 +2509,89 @@ textarea:focus {
   opacity: 0.78;
 }
 
+.paee-page .paee-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.paee-page .paee-header-panel,
+.paee-page .paee-save-panel {
+  border-color: #bfdbfe;
+  background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
+}
+
+.paee-page .paee-section-heading,
+.paee-page .paee-save-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.paee-page .paee-section-heading h2,
+.paee-page .paee-save-panel h2 {
+  margin-bottom: 0.25rem;
+}
+
+.paee-page .paee-status-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #93c5fd;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1e3a8a;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.paee-page .paee-form input,
+.paee-page .paee-form select,
+.paee-page .paee-form textarea {
+  width: 100%;
+  border: 1px solid #bfdbfe;
+  background: #ffffff;
+}
+
+.paee-page .paee-form input:focus,
+.paee-page .paee-form select:focus,
+.paee-page .paee-form textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  outline: none;
+}
+
+.paee-page .paee-form textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.paee-page .paee-objectives-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.paee-page .paee-objective-card {
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  padding: 1rem;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(30, 58, 138, 0.06);
+}
+
+.paee-page .paee-objective-card h3 {
+  margin-bottom: 0.85rem;
+  color: #1e3a8a;
+}
+
+.paee-page .paee-save-panel .form-actions {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
 .estudo-caso-page .estudo-caso-note {
   border: 1px dashed #bfdbfe;
   border-radius: 14px;
@@ -3079,6 +3162,20 @@ textarea:focus {
 
   .paee-page .paee-fields-grid {
     grid-template-columns: 1fr;
+  }
+
+  .paee-page .paee-field-span-2 {
+    grid-column: auto;
+  }
+
+  .paee-page .paee-section-heading,
+  .paee-page .paee-save-panel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .paee-page .paee-save-panel .form-actions {
+    width: 100%;
   }
 
   .estudo-caso-page .estudo-caso-iniciais-grid,
