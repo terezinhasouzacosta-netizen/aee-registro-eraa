@@ -10,6 +10,8 @@ import {
 import { podeVisualizarMetas } from "../utils/permissions";
 
 const PAEE_RASCUNHO_ID_KEY = "paeeRascunhoId";
+const MENSAGEM_CAMPOS_MINIMOS =
+  "Antes de concluir o PAEE, preencha os campos mínimos: identificação do estudante, ano letivo, período, síntese diagnóstica, pelo menos um objetivo, estratégias pedagógicas e critérios de acompanhamento.";
 
 const STATUS_GERAL_OPTIONS = [
   { value: "rascunho", label: "Rascunho" },
@@ -100,6 +102,28 @@ function formatarDataLista(valor, incluirHora = false) {
 function obterLabelStatus(statusGeral) {
   return (
     STATUS_GERAL_OPTIONS.find((status) => status.value === statusGeral)?.label || "Rascunho"
+  );
+}
+
+function obterDataAtualIsoLocal() {
+  const agora = new Date();
+  const dataLocal = new Date(agora.getTime() - agora.getTimezoneOffset() * 60 * 1000);
+  return dataLocal.toISOString().slice(0, 10);
+}
+
+function possuiCamposMinimosParaConclusao(form) {
+  const possuiObjetivo = form.objetivos.some((objetivo) =>
+    limparTexto(objetivo.objetivoEspecifico),
+  );
+
+  return Boolean(
+    limparTexto(form.alunoNome || form.identificacaoEstudante.nome) &&
+      limparTexto(form.anoLetivo) &&
+      limparTexto(form.periodo) &&
+      limparTexto(form.sinteseDiagnostica) &&
+      possuiObjetivo &&
+      limparTexto(form.estrategiasPedagogicas) &&
+      limparTexto(form.criteriosAcompanhamento),
   );
 }
 
@@ -246,6 +270,7 @@ function PAEEPage() {
   const [carregandoLista, setCarregandoLista] = useState(false);
   const [abrindoPaeeId, setAbrindoPaeeId] = useState("");
   const [salvando, setSalvando] = useState(false);
+  const [concluindo, setConcluindo] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [aviso, setAviso] = useState("");
   const [erro, setErro] = useState("");
@@ -399,7 +424,7 @@ function PAEEPage() {
 
   const handleSalvarRascunho = async (event) => {
     event.preventDefault();
-    if (!currentUser || salvando) return;
+    if (!currentUser || salvando || concluindo) return;
 
     setSalvando(true);
     setFeedback("");
@@ -434,6 +459,55 @@ function PAEEPage() {
     setErro("");
     setAviso("");
     setFeedback("Novo PAEE iniciado.");
+  };
+
+  const handleConcluirPaee = async () => {
+    if (!currentUser || salvando || concluindo) return;
+
+    setFeedback("");
+    setAviso("");
+    setErro("");
+
+    if (!possuiCamposMinimosParaConclusao(form)) {
+      setErro(MENSAGEM_CAMPOS_MINIMOS);
+      return;
+    }
+
+    const confirmou = window.confirm(
+      "Deseja concluir este PAEE? Confira se o plano foi revisado e validado pela professora do AEE.",
+    );
+
+    if (!confirmou) return;
+
+    setConcluindo(true);
+
+    try {
+      const dataConclusao = obterDataAtualIsoLocal();
+      const formConcluido = {
+        ...form,
+        statusGeral: "concluido",
+        dataConclusao,
+      };
+      const payload = montarPayload(formConcluido, currentUser);
+      let idAtual = paeeId;
+
+      if (idAtual) {
+        await atualizarPaee(idAtual, payload);
+      } else {
+        idAtual = await criarPaee(payload);
+        setPaeeId(idAtual);
+        salvarPaeeIdLocal(idAtual);
+      }
+
+      setForm(formConcluido);
+      setFeedback("PAEE concluído com sucesso.");
+      await carregarPaeesSalvos();
+    } catch (error) {
+      console.error("[PAEEPage] Erro ao concluir PAEE", error);
+      setErro("Não foi possível concluir o PAEE. Tente novamente.");
+    } finally {
+      setConcluindo(false);
+    }
   };
 
   const handleAbrirPaee = async (id) => {
@@ -484,7 +558,12 @@ function PAEEPage() {
           <h1>PAEE — Plano de Atendimento Educacional Especializado</h1>
           <p>Primeira versão funcional para preenchimento manual e salvamento de rascunho.</p>
         </div>
-        <button type="button" className="btn-secondary" onClick={handleNovoPaee}>
+        <button
+          type="button"
+          className="btn-secondary"
+          onClick={handleNovoPaee}
+          disabled={salvando || concluindo}
+        >
           Novo PAEE
         </button>
       </header>
@@ -492,6 +571,12 @@ function PAEEPage() {
       {feedback ? <p className="toast-success">{feedback}</p> : null}
       {erro ? <p className="toast-error">{erro}</p> : null}
       {aviso ? <div className="paee-note">{aviso}</div> : null}
+      {!carregando && form.statusGeral === "concluido" ? (
+        <div className="paee-concluido-note">
+          Este PAEE está marcado como Concluído. O plano abaixo é a versão validada para
+          acompanhamento pedagógico.
+        </div>
+      ) : null}
 
       {carregando ? (
         <section className="panel">
@@ -619,9 +704,14 @@ function PAEEPage() {
                   name="statusGeral"
                   value={form.statusGeral}
                   onChange={handleCampoPrincipal}
+                  disabled={form.statusGeral === "concluido"}
                 >
                   {STATUS_GERAL_OPTIONS.map((status) => (
-                    <option key={status.value} value={status.value}>
+                    <option
+                      key={status.value}
+                      value={status.value}
+                      disabled={status.value === "concluido" && form.statusGeral !== "concluido"}
+                    >
                       {status.label}
                     </option>
                   ))}
@@ -1012,11 +1102,24 @@ function PAEEPage() {
               </p>
             </div>
             <div className="form-actions">
-              <button type="button" className="btn-secondary" onClick={handleNovoPaee}>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleNovoPaee}
+                disabled={salvando || concluindo}
+              >
                 Novo PAEE
               </button>
-              <button type="submit" disabled={salvando}>
+              <button type="submit" disabled={salvando || concluindo}>
                 {salvando ? "Salvando..." : "Salvar rascunho do PAEE"}
+              </button>
+              <button
+                type="button"
+                className="paee-concluir-button"
+                onClick={handleConcluirPaee}
+                disabled={salvando || concluindo || form.statusGeral === "concluido"}
+              >
+                {concluindo ? "Concluindo..." : "Concluir PAEE"}
               </button>
             </div>
           </section>

@@ -2441,6 +2441,16 @@ textarea:focus {
   font-weight: 500;
 }
 
+.paee-page .paee-concluido-note {
+  margin-bottom: 1rem;
+  border: 1px solid #86efac;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  background: #f0fdf4;
+  color: #166534;
+  font-weight: 600;
+}
+
 .paee-page .paee-card {
   background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
 }
@@ -2651,6 +2661,17 @@ textarea:focus {
 .paee-page .paee-save-panel .form-actions {
   margin-top: 0;
   flex-shrink: 0;
+}
+
+.paee-page .paee-concluir-button {
+  border-color: #1e40af;
+  background: #1e40af;
+  color: #ffffff;
+}
+
+.paee-page .paee-concluir-button:hover:not(:disabled) {
+  border-color: #1e3a8a;
+  background: #1e3a8a;
 }
 
 .estudo-caso-page .estudo-caso-note {
