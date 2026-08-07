@@ -2674,6 +2674,128 @@ textarea:focus {
   background: #1e3a8a;
 }
 
+.paee-page .paee-print-area {
+  display: none;
+}
+
+@media print {
+  .paee-page > :not(.paee-print-area) {
+    display: none !important;
+  }
+
+  .paee-page .paee-print-area {
+    display: block !important;
+    width: 100%;
+    max-width: 180mm;
+    margin: 0 auto;
+    padding: 0;
+    background: #ffffff;
+    color: #111827;
+    font-family: Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.5;
+  }
+
+  .paee-page .paee-print-header {
+    padding-bottom: 7mm;
+    margin-bottom: 7mm;
+    border-bottom: 1px solid #94a3b8;
+    text-align: center;
+  }
+
+  .paee-page .paee-print-brand {
+    margin: 0 0 2mm;
+    color: #1e3a8a;
+    font-size: 10pt;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .paee-page .paee-print-header h1 {
+    margin: 0 0 5mm;
+    color: #111827;
+    font-size: 18pt;
+    line-height: 1.25;
+  }
+
+  .paee-page .paee-print-summary,
+  .paee-page .paee-print-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3mm 8mm;
+    text-align: left;
+  }
+
+  .paee-page .paee-print-summary p,
+  .paee-page .paee-print-section p,
+  .paee-page .paee-print-grid,
+  .paee-page .paee-print-grid dd {
+    margin: 0;
+  }
+
+  .paee-page .paee-print-section {
+    padding-bottom: 5mm;
+    margin-bottom: 5mm;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .paee-page .paee-print-section h2 {
+    margin: 0 0 3mm;
+    color: #1e3a8a;
+    font-size: 13pt;
+    line-height: 1.3;
+  }
+
+  .paee-page .paee-print-section h3 {
+    margin: 0 0 1.5mm;
+    color: #1f2937;
+    font-size: 10.5pt;
+  }
+
+  .paee-page .paee-print-section p,
+  .paee-page .paee-print-grid dd {
+    color: #111827;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .paee-page .paee-print-grid > div,
+  .paee-page .paee-print-content-block,
+  .paee-page .paee-print-objective {
+    break-inside: avoid;
+  }
+
+  .paee-page .paee-print-grid dt {
+    margin-bottom: 0.5mm;
+    color: #475569;
+    font-size: 9pt;
+    font-weight: 700;
+  }
+
+  .paee-page .paee-print-span-2 {
+    grid-column: 1 / -1;
+  }
+
+  .paee-page .paee-print-content-block + .paee-print-content-block,
+  .paee-page .paee-print-objective + .paee-print-objective {
+    margin-top: 4mm;
+  }
+
+  .paee-page .paee-print-objective {
+    padding: 3mm;
+    border: 1px solid #cbd5e1;
+    border-radius: 2mm;
+  }
+
+  .paee-page .paee-print-footer {
+    padding-top: 5mm;
+    color: #475569;
+    font-size: 8.5pt;
+    text-align: right;
+  }
+}
+
 .estudo-caso-page .estudo-caso-note {
   border: 1px dashed #bfdbfe;
   border-radius: 14px;

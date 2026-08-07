@@ -133,6 +133,62 @@ function possuiCamposMinimosParaConclusao(form) {
   );
 }
 
+function objetivoPossuiConteudo(objetivo) {
+  return [
+    objetivo.areaEixo,
+    objetivo.objetivoEspecifico,
+    objetivo.estrategias,
+    objetivo.recursos,
+    objetivo.prazo,
+    objetivo.criterioAcompanhamento,
+  ].some((valor) => limparTexto(valor));
+}
+
+function possuiConteudoMinimoParaImpressao(form) {
+  const possuiEstudante = limparTexto(
+    form.alunoNome || form.identificacaoEstudante.nome,
+  );
+  const possuiConteudoPlano = [
+    form.periodo,
+    form.dataInicio,
+    form.dataFim,
+    form.basePedagogica.potencialidades,
+    form.basePedagogica.barreiras,
+    form.basePedagogica.necessidadesEspecificas,
+    form.basePedagogica.resumoEstudoCaso,
+    form.sinteseDiagnostica,
+    form.estrategiasPedagogicas,
+    form.recursosTecnologiaAssistiva,
+    form.organizacaoAtendimento.frequencia,
+    form.organizacaoAtendimento.duracaoMedia,
+    form.organizacaoAtendimento.modalidade,
+    form.organizacaoAtendimento.articulacaoSalaComumFamilia,
+    form.criteriosAcompanhamento,
+    form.encaminhamentos,
+  ].some((valor) => limparTexto(valor));
+
+  return Boolean(
+    possuiEstudante &&
+      (possuiConteudoPlano || form.objetivos.some(objetivoPossuiConteudo)),
+  );
+}
+
+function obterValorImpressao(valor) {
+  return limparTexto(valor) || "Não informado";
+}
+
+function formatarDataImpressao(valor) {
+  if (!valor) return "Não informado";
+
+  if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+    const [ano, mes, dia] = valor.split("-");
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  const dataFormatada = formatarDataLista(valor);
+  return dataFormatada === "-" ? "Não informado" : dataFormatada;
+}
+
 function normalizarObjetivos(objetivos) {
   const objetivosSalvos = Array.isArray(objetivos) ? objetivos : [];
   const quantidade = Math.max(3, objetivosSalvos.length);
@@ -537,6 +593,19 @@ function PAEEPage() {
     }
   };
 
+  const handleImprimirPaee = () => {
+    setFeedback("");
+    setAviso("");
+    setErro("");
+
+    if (!possuiConteudoMinimoParaImpressao(form)) {
+      setErro("Antes de imprimir, preencha ou abra um PAEE salvo.");
+      return;
+    }
+
+    window.print();
+  };
+
   const handleAbrirPaee = async (id) => {
     if (!id || abrindoPaeeId) return;
 
@@ -577,6 +646,8 @@ function PAEEPage() {
       </main>
     );
   }
+
+  const objetivosParaImpressao = form.objetivos.filter(objetivoPossuiConteudo);
 
   return (
     <main className="alunos-page module-page paee-page">
@@ -1205,11 +1276,241 @@ function PAEEPage() {
               >
                 {concluindo ? "Concluindo..." : "Concluir PAEE"}
               </button>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleImprimirPaee}
+                disabled={salvando || concluindo}
+              >
+                Imprimir PAEE
+              </button>
             </div>
           </section>
           </form>
         </>
       )}
+
+      <section className="paee-print-area" aria-label="PAEE para impressão">
+        <header className="paee-print-header">
+          <p className="paee-print-brand">AEE Registro</p>
+          <h1>Plano de Atendimento Educacional Especializado — PAEE</h1>
+          <div className="paee-print-summary">
+            <p>
+              <strong>Estudante:</strong>{" "}
+              {obterValorImpressao(form.alunoNome || form.identificacaoEstudante.nome)}
+            </p>
+            <p>
+              <strong>Ano letivo:</strong> {obterValorImpressao(form.anoLetivo)}
+            </p>
+            <p>
+              <strong>Período:</strong> {obterValorImpressao(form.periodo)}
+            </p>
+            <p>
+              <strong>Data de impressão:</strong> {formatarDataImpressao(obterDataAtualIsoLocal())}
+            </p>
+          </div>
+        </header>
+
+        <section className="paee-print-section">
+          <h2>Dados gerais do plano</h2>
+          <dl className="paee-print-grid">
+            <div>
+              <dt>Ano letivo</dt>
+              <dd>{obterValorImpressao(form.anoLetivo)}</dd>
+            </div>
+            <div>
+              <dt>Período</dt>
+              <dd>{obterValorImpressao(form.periodo)}</dd>
+            </div>
+            <div>
+              <dt>Data de início</dt>
+              <dd>{formatarDataImpressao(form.dataInicio)}</dd>
+            </div>
+            <div>
+              <dt>Data final prevista</dt>
+              <dd>{formatarDataImpressao(form.dataFim)}</dd>
+            </div>
+            <div>
+              <dt>Status geral</dt>
+              <dd>{obterLabelStatus(form.statusGeral)}</dd>
+            </div>
+            <div>
+              <dt>Responsável pelo preenchimento</dt>
+              <dd>{obterValorImpressao(form.responsavel.nome)}</dd>
+            </div>
+            {form.dataConclusao ? (
+              <div>
+                <dt>Data de conclusão</dt>
+                <dd>{formatarDataImpressao(form.dataConclusao)}</dd>
+              </div>
+            ) : null}
+          </dl>
+        </section>
+
+        <section className="paee-print-section">
+          <h2>1. Identificação do estudante</h2>
+          <dl className="paee-print-grid">
+            <div className="paee-print-span-2">
+              <dt>Nome do estudante</dt>
+              <dd>{obterValorImpressao(form.identificacaoEstudante.nome || form.alunoNome)}</dd>
+            </div>
+            <div>
+              <dt>Data de nascimento</dt>
+              <dd>{formatarDataImpressao(form.identificacaoEstudante.dataNascimento)}</dd>
+            </div>
+            <div>
+              <dt>Série/Ano</dt>
+              <dd>{obterValorImpressao(form.identificacaoEstudante.serieAno)}</dd>
+            </div>
+            <div>
+              <dt>Turma</dt>
+              <dd>{obterValorImpressao(form.identificacaoEstudante.turma)}</dd>
+            </div>
+            <div>
+              <dt>Turno</dt>
+              <dd>{obterValorImpressao(form.identificacaoEstudante.turno)}</dd>
+            </div>
+            <div className="paee-print-span-2">
+              <dt>Professor(a) do AEE</dt>
+              <dd>{obterValorImpressao(form.identificacaoEstudante.professorAee)}</dd>
+            </div>
+            <div className="paee-print-span-2">
+              <dt>Nome da escola</dt>
+              <dd>{obterValorImpressao(form.identificacaoEstudante.nomeEscola)}</dd>
+            </div>
+            <div>
+              <dt>Município</dt>
+              <dd>{obterValorImpressao(form.identificacaoEstudante.municipio)}</dd>
+            </div>
+            <div>
+              <dt>Localização</dt>
+              <dd>{obterValorImpressao(form.identificacaoEstudante.localizacao)}</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section className="paee-print-section">
+          <h2>2. Base pedagógica do PAEE</h2>
+          <div className="paee-print-content-block">
+            <h3>Potencialidades do estudante</h3>
+            <p>{obterValorImpressao(form.basePedagogica.potencialidades)}</p>
+          </div>
+          <div className="paee-print-content-block">
+            <h3>Barreiras identificadas</h3>
+            <p>{obterValorImpressao(form.basePedagogica.barreiras)}</p>
+          </div>
+          <div className="paee-print-content-block">
+            <h3>Necessidades educacionais específicas</h3>
+            <p>{obterValorImpressao(form.basePedagogica.necessidadesEspecificas)}</p>
+          </div>
+          <div className="paee-print-content-block">
+            <h3>Resumo do Estudo de Caso que orienta este PAEE</h3>
+            <p>{obterValorImpressao(form.basePedagogica.resumoEstudoCaso)}</p>
+          </div>
+        </section>
+
+        <section className="paee-print-section">
+          <h2>3. Síntese Diagnóstica</h2>
+          <p>{obterValorImpressao(form.sinteseDiagnostica)}</p>
+        </section>
+
+        <section className="paee-print-section">
+          <h2>4. Objetivos do Atendimento AEE</h2>
+          {objetivosParaImpressao.length ? (
+            objetivosParaImpressao.map((objetivo, indice) => (
+              <article key={objetivo.id || indice} className="paee-print-objective">
+                <h3>Objetivo {indice + 1}</h3>
+                <dl className="paee-print-grid">
+                  <div>
+                    <dt>Área/Eixo</dt>
+                    <dd>{obterValorImpressao(objetivo.areaEixo)}</dd>
+                  </div>
+                  <div>
+                    <dt>Status</dt>
+                    <dd>
+                      {STATUS_OBJETIVO_OPTIONS.find((item) => item.value === objetivo.status)
+                        ?.label || "Planejado"}
+                    </dd>
+                  </div>
+                  <div className="paee-print-span-2">
+                    <dt>Objetivo específico</dt>
+                    <dd>{obterValorImpressao(objetivo.objetivoEspecifico)}</dd>
+                  </div>
+                  <div className="paee-print-span-2">
+                    <dt>Estratégias</dt>
+                    <dd>{obterValorImpressao(objetivo.estrategias)}</dd>
+                  </div>
+                  <div className="paee-print-span-2">
+                    <dt>Recursos</dt>
+                    <dd>{obterValorImpressao(objetivo.recursos)}</dd>
+                  </div>
+                  <div>
+                    <dt>Prazo</dt>
+                    <dd>{formatarDataImpressao(objetivo.prazo)}</dd>
+                  </div>
+                  <div>
+                    <dt>Critério de acompanhamento</dt>
+                    <dd>{obterValorImpressao(objetivo.criterioAcompanhamento)}</dd>
+                  </div>
+                </dl>
+              </article>
+            ))
+          ) : (
+            <p>Nenhum objetivo registrado.</p>
+          )}
+        </section>
+
+        <section className="paee-print-section">
+          <h2>5. Estratégias Pedagógicas</h2>
+          <p>{obterValorImpressao(form.estrategiasPedagogicas)}</p>
+        </section>
+
+        <section className="paee-print-section">
+          <h2>6. Recursos e Tecnologia Assistiva</h2>
+          <p>{obterValorImpressao(form.recursosTecnologiaAssistiva)}</p>
+        </section>
+
+        <section className="paee-print-section">
+          <h2>7. Organização do Atendimento</h2>
+          <dl className="paee-print-grid">
+            <div>
+              <dt>Frequência do atendimento</dt>
+              <dd>{obterValorImpressao(form.organizacaoAtendimento.frequencia)}</dd>
+            </div>
+            <div>
+              <dt>Duração média</dt>
+              <dd>{obterValorImpressao(form.organizacaoAtendimento.duracaoMedia)}</dd>
+            </div>
+            <div className="paee-print-span-2">
+              <dt>Modalidade do atendimento</dt>
+              <dd>{obterValorImpressao(form.organizacaoAtendimento.modalidade)}</dd>
+            </div>
+            <div className="paee-print-span-2">
+              <dt>Articulação com sala comum e família</dt>
+              <dd>
+                {obterValorImpressao(
+                  form.organizacaoAtendimento.articulacaoSalaComumFamilia,
+                )}
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        <section className="paee-print-section">
+          <h2>8. Critérios de Acompanhamento</h2>
+          <p>{obterValorImpressao(form.criteriosAcompanhamento)}</p>
+        </section>
+
+        <section className="paee-print-section">
+          <h2>9. Encaminhamentos</h2>
+          <p>{obterValorImpressao(form.encaminhamentos)}</p>
+        </section>
+
+        <footer className="paee-print-footer">
+          Documento preparado na Plataforma AEE Registro em{" "}
+          {formatarDataImpressao(obterDataAtualIsoLocal())}.
+        </footer>
+      </section>
     </main>
   );
 }
