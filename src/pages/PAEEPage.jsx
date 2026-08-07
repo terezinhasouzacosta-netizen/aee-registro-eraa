@@ -60,6 +60,7 @@ function criarFormularioInicial(currentUser) {
       turma: "",
       turno: "",
       professorAee: "",
+      diagnostico: "",
       nomeEscola: "",
       municipio: "",
       localizacao: "",
@@ -290,6 +291,7 @@ function montarPayload(form, currentUser) {
       turma: limparTexto(identificacao.turma),
       turno: limparTexto(identificacao.turno),
       professorAee: limparTexto(identificacao.professorAee),
+      diagnostico: limparTexto(identificacao.diagnostico),
       nomeEscola: limparTexto(identificacao.nomeEscola),
       municipio: limparTexto(identificacao.municipio),
       localizacao: limparTexto(identificacao.localizacao),
@@ -454,6 +456,7 @@ function PAEEPage() {
           turma: aluno.turma || "",
           turno: aluno.turno || "",
           professorAee: aluno.professorAee || "",
+          diagnostico: aluno.diagnostico || "",
           nomeEscola: aluno.nomeEscola || "",
           municipio: aluno.municipio || "",
           localizacao: aluno.localizacao || "",
@@ -906,6 +909,16 @@ function PAEEPage() {
                   id="professorAee"
                   name="professorAee"
                   value={form.identificacaoEstudante.professorAee}
+                  onChange={handleIdentificacao}
+                />
+              </div>
+              <div className="paee-field-span-2">
+                <label htmlFor="diagnosticoPaee">Diagnóstico/condição informada</label>
+                <textarea
+                  id="diagnosticoPaee"
+                  name="diagnostico"
+                  rows="3"
+                  value={form.identificacaoEstudante.diagnostico}
                   onChange={handleIdentificacao}
                 />
               </div>
@@ -1373,6 +1386,10 @@ function PAEEPage() {
             <div className="paee-print-span-2">
               <dt>Professor(a) do AEE</dt>
               <dd>{obterValorImpressao(form.identificacaoEstudante.professorAee)}</dd>
+            </div>
+            <div className="paee-print-span-2">
+              <dt>Diagnóstico/condição informada</dt>
+              <dd>{obterValorImpressao(form.identificacaoEstudante.diagnostico)}</dd>
             </div>
             <div className="paee-print-span-2">
               <dt>Nome da escola</dt>
