@@ -5,6 +5,7 @@ import {
   atualizarPaee,
   buscarPaeePorId,
   criarPaee,
+  listarPaees,
 } from "../services/paeesService";
 import { podeVisualizarMetas } from "../utils/permissions";
 
@@ -80,6 +81,26 @@ function criarFormularioInicial(currentUser) {
 
 function limparTexto(valor) {
   return String(valor || "").trim();
+}
+
+function formatarDataLista(valor, incluirHora = false) {
+  if (!valor) return "-";
+
+  const data = valor?.toDate ? valor.toDate() : new Date(valor);
+  if (Number.isNaN(data.getTime())) return "-";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    ...(incluirHora ? { hour: "2-digit", minute: "2-digit" } : {}),
+  }).format(data);
+}
+
+function obterLabelStatus(statusGeral) {
+  return (
+    STATUS_GERAL_OPTIONS.find((status) => status.value === statusGeral)?.label || "Rascunho"
+  );
 }
 
 function normalizarObjetivos(objetivos) {
@@ -219,12 +240,29 @@ function PAEEPage() {
   const podeLer = podeVisualizarMetas(perfil);
   const [form, setForm] = useState(() => criarFormularioInicial(currentUser));
   const [alunos, setAlunos] = useState([]);
+  const [paeesSalvos, setPaeesSalvos] = useState([]);
   const [paeeId, setPaeeId] = useState("");
   const [carregando, setCarregando] = useState(true);
+  const [carregandoLista, setCarregandoLista] = useState(false);
+  const [abrindoPaeeId, setAbrindoPaeeId] = useState("");
   const [salvando, setSalvando] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [aviso, setAviso] = useState("");
   const [erro, setErro] = useState("");
+
+  const carregarPaeesSalvos = async () => {
+    setCarregandoLista(true);
+
+    try {
+      const lista = await listarPaees();
+      setPaeesSalvos(lista);
+    } catch (error) {
+      console.error("[PAEEPage] Erro ao listar PAEEs salvos", error);
+      setErro("Não foi possível carregar os PAEEs salvos.");
+    } finally {
+      setCarregandoLista(false);
+    }
+  };
 
   useEffect(() => {
     if (!currentUser || !podeLer) return undefined;
@@ -242,6 +280,8 @@ function PAEEPage() {
         console.error("[PAEEPage] Erro ao carregar alunos", error);
         if (ativo) setErro("Não foi possível carregar os alunos cadastrados.");
       }
+
+      if (ativo) await carregarPaeesSalvos();
 
       const rascunhoId = lerPaeeIdLocal();
 
@@ -378,6 +418,7 @@ function PAEEPage() {
       }
 
       setFeedback("Rascunho do PAEE salvo com sucesso.");
+      await carregarPaeesSalvos();
     } catch (error) {
       console.error("[PAEEPage] Erro ao salvar rascunho", error);
       setErro("Não foi possível salvar o rascunho do PAEE. Tente novamente.");
@@ -393,6 +434,36 @@ function PAEEPage() {
     setErro("");
     setAviso("");
     setFeedback("Novo PAEE iniciado.");
+  };
+
+  const handleAbrirPaee = async (id) => {
+    if (!id || abrindoPaeeId) return;
+
+    setAbrindoPaeeId(id);
+    setFeedback("");
+    setAviso("");
+    setErro("");
+
+    try {
+      const paeeSalvo = await buscarPaeePorId(id);
+
+      if (!paeeSalvo) {
+        setAviso("O PAEE selecionado não foi encontrado.");
+        await carregarPaeesSalvos();
+        return;
+      }
+
+      setForm(normalizarPaeeParaFormulario(paeeSalvo, currentUser));
+      setPaeeId(paeeSalvo.id || id);
+      salvarPaeeIdLocal(paeeSalvo.id || id);
+      setFeedback("PAEE carregado com sucesso.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      console.error("[PAEEPage] Erro ao abrir PAEE salvo", error);
+      setErro("Não foi possível abrir o PAEE selecionado.");
+    } finally {
+      setAbrindoPaeeId("");
+    }
   };
 
   if (!podeLer) {
@@ -427,7 +498,66 @@ function PAEEPage() {
           <p>Carregando PAEE...</p>
         </section>
       ) : (
-        <form className="paee-form" onSubmit={handleSalvarRascunho}>
+        <>
+          <section className="panel paee-salvos-panel" aria-labelledby="paees-salvos-titulo">
+            <div className="paee-section-heading">
+              <div>
+                <h2 id="paees-salvos-titulo">PAEEs salvos</h2>
+                <p className="muted">Abra um plano para continuar o preenchimento e o salvamento.</p>
+              </div>
+              <span className="paee-status-chip">{paeesSalvos.length} registro(s)</span>
+            </div>
+
+            {carregandoLista ? (
+              <p className="muted">Carregando PAEEs salvos...</p>
+            ) : paeesSalvos.length ? (
+              <div className="paee-table-wrapper">
+                <table className="paee-salvos-table">
+                  <thead>
+                    <tr>
+                      <th>Aluno</th>
+                      <th>Ano letivo</th>
+                      <th>Período</th>
+                      <th>Status</th>
+                      <th>Data de início</th>
+                      <th>Data final prevista</th>
+                      <th>Atualizado em</th>
+                      <th>Abrir</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paeesSalvos.map((paee) => (
+                      <tr key={paee.id}>
+                        <td>
+                          {paee.alunoNome || paee.identificacaoEstudante?.nome || "Não informado"}
+                        </td>
+                        <td>{paee.anoLetivo || "-"}</td>
+                        <td>{paee.periodo || "-"}</td>
+                        <td>{obterLabelStatus(paee.statusGeral)}</td>
+                        <td>{formatarDataLista(paee.dataInicio)}</td>
+                        <td>{formatarDataLista(paee.dataFim)}</td>
+                        <td>{formatarDataLista(paee.atualizadoEm || paee.criadoEm, true)}</td>
+                        <td>
+                          <button
+                            type="button"
+                            className="btn-secondary paee-open-button"
+                            onClick={() => handleAbrirPaee(paee.id)}
+                            disabled={abrindoPaeeId === paee.id}
+                          >
+                            {abrindoPaeeId === paee.id ? "Abrindo..." : "Abrir"}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="paee-empty-state">Nenhum PAEE salvo até o momento.</p>
+            )}
+          </section>
+
+          <form className="paee-form" onSubmit={handleSalvarRascunho}>
           <section className="panel paee-header-panel">
             <div className="paee-section-heading">
               <div>
@@ -890,7 +1020,8 @@ function PAEEPage() {
               </button>
             </div>
           </section>
-        </form>
+          </form>
+        </>
       )}
     </main>
   );

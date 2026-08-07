@@ -2548,6 +2548,67 @@ textarea:focus {
   white-space: nowrap;
 }
 
+.paee-page .paee-salvos-panel {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  border-color: #bfdbfe;
+}
+
+.paee-page .paee-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+}
+
+.paee-page .paee-salvos-table {
+  width: 100%;
+  min-width: 1060px;
+  border-collapse: collapse;
+  background: #ffffff;
+}
+
+.paee-page .paee-salvos-table th,
+.paee-page .paee-salvos-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #dbeafe;
+  color: #1f2937;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.paee-page .paee-salvos-table th {
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.paee-page .paee-salvos-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.paee-page .paee-salvos-table tbody tr:hover {
+  background: #f8fbff;
+}
+
+.paee-page .paee-open-button {
+  min-width: 82px;
+  padding: 0.45rem 0.75rem;
+}
+
+.paee-page .paee-empty-state {
+  margin: 0;
+  border: 1px dashed #bfdbfe;
+  border-radius: 12px;
+  padding: 1rem;
+  background: #f8fbff;
+  color: #475569;
+  text-align: center;
+}
+
 .paee-page .paee-form input,
 .paee-page .paee-form select,
 .paee-page .paee-form textarea {
