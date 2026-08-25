@@ -137,21 +137,6 @@ const AUTONOMIA_OPCOES = [
   "autonomia satisfatória",
 ];
 
-const ESTRATEGIAS_OPCOES = [
-  "apoio visual",
-  "explicação individual",
-  "instrução em etapas",
-  "atividade reduzida",
-  "leitura mediada",
-  "modelagem",
-  "repetição orientada",
-  "apoio verbal",
-  "colega de apoio",
-  "tempo ampliado",
-  "adaptação de material",
-  "outro",
-];
-
 const INTERVENCOES_PROFESSOR_OBSERVADAS_OPCOES = [
   "atividade adaptada",
   "explicação individual",
@@ -715,18 +700,6 @@ function AcompanhamentoPage() {
       }
 
       return { ...prev, [name]: value };
-    });
-  };
-
-  const handleAlternarEstrategia = (estrategia) => {
-    setForm((prev) => {
-      const existe = prev.estrategiasUtilizadas.includes(estrategia);
-      return {
-        ...prev,
-        estrategiasUtilizadas: existe
-          ? prev.estrategiasUtilizadas.filter((item) => item !== estrategia)
-          : [...prev.estrategiasUtilizadas, estrategia],
-      };
     });
   };
 
@@ -1572,28 +1545,6 @@ function AcompanhamentoPage() {
             </section>
 
             <section className="form-section">
-              <h3>Estratégias / intervenções realizadas</h3>
-              <div className="checkbox-group">
-                {ESTRATEGIAS_OPCOES.map((opcao) => (
-                  <label key={opcao} className="checkbox-item">
-                    <input
-                      type="checkbox"
-                      checked={form.estrategiasUtilizadas.includes(opcao)}
-                      onChange={() => handleAlternarEstrategia(opcao)}
-                    />
-                    {opcao}
-                  </label>
-                ))}
-              </div>
-
-              {renderSelect(
-                "resultadoIntervencao",
-                "Resultado da intervenção",
-                RESULTADO_INTERVENCAO_OPCOES
-              )}
-            </section>
-
-            <section className="form-section">
               <h3>Intervenções do professor observadas na aula</h3>
               <p className="tab-helper-text">
                 Marque as intervenções realizadas pelo professor durante a aula observada. Este
@@ -1615,6 +1566,12 @@ function AcompanhamentoPage() {
               <p className="tab-helper-text">
                 Se marcar “outro”, detalhe a intervenção no campo Observação geral.
               </p>
+
+              {renderSelect(
+                "resultadoIntervencao",
+                "Resultado da intervenção",
+                RESULTADO_INTERVENCAO_OPCOES
+              )}
             </section>
 
             <section className="form-section">
