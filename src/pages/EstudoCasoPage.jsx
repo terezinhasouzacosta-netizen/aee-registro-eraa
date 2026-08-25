@@ -49,28 +49,31 @@ const FORMAS_PREENCHIMENTO = [
   {
     id: "manual",
     titulo: "Responder manualmente",
-    descricao: "Preenchimento guiado pergunta por pergunta, já disponível nesta etapa visual.",
+    descricao: "Preenchimento guiado pergunta por pergunta, disponível nesta etapa.",
     status: "Ativa nesta etapa",
     ativa: true,
   },
   {
     id: "colar-texto",
     titulo: "Colar texto de entrevista/reunião",
-    descricao: "Recurso futuro para transformar entrevistas em respostas estruturadas.",
+    descricao:
+      "Recurso futuro para transformar registros de entrevistas, reuniões e escutas em respostas organizadas.",
     status: "Recurso futuro",
     ativa: false,
   },
   {
     id: "usar-dados-plataforma",
     titulo: "Usar dados da plataforma",
-    descricao: "Integração futura com cadastro, sondagem, habilidades e demais módulos.",
+    descricao:
+      "Recurso futuro para importar informações do Cadastro, Sondagem, Habilidades, PAEE e PEI, sempre com revisão da professora.",
     status: "Recurso futuro",
     ativa: false,
   },
   {
     id: "anexar-documentos",
     titulo: "Anexar documentos",
-    descricao: "Importação futura de arquivos de apoio e registros pedagógicos.",
+    descricao:
+      "Recurso futuro para incluir arquivos de apoio, registros pedagógicos e documentos complementares.",
     status: "Recurso futuro",
     ativa: false,
   },
@@ -2310,13 +2313,9 @@ function EstudoCasoPage() {
       <header className="page-header">
         <h1>Estudo de Caso</h1>
         <p>
-          Estrutura funcional visual organizada em uma única página, preparada para futuro
-          preenchimento guiado e geração do relatório do Estudo de Caso.
-        </p>
-        <p className="muted">
-          Nesta etapa o rascunho já pode ser salvo no banco, sem integração com outros módulos
-          da plataforma. A prévia textual continua local na tela e, quando já gerada, acompanha
-          o próximo salvamento do rascunho.
+          O Estudo de Caso organiza informações pedagógicas sobre o estudante, suas
+          potencialidades, barreiras, necessidades de apoio e encaminhamentos, servindo como base
+          para o PAEE e o PEI.
         </p>
       </header>
 
@@ -2326,9 +2325,9 @@ function EstudoCasoPage() {
 
       <section className="panel estudo-caso-header-panel">
         <div className="estudo-caso-note">
-          Aviso de segurança: esta versão salva apenas o rascunho do Estudo de Caso no Firestore
-          e gera uma prévia textual local, sem IA, sem exportação e sem integração com módulos
-          externos.
+          Este módulo permite preencher, salvar, retomar, concluir e imprimir o Estudo de Caso. A
+          prévia textual é gerada localmente na tela, sem IA integrada. As integrações automáticas
+          com Cadastro, Sondagem, Habilidades, PAEE e PEI serão implementadas em fases posteriores.
         </div>
       </section>
 
