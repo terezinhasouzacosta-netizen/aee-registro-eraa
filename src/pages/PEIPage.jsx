@@ -1154,6 +1154,12 @@ function PEIPage() {
           titulo="Objetivos e metas de aprendizagem"
           descricao="Metas observáveis, possíveis e relacionadas ao currículo da turma."
         >
+          <aside className="pei-smart-guidance" aria-label="Orientação para metas SMART">
+            Para facilitar o acompanhamento, escreva objetivos no formato SMART: específicos,
+            mensuráveis, atingíveis, relevantes e com prazo definido. A meta deve indicar o que o
+            estudante irá desenvolver, como o avanço será observado e em qual período será
+            acompanhado.
+          </aside>
           <div className="pei-repeat-grid">
             {[1, 2, 3].map((numeroObjetivo) => (
               <article key={numeroObjetivo} className="pei-repeat-card">
@@ -1163,13 +1169,13 @@ function PEIPage() {
                     id={`pei-objetivo-${numeroObjetivo}`}
                     label="Objetivo/meta"
                     rows={3}
-                    placeholder="Escreva o que se espera que o estudante desenvolva no período, de forma possível, observável e relacionada ao currículo."
+                    placeholder="Escreva uma meta específica e possível para o estudante desenvolver neste período, relacionada ao currículo e às necessidades observadas."
                   />
                   <CampoTexto
                     id={`pei-resultado-${numeroObjetivo}`}
                     label="Resultado esperado"
                     rows={3}
-                    placeholder="Descreva como será possível perceber que houve avanço na aprendizagem ou participação do estudante."
+                    placeholder="Descreva como será possível observar ou registrar o avanço do estudante."
                   />
                   <CampoSelect
                     id={`pei-prioridade-objetivo-${numeroObjetivo}`}
@@ -1180,7 +1186,7 @@ function PEIPage() {
                   <Campo
                     id={`pei-prazo-objetivo-${numeroObjetivo}`}
                     label="Prazo"
-                    placeholder="Informe o prazo previsto para acompanhamento da meta."
+                    placeholder="Informe o prazo de acompanhamento da meta, por exemplo: 1º bimestre, 2º semestre ou data prevista."
                   />
                 </div>
               </article>

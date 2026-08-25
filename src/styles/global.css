@@ -2612,6 +2612,16 @@ textarea:focus {
   gap: 1rem;
 }
 
+.pei-page .pei-smart-guidance {
+  margin-bottom: 1rem;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  background: #eff6ff;
+  color: #1e3a8a;
+  line-height: 1.5;
+}
+
 .pei-page .pei-repeat-card {
   border: 1px solid #bfdbfe;
   border-radius: 14px;
