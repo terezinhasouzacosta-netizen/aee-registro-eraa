@@ -152,6 +152,26 @@ const ESTRATEGIAS_OPCOES = [
   "outro",
 ];
 
+const INTERVENCOES_PROFESSOR_OBSERVADAS_OPCOES = [
+  "atividade adaptada",
+  "explicação individual",
+  "apoio visual",
+  "apoio oral",
+  "leitura mediada",
+  "instrução em etapas",
+  "redução de itens",
+  "tempo ampliado",
+  "repetição orientada",
+  "modelagem",
+  "trabalho em dupla",
+  "colega de apoio",
+  "flexibilização na correção",
+  "retomada de combinados",
+  "mediação de comportamento",
+  "uso de material concreto",
+  "outro",
+];
+
 const RESULTADO_INTERVENCAO_OPCOES = [
   "não respondeu à estratégia",
   "respondeu minimamente",
@@ -252,6 +272,7 @@ function formInicial({ alunoId = "", turno = "", responsavelNome = "", funcaoRes
     interacaoSocial: "",
     autonomia: "",
     estrategiasUtilizadas: [],
+    intervencoesProfessorObservadas: [],
     resultadoIntervencao: "",
     avancosPercebidos: "",
     dificuldadesObservadas: "",
@@ -709,6 +730,18 @@ function AcompanhamentoPage() {
     });
   };
 
+  const handleAlternarIntervencaoProfessorObservada = (intervencao) => {
+    setForm((prev) => {
+      const existe = prev.intervencoesProfessorObservadas.includes(intervencao);
+      return {
+        ...prev,
+        intervencoesProfessorObservadas: existe
+          ? prev.intervencoesProfessorObservadas.filter((item) => item !== intervencao)
+          : [...prev.intervencoesProfessorObservadas, intervencao],
+      };
+    });
+  };
+
   const handleAlternarMarcadorProfessor = (marcador) => {
     setFormProfessor((prev) => {
       const existe = prev.marcadoresIntervencao.includes(marcador);
@@ -773,6 +806,7 @@ function AcompanhamentoPage() {
         interacaoSocial: form.interacaoSocial,
         autonomia: form.autonomia,
         estrategiasUtilizadas: form.estrategiasUtilizadas,
+        intervencoesProfessorObservadas: form.intervencoesProfessorObservadas,
         resultadoIntervencao: form.resultadoIntervencao,
         avancosPercebidos: form.avancosPercebidos.trim(),
         dificuldadesObservadas: form.dificuldadesObservadas.trim(),
@@ -882,6 +916,9 @@ function AcompanhamentoPage() {
         autonomia: item.autonomia || "",
         estrategiasUtilizadas: Array.isArray(item.estrategiasUtilizadas)
           ? item.estrategiasUtilizadas
+          : [],
+        intervencoesProfessorObservadas: Array.isArray(item.intervencoesProfessorObservadas)
+          ? item.intervencoesProfessorObservadas
           : [],
         resultadoIntervencao: item.resultadoIntervencao || "",
         avancosPercebidos: item.avancosPercebidos || "",
@@ -1554,6 +1591,30 @@ function AcompanhamentoPage() {
                 "Resultado da intervenção",
                 RESULTADO_INTERVENCAO_OPCOES
               )}
+            </section>
+
+            <section className="form-section">
+              <h3>Intervenções do professor observadas na aula</h3>
+              <p className="tab-helper-text">
+                Marque as intervenções realizadas pelo professor durante a aula observada. Este
+                registro serve para documentar os apoios oferecidos ao estudante, sem caráter
+                avaliativo da atuação docente.
+              </p>
+              <div className="checkbox-group">
+                {INTERVENCOES_PROFESSOR_OBSERVADAS_OPCOES.map((intervencao) => (
+                  <label key={intervencao} className="checkbox-item">
+                    <input
+                      type="checkbox"
+                      checked={form.intervencoesProfessorObservadas.includes(intervencao)}
+                      onChange={() => handleAlternarIntervencaoProfessorObservada(intervencao)}
+                    />
+                    {intervencao}
+                  </label>
+                ))}
+              </div>
+              <p className="tab-helper-text">
+                Se marcar “outro”, detalhe a intervenção no campo Observação geral.
+              </p>
             </section>
 
             <section className="form-section">
