@@ -24,11 +24,23 @@ import { gerarRelatorioMultidisciplinarAutomatico } from "../utils/relatorioMult
 
 const BIMESTRES = ["1\u00BA", "2\u00BA", "3\u00BA", "4\u00BA"];
 const OPCOES_FUNCAO = [
-  "Professor(a) do SRM",
+  "Mediador",
+  "Assistente Educacional",
+  "Intérprete",
+  "Professor(a) da SRM",
+  "Professor(a) do AEE",
   "Professor(a) do Atendimento Domiciliar",
+  "Outro",
 ];
 const OPCOES_LOCALIZACAO = ["Urbana", "Rural", "Campo"];
 const OPCOES_LAUDO = ["Sim", "Não"];
+const OPCOES_SITUACAO_OBJETIVOS = [
+  "Plenamente alcançados",
+  "Parcialmente alcançados",
+  "Ainda não alcançados",
+  "Em desenvolvimento",
+  "Não se aplica",
+];
 const OPCOES_TIPO_ACOMPANHAMENTO = [
   "Sem mediação",
   "Com mediador",
@@ -58,6 +70,19 @@ const initialRelatorioForm = {
   profissionalAcompanhamentoNome: "",
   responsavelPreenchimento: "",
   funcao: [],
+  introducao: "",
+  interacaoComunicacao: "",
+  habilidadesMotoras: "",
+  habilidadesCognitivas: "",
+  autonomiaIndependencia: "",
+  outrasInformacoes: "",
+  conclusaoParecer: "",
+  situacaoObjetivos: "",
+  localAssinatura: "",
+  dataAssinatura: "",
+  assinaturaProfissional: "",
+  cargoFuncao: "",
+  assinaturaGestao: "",
   textoRelatorio: "",
 };
 
@@ -84,6 +109,7 @@ function obterDadosCadastroAlunoParaRelatorio(aluno) {
       turno: "",
       diagnostico: "",
       laudo: "",
+      comprometimento: "",
       profissionalAEE: "",
       tipoAcompanhamento: "",
       profissionalAcompanhamentoNome: "",
@@ -101,6 +127,12 @@ function obterDadosCadastroAlunoParaRelatorio(aluno) {
     turno: aluno.turno || "",
     diagnostico: aluno.diagnostico || "",
     laudo: aluno.laudo || "",
+    comprometimento:
+      aluno.comprometimento ||
+      aluno.condicaoInformada ||
+      aluno.condicao ||
+      aluno.diagnostico ||
+      "",
     profissionalAEE: aluno.professorAee || "",
     tipoAcompanhamento: normalizarTipoAcompanhamento(aluno.tipoAcompanhamento),
     profissionalAcompanhamentoNome:
@@ -269,6 +301,160 @@ function agruparHabilidadesPorEixo(habilidades = []) {
   return Object.values(mapa).sort((a, b) => a.eixo.localeCompare(b.eixo));
 }
 
+function textoOuNaoInformado(valor) {
+  const texto = String(valor || "").trim();
+  return texto || "Não informado.";
+}
+
+function formatarDataCampo(valor) {
+  const texto = String(valor || "").trim();
+  const partes = texto.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!partes) return textoOuNaoInformado(texto);
+  return `${partes[3]}/${partes[2]}/${partes[1]}`;
+}
+
+function formatarFuncoesRelatorio(valor) {
+  if (Array.isArray(valor)) return valor.filter(Boolean).join(", ") || "Não informado.";
+  return textoOuNaoInformado(valor);
+}
+
+function possuiConteudoPedagogico(relatorio) {
+  return [
+    relatorio?.introducao,
+    relatorio?.interacaoComunicacao,
+    relatorio?.habilidadesMotoras,
+    relatorio?.habilidadesCognitivas,
+    relatorio?.autonomiaIndependencia,
+    relatorio?.outrasInformacoes,
+    relatorio?.conclusaoParecer,
+    relatorio?.textoRelatorio,
+  ].some((valor) => String(valor || "").trim());
+}
+
+function DocumentoRelatorioPedagogico({ relatorio = {} }) {
+  const textoLegado = String(relatorio.textoRelatorio || "").trim();
+  const introducao = relatorio.introducao || textoLegado;
+  const outrasInformacoes =
+    relatorio.outrasInformacoes || (relatorio.introducao ? textoLegado : "");
+  const dataDocumento = relatorio.dataAssinatura
+    ? formatarDataCampo(relatorio.dataAssinatura)
+    : formatarDataFlex(relatorio.atualizadoEm || relatorio.criadoEm);
+
+  return (
+    <div className="relatorio-documento-estrutura">
+      <section className="relatorio-documento-bloco">
+        <h3>1. DADOS DE IDENTIFICAÇÃO</h3>
+        <div className="report-identification relatorio-documento-grid">
+          <p><strong>Nome da escola:</strong> {textoOuNaoInformado(relatorio.nomeEscola)}</p>
+          <p><strong>Município:</strong> {textoOuNaoInformado(relatorio.municipio)}</p>
+          <p><strong>Localização:</strong> {textoOuNaoInformado(relatorio.localizacao)}</p>
+          <p><strong>Aluno:</strong> {textoOuNaoInformado(relatorio.alunoNome)}</p>
+          <p><strong>Data de nascimento:</strong> {formatarDataCampo(relatorio.dataNascimento)}</p>
+          <p><strong>Série/Ano:</strong> {textoOuNaoInformado(relatorio.serieAno)}</p>
+          <p><strong>Turno:</strong> {textoOuNaoInformado(relatorio.turno)}</p>
+          <p><strong>Laudo:</strong> {textoOuNaoInformado(relatorio.laudo)}</p>
+          <p className="relatorio-documento-campo-largo">
+            <strong>Comprometimento/condição informada:</strong>{" "}
+            {textoOuNaoInformado(relatorio.comprometimento || relatorio.diagnostico)}
+          </p>
+          <p><strong>Pai:</strong> {textoOuNaoInformado(relatorio.pai)}</p>
+          <p><strong>Mãe:</strong> {textoOuNaoInformado(relatorio.mae)}</p>
+          <p>
+            <strong>Profissional da Educação Especial:</strong>{" "}
+            {textoOuNaoInformado(
+              relatorio.profissionalAEE || relatorio.profissionalAcompanhamentoNome
+            )}
+          </p>
+          <p>
+            <strong>Função do profissional:</strong>{" "}
+            {formatarFuncoesRelatorio(relatorio.funcao)}
+          </p>
+          <p><strong>Bimestre:</strong> {textoOuNaoInformado(relatorio.bimestre)}</p>
+          <p>
+            <strong>Período analisado:</strong>{" "}
+            {relatorio.dataInicio || relatorio.dataFim
+              ? `${relatorio.dataInicio || "-"} até ${relatorio.dataFim || "-"}`
+              : textoOuNaoInformado(relatorio.bimestre)}
+          </p>
+        </div>
+      </section>
+
+      <section className="relatorio-documento-bloco">
+        <h3>2. INTRODUÇÃO — CONTEXTUALIZAÇÃO DO ALUNO</h3>
+        <p className="report-text">{textoOuNaoInformado(introducao)}</p>
+      </section>
+
+      <section className="relatorio-documento-bloco">
+        <h3>3. DESENVOLVIMENTO — HABILIDADES E PROGRESSOS</h3>
+        <div className="relatorio-documento-subbloco">
+          <h4>3.1 Interação social, comportamento e comunicação</h4>
+          <p className="report-text">{textoOuNaoInformado(relatorio.interacaoComunicacao)}</p>
+        </div>
+        <div className="relatorio-documento-subbloco">
+          <h4>3.2 Habilidades motoras</h4>
+          <p className="report-text">{textoOuNaoInformado(relatorio.habilidadesMotoras)}</p>
+        </div>
+        <div className="relatorio-documento-subbloco">
+          <h4>3.3 Habilidades cognitivas</h4>
+          <p className="report-text">{textoOuNaoInformado(relatorio.habilidadesCognitivas)}</p>
+        </div>
+        <div className="relatorio-documento-subbloco">
+          <h4>3.4 Autonomia e independência</h4>
+          <p className="report-text">{textoOuNaoInformado(relatorio.autonomiaIndependencia)}</p>
+        </div>
+        <div className="relatorio-documento-subbloco">
+          <h4>3.5 Outras informações relevantes observadas</h4>
+          <p className="report-text">{textoOuNaoInformado(outrasInformacoes)}</p>
+        </div>
+      </section>
+
+      <section className="relatorio-documento-bloco">
+        <h3>4. CONCLUSÃO — PARECER FINAL</h3>
+        <p>
+          <strong>Situação dos objetivos:</strong>{" "}
+          {textoOuNaoInformado(relatorio.situacaoObjetivos)}
+        </p>
+        <p className="report-text">{textoOuNaoInformado(relatorio.conclusaoParecer)}</p>
+      </section>
+
+      <section className="relatorio-documento-bloco">
+        <h3>5. LOCAL, DATA E ASSINATURAS</h3>
+        <div className="report-identification relatorio-documento-grid">
+          <p>
+            <strong>Local:</strong>{" "}
+            {textoOuNaoInformado(relatorio.localAssinatura || relatorio.municipio)}
+          </p>
+          <p><strong>Data:</strong> {dataDocumento}</p>
+          <p>
+            <strong>Assinatura do profissional:</strong>{" "}
+            {textoOuNaoInformado(
+              relatorio.assinaturaProfissional || relatorio.responsavelPreenchimento
+            )}
+          </p>
+          <p>
+            <strong>Cargo/função:</strong>{" "}
+            {textoOuNaoInformado(
+              relatorio.cargoFuncao || formatarFuncoesRelatorio(relatorio.funcao)
+            )}
+          </p>
+          <p className="relatorio-documento-campo-largo">
+            <strong>Assinatura da gestão escolar:</strong>{" "}
+            {textoOuNaoInformado(relatorio.assinaturaGestao)}
+          </p>
+        </div>
+      </section>
+
+      <section className="relatorio-documento-bloco relatorio-anexos-futuro">
+        <h3>6. ANEXOS/EVIDÊNCIAS</h3>
+        <p>
+          Recurso futuro para incluir evidências do acompanhamento, como atividades, fotos
+          autorizadas, registros, cronogramas ou documentos complementares.
+        </p>
+      </section>
+    </div>
+  );
+}
+
 function RelatoriosPage() {
   const { currentUser, perfil } = useAuth();
   const [alunos, setAlunos] = useState([]);
@@ -363,7 +549,7 @@ function RelatoriosPage() {
 
     if (relatórios.length > 0) return relatórios[0];
 
-    if (formRelatorio.textoRelatorio?.trim()) {
+    if (possuiConteudoPedagogico(formRelatorio)) {
       return {
         ...formRelatorio,
         alunoNome: formRelatorio.alunoNome || alunoSelecionado?.nome || "-",
@@ -802,7 +988,7 @@ function RelatoriosPage() {
       turno: relatório.turno || "",
       diagnostico: relatório.diagnostico || "",
       laudo: relatório.laudo || "",
-      comprometimento: relatório.comprometimento || "",
+      comprometimento: relatório.comprometimento || relatório.diagnostico || "",
       pai: relatório.pai || "",
       mae: relatório.mae || "",
       profissionalAEE: relatório.profissionalAEE || "",
@@ -810,7 +996,26 @@ function RelatoriosPage() {
       profissionalAcompanhamentoNome: relatório.profissionalAcompanhamentoNome || "",
       responsavelPreenchimento:
         relatório.responsavelPreenchimento || relatório.coordenadorNome || "",
-      funcao: Array.isArray(relatório.funcao) ? relatório.funcao : [],
+      funcao: Array.isArray(relatório.funcao)
+        ? relatório.funcao.map((item) =>
+            item === "Professor(a) do SRM" ? "Professor(a) da SRM" : item
+          )
+        : relatório.funcao
+          ? [relatório.funcao]
+          : [],
+      introducao: relatório.introducao || "",
+      interacaoComunicacao: relatório.interacaoComunicacao || "",
+      habilidadesMotoras: relatório.habilidadesMotoras || "",
+      habilidadesCognitivas: relatório.habilidadesCognitivas || "",
+      autonomiaIndependencia: relatório.autonomiaIndependencia || "",
+      outrasInformacoes: relatório.outrasInformacoes || "",
+      conclusaoParecer: relatório.conclusaoParecer || "",
+      situacaoObjetivos: relatório.situacaoObjetivos || "",
+      localAssinatura: relatório.localAssinatura || relatório.municipio || "",
+      dataAssinatura: relatório.dataAssinatura || "",
+      assinaturaProfissional: relatório.assinaturaProfissional || "",
+      cargoFuncao: relatório.cargoFuncao || "",
+      assinaturaGestao: relatório.assinaturaGestao || "",
       textoRelatorio: relatório.textoRelatorio || "",
     });
   };
@@ -977,14 +1182,31 @@ function RelatoriosPage() {
       localizacao: formRelatorio.localizacao,
       dataNascimento: formRelatorio.dataNascimento,
       serieAno: formRelatorio.serieAno.trim(),
+      turma: formRelatorio.turma.trim(),
       turno: formRelatorio.turno.trim(),
+      diagnostico: formRelatorio.diagnostico.trim(),
       laudo: formRelatorio.laudo,
       comprometimento: formRelatorio.comprometimento.trim(),
       pai: formRelatorio.pai.trim(),
       mae: formRelatorio.mae.trim(),
       profissionalAEE: formRelatorio.profissionalAEE.trim(),
+      tipoAcompanhamento: formRelatorio.tipoAcompanhamento,
+      profissionalAcompanhamentoNome: formRelatorio.profissionalAcompanhamentoNome.trim(),
       responsavelPreenchimento: formRelatorio.responsavelPreenchimento.trim(),
       funcao: formRelatorio.funcao,
+      introducao: formRelatorio.introducao.trim(),
+      interacaoComunicacao: formRelatorio.interacaoComunicacao.trim(),
+      habilidadesMotoras: formRelatorio.habilidadesMotoras.trim(),
+      habilidadesCognitivas: formRelatorio.habilidadesCognitivas.trim(),
+      autonomiaIndependencia: formRelatorio.autonomiaIndependencia.trim(),
+      outrasInformacoes: formRelatorio.outrasInformacoes.trim(),
+      conclusaoParecer: formRelatorio.conclusaoParecer.trim(),
+      situacaoObjetivos: formRelatorio.situacaoObjetivos,
+      localAssinatura: formRelatorio.localAssinatura.trim(),
+      dataAssinatura: formRelatorio.dataAssinatura,
+      assinaturaProfissional: formRelatorio.assinaturaProfissional.trim(),
+      cargoFuncao: formRelatorio.cargoFuncao.trim(),
+      assinaturaGestao: formRelatorio.assinaturaGestao.trim(),
       textoRelatorio: formRelatorio.textoRelatorio.trim(),
     };
 
@@ -1031,7 +1253,7 @@ function RelatoriosPage() {
 
   if (!podeLer) {
     return (
-      <main className="alunos-page">
+      <main className="alunos-page relatorios-page">
         <section className="panel">
           <h1>Relatório Pedagógico do Aluno</h1>
           <p>Seu perfil não possui permissão para visualizar relatórios.</p>
@@ -1041,7 +1263,7 @@ function RelatoriosPage() {
   }
 
   return (
-    <main className="alunos-page">
+    <main className="alunos-page relatorios-page">
       <header className="page-header">
         <h1>Relatório Pedagógico do Aluno</h1>
         <p>
@@ -1108,225 +1330,220 @@ function RelatoriosPage() {
 
         {podeGerenciarRelatorio ? (
           <form className="aluno-form no-print" onSubmit={handleSalvarRelatorio}>
-            <h3>Dados de Identificação</h3>
-            <label htmlFor="nomeEscola">Nome da escola</label>
-            <input
-              id="nomeEscola"
-              name="nomeEscola"
-              value={formRelatorio.nomeEscola}
-              onChange={handleChangeRelatorio}
-              required
-            />
-
-            <label htmlFor="municipio">Município</label>
-            <input
-              id="municipio"
-              name="municipio"
-              value={formRelatorio.municipio}
-              onChange={handleChangeRelatorio}
-              required
-            />
-
-            <label htmlFor="localizacao">Localização</label>
-            <select
-              id="localizacao"
-              name="localizacao"
-              value={formRelatorio.localizacao}
-              onChange={handleChangeRelatorio}
-            >
-              <option value="">Selecione</option>
-              {OPCOES_LOCALIZACAO.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-
-            <label htmlFor="bimestreRelatorio">Bimestre</label>
-            <select
-              id="bimestreRelatorio"
-              name="bimestre"
-              value={formRelatorio.bimestre}
-              onChange={handleChangeRelatorio}
-            >
-              {BIMESTRES.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-
-            <div className="acompanhamento-inline-grid">
-              <div>
-                <label htmlFor="dataInicioRelatorio">Data inicial (opcional)</label>
-                <input
-                  id="dataInicioRelatorio"
-                  name="dataInicio"
-                  type="date"
-                  value={formRelatorio.dataInicio || ""}
-                  onChange={handleChangeRelatorio}
-                />
+            <section className="form-section relatorio-form-bloco">
+              <h3>Período do relatório</h3>
+              <div className="relatorio-form-grid">
+                <div>
+                  <label htmlFor="bimestreRelatorio">Bimestre</label>
+                  <select
+                    id="bimestreRelatorio"
+                    name="bimestre"
+                    value={formRelatorio.bimestre}
+                    onChange={handleChangeRelatorio}
+                  >
+                    {BIMESTRES.map((item) => (
+                      <option key={item} value={item}>{item}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="dataInicioRelatorio">Data inicial (opcional)</label>
+                  <input
+                    id="dataInicioRelatorio"
+                    name="dataInicio"
+                    type="date"
+                    value={formRelatorio.dataInicio || ""}
+                    onChange={handleChangeRelatorio}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="dataFimRelatorio">Data final (opcional)</label>
+                  <input
+                    id="dataFimRelatorio"
+                    name="dataFim"
+                    type="date"
+                    value={formRelatorio.dataFim || ""}
+                    onChange={handleChangeRelatorio}
+                  />
+                </div>
               </div>
-              <div>
-                <label htmlFor="dataFimRelatorio">Data final (opcional)</label>
-                <input
-                  id="dataFimRelatorio"
-                  name="dataFim"
-                  type="date"
-                  value={formRelatorio.dataFim || ""}
-                  onChange={handleChangeRelatorio}
-                />
+            </section>
+
+            <section className="form-section relatorio-form-bloco">
+              <h3>1. Dados de identificação</h3>
+              <div className="relatorio-form-grid">
+                <div>
+                  <label htmlFor="nomeEscola">Nome da escola</label>
+                  <input id="nomeEscola" name="nomeEscola" value={formRelatorio.nomeEscola} onChange={handleChangeRelatorio} required />
+                </div>
+                <div>
+                  <label htmlFor="municipio">Município</label>
+                  <input id="municipio" name="municipio" value={formRelatorio.municipio} onChange={handleChangeRelatorio} required />
+                </div>
+                <div>
+                  <label htmlFor="localizacao">Localização</label>
+                  <select id="localizacao" name="localizacao" value={formRelatorio.localizacao} onChange={handleChangeRelatorio}>
+                    <option value="">Selecione</option>
+                    {OPCOES_LOCALIZACAO.map((item) => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="alunoNome">Aluno</label>
+                  <input id="alunoNome" name="alunoNome" value={formRelatorio.alunoNome} readOnly />
+                </div>
+                <div>
+                  <label htmlFor="dataNascimentoRelatorio">Data de nascimento</label>
+                  <input id="dataNascimentoRelatorio" name="dataNascimento" type="date" value={formRelatorio.dataNascimento} onChange={handleChangeRelatorio} />
+                </div>
+                <div>
+                  <label htmlFor="serieAno">Série/Ano</label>
+                  <input id="serieAno" name="serieAno" value={formRelatorio.serieAno} onChange={handleChangeRelatorio} />
+                </div>
+                <div>
+                  <label htmlFor="turma">Turma</label>
+                  <input id="turma" name="turma" value={formRelatorio.turma} onChange={handleChangeRelatorio} />
+                </div>
+                <div>
+                  <label htmlFor="turno">Turno</label>
+                  <input id="turno" name="turno" value={formRelatorio.turno} onChange={handleChangeRelatorio} />
+                </div>
+                <div>
+                  <label htmlFor="laudo">Laudo</label>
+                  <select id="laudo" name="laudo" value={formRelatorio.laudo} onChange={handleChangeRelatorio}>
+                    <option value="">Selecione</option>
+                    {OPCOES_LAUDO.map((item) => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="pai">Pai</label>
+                  <input id="pai" name="pai" value={formRelatorio.pai} onChange={handleChangeRelatorio} />
+                </div>
+                <div>
+                  <label htmlFor="mae">Mãe</label>
+                  <input id="mae" name="mae" value={formRelatorio.mae} onChange={handleChangeRelatorio} />
+                </div>
+                <div>
+                  <label htmlFor="profissionalAEE">Profissional da Educação Especial</label>
+                  <input id="profissionalAEE" name="profissionalAEE" value={formRelatorio.profissionalAEE} onChange={handleChangeRelatorio} />
+                </div>
+                <div className="relatorio-form-campo-largo">
+                  <label htmlFor="comprometimentoRelatorio">Comprometimento/condição informada</label>
+                  <textarea id="comprometimentoRelatorio" name="comprometimento" rows={3} value={formRelatorio.comprometimento} onChange={handleChangeRelatorio} />
+                </div>
+                <div>
+                  <label htmlFor="tipoAcompanhamentoRelatorio">Tipo de acompanhamento</label>
+                  <select id="tipoAcompanhamentoRelatorio" name="tipoAcompanhamento" value={formRelatorio.tipoAcompanhamento} onChange={handleChangeRelatorio}>
+                    <option value="">Selecione</option>
+                    {OPCOES_TIPO_ACOMPANHAMENTO.map((item) => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="profissionalAcompanhamentoNome">Nome do profissional de acompanhamento</label>
+                  <input id="profissionalAcompanhamentoNome" name="profissionalAcompanhamentoNome" value={formRelatorio.profissionalAcompanhamentoNome} onChange={handleChangeRelatorio} />
+                </div>
+                <div className="relatorio-form-campo-largo">
+                  <span className="checkbox-title">Função do profissional</span>
+                  <div className="checkbox-group">
+                    {OPCOES_FUNCAO.map((item) => (
+                      <label key={item} className="checkbox-item">
+                        <input type="checkbox" checked={formRelatorio.funcao.includes(item)} onChange={() => handleToggleFuncao(item)} />
+                        {item}
+                      </label>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
+            </section>
 
-            <label htmlFor="alunoNome">Aluno</label>
-            <input
-              id="alunoNome"
-              name="alunoNome"
-              value={formRelatorio.alunoNome}
-              readOnly
-            />
+            <section className="form-section relatorio-form-bloco">
+              <h3>2. Introdução — contextualização do aluno</h3>
+              <label htmlFor="introducaoRelatorio">Contextualização do estudante</label>
+              <textarea
+                id="introducaoRelatorio"
+                name="introducao"
+                rows={6}
+                value={formRelatorio.introducao}
+                onChange={handleChangeRelatorio}
+                placeholder="Descreva o objetivo do relatório e apresente o estudante. Inclua idade, turma, rotina escolar, histórico de atendimento, principais características observadas e necessidades educacionais específicas."
+              />
+            </section>
 
-            <label htmlFor="dataNascimentoRelatorio">Data de nascimento</label>
-            <input
-              id="dataNascimentoRelatorio"
-              name="dataNascimento"
-              type="date"
-              value={formRelatorio.dataNascimento}
-              onChange={handleChangeRelatorio}
-            />
+            <section className="form-section relatorio-form-bloco">
+              <h3>3. Desenvolvimento — habilidades e progressos</h3>
+              <label htmlFor="interacaoComunicacao">3.1 Interação social, comportamento e comunicação</label>
+              <textarea id="interacaoComunicacao" name="interacaoComunicacao" rows={5} value={formRelatorio.interacaoComunicacao} onChange={handleChangeRelatorio} placeholder="Descreva como o estudante interage com colegas e professores, como se comunica, participa de grupos, segue regras, compreende comandos e reage a mudanças ou frustrações." />
 
-            <label htmlFor="serieAno">Série/Ano</label>
-            <input
-              id="serieAno"
-              name="serieAno"
-              value={formRelatorio.serieAno}
-              onChange={handleChangeRelatorio}
-            />
+              <label htmlFor="habilidadesMotoras">3.2 Habilidades motoras</label>
+              <textarea id="habilidadesMotoras" name="habilidadesMotoras" rows={5} value={formRelatorio.habilidadesMotoras} onChange={handleChangeRelatorio} placeholder="Descreva aspectos relacionados à coordenação motora fina e grossa, como escrita, recorte, manuseio de objetos, equilíbrio, deslocamentos, força, agilidade ou resistência nas atividades." />
 
-            <label htmlFor="turma">Turma</label>
-            <input
-              id="turma"
-              name="turma"
-              value={formRelatorio.turma}
-              onChange={handleChangeRelatorio}
-            />
+              <label htmlFor="habilidadesCognitivas">3.3 Habilidades cognitivas</label>
+              <textarea id="habilidadesCognitivas" name="habilidadesCognitivas" rows={5} value={formRelatorio.habilidadesCognitivas} onChange={handleChangeRelatorio} placeholder="Descreva atenção, memória, raciocínio, percepção visual e auditiva, compreensão de instruções, resolução de desafios, imaginação, criatividade e transferência de aprendizagens." />
 
-            <label htmlFor="turno">Turno</label>
-            <input
-              id="turno"
-              name="turno"
-              value={formRelatorio.turno}
-              onChange={handleChangeRelatorio}
-            />
+              <label htmlFor="autonomiaIndependencia">3.4 Autonomia e independência</label>
+              <textarea id="autonomiaIndependencia" name="autonomiaIndependencia" rows={5} value={formRelatorio.autonomiaIndependencia} onChange={handleChangeRelatorio} placeholder="Descreva a autonomia do estudante na organização de materiais, higiene, alimentação, deslocamentos, cumprimento de horários e regras, autocuidado, autorregulação emocional e capacidade de fazer escolhas." />
 
-            <label htmlFor="diagnosticoRelatorio">Diagnóstico</label>
-            <input
-              id="diagnosticoRelatorio"
-              name="diagnostico"
-              value={formRelatorio.diagnostico}
-              onChange={handleChangeRelatorio}
-            />
+              <label htmlFor="outrasInformacoes">3.5 Outras informações relevantes observadas</label>
+              <textarea id="outrasInformacoes" name="outrasInformacoes" rows={5} value={formRelatorio.outrasInformacoes} onChange={handleChangeRelatorio} placeholder="Registre outras informações importantes observadas durante o percurso que não se encaixam nos eixos anteriores, mas que ajudam a compreender o desenvolvimento e o acompanhamento do estudante." />
+            </section>
 
-            <label htmlFor="laudo">Laudo</label>
-            <select
-              id="laudo"
-              name="laudo"
-              value={formRelatorio.laudo}
-              onChange={handleChangeRelatorio}
-            >
-              <option value="">Selecione</option>
-              {OPCOES_LAUDO.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
+            <section className="form-section relatorio-form-bloco">
+              <h3>4. Conclusão — parecer final</h3>
+              <label htmlFor="situacaoObjetivos">Situação dos objetivos</label>
+              <select id="situacaoObjetivos" name="situacaoObjetivos" value={formRelatorio.situacaoObjetivos} onChange={handleChangeRelatorio}>
+                <option value="">Selecione</option>
+                {OPCOES_SITUACAO_OBJETIVOS.map((item) => <option key={item} value={item}>{item}</option>)}
+              </select>
+              <label htmlFor="conclusaoParecer">Parecer final</label>
+              <textarea id="conclusaoParecer" name="conclusaoParecer" rows={6} value={formRelatorio.conclusaoParecer} onChange={handleChangeRelatorio} placeholder="Elabore uma síntese dos avanços, desafios e necessidades de continuidade. Indique se os objetivos foram alcançados plenamente, parcialmente ou ainda não alcançados, e proponha estratégias para o próximo período." />
+            </section>
 
-            <label htmlFor="pai">Pai</label>
-            <input
-              id="pai"
-              name="pai"
-              value={formRelatorio.pai}
-              onChange={handleChangeRelatorio}
-            />
-
-            <label htmlFor="mae">Mãe</label>
-            <input
-              id="mae"
-              name="mae"
-              value={formRelatorio.mae}
-              onChange={handleChangeRelatorio}
-            />
-
-            <label htmlFor="profissionalAEE">Professor(a) do AEE</label>
-            <input
-              id="profissionalAEE"
-              name="profissionalAEE"
-              value={formRelatorio.profissionalAEE}
-              onChange={handleChangeRelatorio}
-            />
-
-            <label htmlFor="tipoAcompanhamentoRelatorio">Tipo de acompanhamento</label>
-            <select
-              id="tipoAcompanhamentoRelatorio"
-              name="tipoAcompanhamento"
-              value={formRelatorio.tipoAcompanhamento}
-              onChange={handleChangeRelatorio}
-            >
-              <option value="">Selecione</option>
-              {OPCOES_TIPO_ACOMPANHAMENTO.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-
-            <label htmlFor="profissionalAcompanhamentoNome">
-              Nome do profissional de acompanhamento
-            </label>
-            <input
-              id="profissionalAcompanhamentoNome"
-              name="profissionalAcompanhamentoNome"
-              value={formRelatorio.profissionalAcompanhamentoNome}
-              onChange={handleChangeRelatorio}
-            />
-
-            <div>
-              <span className="checkbox-title">Função</span>
-              <div className="checkbox-group">
-                {OPCOES_FUNCAO.map((item) => (
-                  <label key={item} className="checkbox-item">
-                    <input
-                      type="checkbox"
-                      checked={formRelatorio.funcao.includes(item)}
-                      onChange={() => handleToggleFuncao(item)}
-                    />
-                    {item}
-                  </label>
-                ))}
+            <section className="form-section relatorio-form-bloco">
+              <h3>5. Local, data e assinaturas</h3>
+              <div className="relatorio-form-grid">
+                <div>
+                  <label htmlFor="localAssinatura">Local</label>
+                  <input id="localAssinatura" name="localAssinatura" value={formRelatorio.localAssinatura} onChange={handleChangeRelatorio} />
+                </div>
+                <div>
+                  <label htmlFor="dataAssinatura">Data</label>
+                  <input id="dataAssinatura" name="dataAssinatura" type="date" value={formRelatorio.dataAssinatura} onChange={handleChangeRelatorio} />
+                </div>
+                <div>
+                  <label htmlFor="responsavelPreenchimento">Responsável pelo preenchimento</label>
+                  <input id="responsavelPreenchimento" name="responsavelPreenchimento" value={formRelatorio.responsavelPreenchimento} onChange={handleChangeRelatorio} />
+                </div>
+                <div>
+                  <label htmlFor="assinaturaProfissional">Assinatura do profissional</label>
+                  <input id="assinaturaProfissional" name="assinaturaProfissional" value={formRelatorio.assinaturaProfissional} onChange={handleChangeRelatorio} />
+                </div>
+                <div>
+                  <label htmlFor="cargoFuncao">Cargo/função</label>
+                  <input id="cargoFuncao" name="cargoFuncao" value={formRelatorio.cargoFuncao} onChange={handleChangeRelatorio} />
+                </div>
+                <div>
+                  <label htmlFor="assinaturaGestao">Assinatura da gestão escolar</label>
+                  <input id="assinaturaGestao" name="assinaturaGestao" value={formRelatorio.assinaturaGestao} onChange={handleChangeRelatorio} />
+                </div>
               </div>
-            </div>
+            </section>
 
-            <label htmlFor="responsavelPreenchimento">
-              Responsável pelo preenchimento do relatório
-            </label>
-            <input
-              id="responsavelPreenchimento"
-              name="responsavelPreenchimento"
-              value={formRelatorio.responsavelPreenchimento}
-              onChange={handleChangeRelatorio}
-            />
+            <section className="form-section relatorio-form-bloco relatorio-anexos-futuro">
+              <h3>6. Anexos/evidências</h3>
+              <p>
+                Recurso futuro para incluir evidências do acompanhamento, como atividades, fotos
+                autorizadas, registros, cronogramas ou documentos complementares.
+              </p>
+            </section>
 
-            <label htmlFor="textoRelatorio">Texto do relatório</label>
-            <textarea
-              id="textoRelatorio"
-              name="textoRelatorio"
-              rows={10}
-              value={formRelatorio.textoRelatorio}
-              onChange={handleChangeRelatorio}
-              required
-            />
+            <section className="form-section relatorio-form-bloco">
+              <h3>Texto pedagógico complementar</h3>
+              <p className="muted">
+                Este campo preserva os geradores atuais como texto de apoio. Revise o conteúdo e
+                distribua as informações nos blocos pedagógicos antes do uso oficial.
+              </p>
+              <label htmlFor="textoRelatorio">Texto base gerado ou complementar</label>
+              <textarea id="textoRelatorio" name="textoRelatorio" rows={10} value={formRelatorio.textoRelatorio} onChange={handleChangeRelatorio} />
+            </section>
 
             <section className="form-section">
               <h3>Integração Atendimento AEE (mensal)</h3>
@@ -1418,7 +1635,8 @@ function RelatoriosPage() {
                 ? `${relatorioVisualizado.dataInicio || "-"} até ${relatorioVisualizado.dataFim || "-"}`
                 : relatorioVisualizado.bimestre || "-"}
             </p>
-            <div>
+            <DocumentoRelatorioPedagogico relatorio={relatorioVisualizado} />
+            <div className="relatorio-registros-apoio">
               <strong>Habilidades do aluno por eixo temático:</strong>
               {(habilidadesAgrupadasPorBimestre[relatorioVisualizado.bimestre] || []).length === 0 ? (
                 <p className="muted">Não há habilidades registradas para este bimestre.</p>
@@ -1431,7 +1649,6 @@ function RelatoriosPage() {
                 </div>
               )}
             </div>
-            <p className="report-text">{relatorioVisualizado.textoRelatorio || "-"}</p>
           </section>
         ) : null}
 
@@ -1440,6 +1657,8 @@ function RelatoriosPage() {
           {historicoRelatorios.length === 0 ? <p>Nenhum relatório cadastrado.</p> : null}
           {historicoRelatorios.map((relatório) => {
             const gruposHistorico = habilidadesAgrupadasPorBimestre[relatório.bimestre] || [];
+            const trechoHistorico =
+              relatório.introducao || relatório.textoRelatorio || relatório.conclusaoParecer || "";
             return (
             <article key={relatório.id} className="meta-card">
               <p>
@@ -1460,8 +1679,8 @@ function RelatoriosPage() {
               </p>
               <p>
                 <strong>Trecho inicial:</strong>{" "}
-                {(relatório.textoRelatorio || "").slice(0, 140)}
-                {(relatório.textoRelatorio || "").length > 140 ? "..." : ""}
+                {trechoHistorico.slice(0, 140)}
+                {trechoHistorico.length > 140 ? "..." : ""}
               </p>
               <div>
                 <strong>Habilidades por eixo temático:</strong>
@@ -1558,86 +1777,7 @@ function RelatoriosPage() {
             )
             .map((relatorio) => (
             <article key={`${relatorio.id}-print`} className="print-report-card">
-            <h3>1. DADOS DE IDENTIFICAÇÃO</h3>
-            <section className="report-identification">
-            <p>
-              <strong>Escola:</strong> {relatorio.nomeEscola || "-"}
-            </p>
-            <p>
-              <strong>Município:</strong> {relatorio.municipio || "-"}
-            </p>
-            <p>
-              <strong>Localização:</strong> {relatorio.localizacao || "-"}
-            </p>
-            <p>
-              <strong>Aluno:</strong> {relatorio.alunoNome || "-"}
-            </p>
-            <p>
-              <strong>Data de nascimento:</strong> {relatorio.dataNascimento || "-"}
-            </p>
-            <p>
-              <strong>Série/Ano:</strong> {relatorio.serieAno || "-"}
-            </p>
-            <p>
-              <strong>Turma:</strong> {relatorio.turma || "-"}
-            </p>
-            <p>
-              <strong>Turno:</strong> {relatorio.turno || "-"}
-            </p>
-            <p>
-              <strong>Diagnóstico:</strong> {relatorio.diagnostico || "-"}
-            </p>
-            <p>
-              <strong>Laudo:</strong> {relatorio.laudo || "-"}
-            </p>
-            <p>
-              <strong>Comprometimento:</strong> {relatorio.comprometimento || "-"}
-            </p>
-            <p>
-              <strong>Pai:</strong> {relatorio.pai || "-"}
-            </p>
-            <p>
-              <strong>Mãe:</strong> {relatorio.mae || "-"}
-            </p>
-            <p>
-              <strong>Professor(a) do AEE:</strong> {relatorio.profissionalAEE || "-"}
-            </p>
-            <p>
-              <strong>Tipo de acompanhamento:</strong> {relatorio.tipoAcompanhamento || "-"}
-            </p>
-            <p>
-              <strong>Profissional de acompanhamento:</strong>{" "}
-              {relatorio.profissionalAcompanhamentoNome || "-"}
-            </p>
-            <p>
-              <strong>Função:</strong>{" "}
-              {Array.isArray(relatorio.funcao) ? relatorio.funcao.join(", ") : "-"}
-            </p>
-            <p>
-              <strong>Bimestre:</strong> {relatorio.bimestre || "-"}
-            </p>
-            <p>
-              <strong>Período analisado:</strong>{" "}
-              {relatorio.dataInicio || relatorio.dataFim
-                ? `${relatorio.dataInicio || "-"} até ${relatorio.dataFim || "-"}`
-                : relatorio.bimestre || "-"}
-            </p>
-            </section>
-
-            <h3>2. TEXTO DESCRITIVO</h3>
-            <p className="report-text">{relatorio.textoRelatorio || "-"}</p>
-
-            <div className="print-signature">
-              <p>
-                {relatorio.municipio || "Cidade"}, {formatarData(relatorio.atualizadoEm)}
-              </p>
-            <p>{relatorio.profissionalAEE || "Professor(a) do AEE"}</p>
-              <p>
-                {relatorio.responsavelPreenchimento ||
-                  relatorio.coordenadorNome ||
-                  "Responsável pelo preenchimento do relatório"}
-              </p>
-            </div>
+              <DocumentoRelatorioPedagogico relatorio={relatorio} />
           </article>
             ))}
       </section>
@@ -1672,89 +1812,7 @@ function RelatoriosPage() {
       <section className="pdf-export-area" aria-hidden="true">
         <article ref={pdfRef} className="pdf-export-content">
           <h2 className="print-title">Relatório Pedagógico do Aluno</h2>
-
-          <h3>1. DADOS DE IDENTIFICAÇÃO</h3>
-          <section className="report-identification">
-          <p>
-            <strong>Escola:</strong> {relatorioParaExportacao?.nomeEscola || "-"}
-          </p>
-          <p>
-            <strong>Município:</strong> {relatorioParaExportacao?.municipio || "-"}
-          </p>
-          <p>
-            <strong>Localização:</strong> {relatorioParaExportacao?.localizacao || "-"}
-          </p>
-          <p>
-            <strong>Aluno:</strong> {relatorioParaExportacao?.alunoNome || "-"}
-          </p>
-          <p>
-            <strong>Data de nascimento:</strong> {relatorioParaExportacao?.dataNascimento || "-"}
-          </p>
-          <p>
-            <strong>Série/Ano:</strong> {relatorioParaExportacao?.serieAno || "-"}
-          </p>
-          <p>
-            <strong>Turma:</strong> {relatorioParaExportacao?.turma || "-"}
-          </p>
-          <p>
-            <strong>Turno:</strong> {relatorioParaExportacao?.turno || "-"}
-          </p>
-          <p>
-            <strong>Diagnóstico:</strong> {relatorioParaExportacao?.diagnostico || "-"}
-          </p>
-          <p>
-            <strong>Laudo:</strong> {relatorioParaExportacao?.laudo || "-"}
-          </p>
-          <p>
-            <strong>Comprometimento:</strong> {relatorioParaExportacao?.comprometimento || "-"}
-          </p>
-          <p>
-            <strong>Pai:</strong> {relatorioParaExportacao?.pai || "-"}
-          </p>
-          <p>
-            <strong>Mãe:</strong> {relatorioParaExportacao?.mae || "-"}
-          </p>
-          <p>
-            <strong>Professor(a) do AEE:</strong> {relatorioParaExportacao?.profissionalAEE || "-"}
-          </p>
-          <p>
-            <strong>Tipo de acompanhamento:</strong> {relatorioParaExportacao?.tipoAcompanhamento || "-"}
-          </p>
-          <p>
-            <strong>Profissional de acompanhamento:</strong>{" "}
-            {relatorioParaExportacao?.profissionalAcompanhamentoNome || "-"}
-          </p>
-          <p>
-            <strong>Função:</strong>{" "}
-            {Array.isArray(relatorioParaExportacao?.funcao)
-              ? relatorioParaExportacao.funcao.join(", ")
-              : "-"}
-          </p>
-          <p>
-            <strong>Bimestre:</strong> {relatorioParaExportacao?.bimestre || "-"}
-          </p>
-          <p>
-            <strong>Período analisado:</strong>{" "}
-            {relatorioParaExportacao?.dataInicio || relatorioParaExportacao?.dataFim
-              ? `${relatorioParaExportacao?.dataInicio || "-"} até ${relatorioParaExportacao?.dataFim || "-"}`
-              : relatorioParaExportacao?.bimestre || "-"}
-          </p>
-          </section>
-
-          <h3>2. TEXTO DESCRITIVO</h3>
-          <p className="report-text">{relatorioParaExportacao?.textoRelatorio || "-"}</p>
-
-          <div className="print-signature">
-            <p>
-              {relatorioParaExportacao?.municipio || "Cidade"},{" "}
-              {formatarDataFlex(relatorioParaExportacao?.atualizadoEm)}
-            </p>
-            <p>{relatorioParaExportacao?.profissionalAEE || "Professor(a) do AEE"}</p>
-            <p>
-              {relatorioParaExportacao?.responsavelPreenchimento ||
-                "Responsável pelo preenchimento do relatório"}
-            </p>
-          </div>
+          <DocumentoRelatorioPedagogico relatorio={relatorioParaExportacao || {}} />
         </article>
       </section>
     </main>

@@ -821,6 +821,95 @@ textarea:focus {
   line-height: 1.18;
 }
 
+.relatorios-page .relatorio-form-bloco {
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  background: #f8fbff;
+}
+
+.relatorios-page .relatorio-form-bloco + .relatorio-form-bloco {
+  margin-top: 1rem;
+}
+
+.relatorios-page .relatorio-form-bloco > h3 {
+  color: #1e3a8a;
+  margin-bottom: 0.75rem;
+}
+
+.relatorios-page .relatorio-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem 1rem;
+}
+
+.relatorios-page .relatorio-form-grid > div {
+  min-width: 0;
+}
+
+.relatorios-page .relatorio-form-campo-largo {
+  grid-column: 1 / -1;
+}
+
+.relatorios-page .relatorio-anexos-futuro {
+  border-style: dashed;
+  background: #eff6ff;
+  color: #334155;
+}
+
+.relatorios-page .relatorio-documento-estrutura {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 0.75rem;
+}
+
+.relatorios-page .relatorio-documento-bloco {
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  padding: 0.8rem;
+  background: #ffffff;
+}
+
+.relatorios-page .relatorio-documento-bloco h3,
+.relatorios-page .relatorio-documento-bloco h4 {
+  color: #1e3a8a;
+  margin: 0 0 0.45rem;
+}
+
+.relatorios-page .relatorio-documento-bloco h4 {
+  font-size: 0.95rem;
+}
+
+.relatorios-page .relatorio-documento-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem 1rem;
+}
+
+.relatorios-page .relatorio-documento-campo-largo {
+  grid-column: 1 / -1;
+}
+
+.relatorios-page .relatorio-documento-subbloco {
+  padding: 0.65rem 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.relatorios-page .relatorio-documento-subbloco:first-of-type {
+  border-top: 0;
+  padding-top: 0.15rem;
+}
+
+.relatorios-page .relatorio-documento-bloco .report-text {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.relatorios-page .relatorio-registros-apoio {
+  margin-top: 1rem;
+}
+
 .pdf-export-content .report-text {
   margin-top: 0.16rem;
   line-height: 1.28;
@@ -1815,6 +1904,16 @@ textarea:focus {
   .app-sidebar {
     border-bottom: 1px solid rgba(255, 255, 255, 0.14);
   }
+
+  .relatorios-page .relatorio-form-grid,
+  .relatorios-page .relatorio-documento-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .relatorios-page .relatorio-form-campo-largo,
+  .relatorios-page .relatorio-documento-campo-largo {
+    grid-column: auto;
+  }
 }
 
 @media print {
@@ -1868,6 +1967,32 @@ textarea:focus {
 
   .print-report-card p {
     margin: 0.12rem 0;
+  }
+
+  .relatorios-page .panel,
+  .relatorios-page .print-report-card {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  .relatorios-page .relatorio-documento-subbloco {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+
+  .relatorios-page .relatorio-documento-bloco > h3,
+  .relatorios-page .relatorio-documento-subbloco > h4 {
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .relatorios-page .relatorio-documento-bloco {
+    box-shadow: none;
+    padding: 0.55rem;
+  }
+
+  .relatorios-page .relatorio-documento-estrutura {
+    gap: 0.5rem;
   }
 
 }
