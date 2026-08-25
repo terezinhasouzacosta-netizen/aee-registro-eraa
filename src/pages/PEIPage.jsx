@@ -5,6 +5,7 @@ import {
   atualizarPei,
   buscarPeiPorId,
   criarPei,
+  excluirPei,
   listarPeis,
 } from "../services/peisService";
 
@@ -583,6 +584,7 @@ function PEIPage() {
   const [carregando, setCarregando] = useState(true);
   const [carregandoLista, setCarregandoLista] = useState(false);
   const [abrindoPeiId, setAbrindoPeiId] = useState("");
+  const [excluindoPeiId, setExcluindoPeiId] = useState("");
   const [salvando, setSalvando] = useState(false);
   const [concluindo, setConcluindo] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -718,7 +720,7 @@ function PEIPage() {
 
   const handleSalvarRascunho = async (event) => {
     event.preventDefault();
-    if (salvando || concluindo) return;
+    if (salvando || concluindo || excluindoPeiId) return;
 
     if (!currentUser) {
       setErro("Não foi possível identificar o usuário para salvar o rascunho do PEI.");
@@ -752,6 +754,8 @@ function PEIPage() {
   };
 
   const handleNovoPei = () => {
+    if (excluindoPeiId) return;
+
     setForm(criarFormularioInicial());
     setPeiId("");
     removerPeiIdLocal();
@@ -761,7 +765,7 @@ function PEIPage() {
   };
 
   const handleConcluirPei = async () => {
-    if (salvando || concluindo || form.statusGeral === "concluido") return;
+    if (salvando || concluindo || excluindoPeiId || form.statusGeral === "concluido") return;
 
     if (!currentUser) {
       setErro("Não foi possível identificar o usuário para concluir o PEI.");
@@ -807,6 +811,8 @@ function PEIPage() {
   };
 
   const handleImprimirPei = () => {
+    if (excluindoPeiId) return;
+
     setFeedback("");
     setAviso("");
     setErro("");
@@ -820,7 +826,7 @@ function PEIPage() {
   };
 
   const handleAbrirPei = async (id) => {
-    if (!id || abrindoPeiId || salvando || concluindo) return;
+    if (!id || abrindoPeiId || excluindoPeiId || salvando || concluindo) return;
 
     setAbrindoPeiId(id);
     setFeedback("");
@@ -849,6 +855,48 @@ function PEIPage() {
       setErro("Não foi possível abrir o PEI selecionado.");
     } finally {
       setAbrindoPeiId("");
+    }
+  };
+
+  const handleExcluirPei = async (pei) => {
+    if (!pei?.id || excluindoPeiId || abrindoPeiId || salvando || concluindo) return;
+
+    const nomeEstudante = String(
+      pei.alunoNome ||
+        pei.identificacaoEstudante?.nome ||
+        pei.identificacaoEstudante?.alunoCadastrado ||
+        "",
+    ).trim();
+    const pergunta = nomeEstudante
+      ? `Deseja realmente excluir o PEI de ${nomeEstudante}?`
+      : "Deseja realmente excluir este PEI?";
+    const confirmou = window.confirm(
+      `${pergunta}\nEsta ação não poderá ser desfeita.\nConfira se este documento não será mais necessário antes de confirmar.`,
+    );
+
+    if (!confirmou) return;
+
+    setExcluindoPeiId(pei.id);
+    setFeedback("");
+    setAviso("");
+    setErro("");
+
+    try {
+      await excluirPei(pei.id);
+
+      if (pei.id === peiId) {
+        setForm(criarFormularioInicial());
+        setPeiId("");
+        removerPeiIdLocal();
+      }
+
+      setFeedback("PEI excluído com sucesso.");
+      await carregarPeisSalvos();
+    } catch (error) {
+      console.error("[PEIPage] Erro ao excluir PEI", error);
+      setErro("Não foi possível excluir o PEI. Tente novamente.");
+    } finally {
+      setExcluindoPeiId("");
     }
   };
 
@@ -903,7 +951,7 @@ function PEIPage() {
                   <th>Status geral</th>
                   <th>Componente curricular principal</th>
                   <th>Atualizado em</th>
-                  <th>Abrir</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -925,14 +973,28 @@ function PEIPage() {
                     <td>{pei.planejamentoCurricular?.componenteCurricular || "-"}</td>
                     <td>{formatarDataLista(pei.atualizadoEm || pei.criadoEm)}</td>
                     <td>
-                      <button
-                        type="button"
-                        className="btn-secondary pei-open-button"
-                        onClick={() => handleAbrirPei(pei.id)}
-                        disabled={abrindoPeiId === pei.id || salvando || concluindo}
-                      >
-                        {abrindoPeiId === pei.id ? "Abrindo..." : "Abrir"}
-                      </button>
+                      <div className="pei-list-actions">
+                        <button
+                          type="button"
+                          className="btn-secondary pei-open-button"
+                          onClick={() => handleAbrirPei(pei.id)}
+                          disabled={
+                            Boolean(abrindoPeiId || excluindoPeiId) || salvando || concluindo
+                          }
+                        >
+                          {abrindoPeiId === pei.id ? "Abrindo..." : "Abrir"}
+                        </button>
+                        <button
+                          type="button"
+                          className="pei-delete-button"
+                          onClick={() => handleExcluirPei(pei)}
+                          disabled={
+                            Boolean(abrindoPeiId || excluindoPeiId) || salvando || concluindo
+                          }
+                        >
+                          {excluindoPeiId === pei.id ? "Excluindo..." : "Excluir"}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -1342,11 +1404,14 @@ function PEIPage() {
               type="button"
               className="btn-secondary"
               onClick={handleNovoPei}
-              disabled={salvando || concluindo}
+              disabled={salvando || concluindo || Boolean(excluindoPeiId)}
             >
               Novo PEI
             </button>
-            <button type="submit" disabled={salvando || concluindo}>
+            <button
+              type="submit"
+              disabled={salvando || concluindo || Boolean(excluindoPeiId)}
+            >
               {salvando ? "Salvando..." : "Salvar rascunho do PEI"}
             </button>
             <button
@@ -1355,7 +1420,12 @@ function PEIPage() {
                 form.statusGeral === "concluido" ? " pei-concluir-button-concluido" : ""
               }`}
               onClick={handleConcluirPei}
-              disabled={salvando || concluindo || form.statusGeral === "concluido"}
+              disabled={
+                salvando ||
+                concluindo ||
+                Boolean(excluindoPeiId) ||
+                form.statusGeral === "concluido"
+              }
             >
               {concluindo
                 ? "Concluindo..."
@@ -1367,7 +1437,7 @@ function PEIPage() {
               type="button"
               className="btn-secondary"
               onClick={handleImprimirPei}
-              disabled={salvando || concluindo}
+              disabled={salvando || concluindo || Boolean(excluindoPeiId)}
             >
               Imprimir PEI
             </button>
