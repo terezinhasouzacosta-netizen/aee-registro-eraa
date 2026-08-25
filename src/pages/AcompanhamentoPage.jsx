@@ -285,6 +285,7 @@ function formInicialProfessor({ alunoId = "", turno = "", professorNome = "" } =
     dificuldadesObservadas: "",
     encaminhamentosPedagogicos: "",
     marcadoresIntervencao: [],
+    avaliacaoIntervencoesRealizadas: "",
   };
 }
 
@@ -832,6 +833,7 @@ function AcompanhamentoPage() {
         dificuldadesObservadas: formProfessor.dificuldadesObservadas.trim(),
         encaminhamentosPedagogicos: formProfessor.encaminhamentosPedagogicos.trim(),
         marcadoresIntervencao: formProfessor.marcadoresIntervencao,
+        avaliacaoIntervencoesRealizadas: formProfessor.avaliacaoIntervencoesRealizadas.trim(),
       };
 
       if (professorEmEdicao?.id) {
@@ -928,6 +930,7 @@ function AcompanhamentoPage() {
         marcadoresIntervencao: Array.isArray(item.marcadoresIntervencao)
           ? item.marcadoresIntervencao
           : [],
+        avaliacaoIntervencoesRealizadas: item.avaliacaoIntervencoesRealizadas || "",
       });
       return;
     }
@@ -1857,6 +1860,18 @@ function AcompanhamentoPage() {
                   </label>
                 ))}
               </div>
+
+              <label htmlFor="avaliacaoIntervencoesRealizadas">
+                Avaliação das intervenções realizadas
+              </label>
+              <textarea
+                id="avaliacaoIntervencoesRealizadas"
+                name="avaliacaoIntervencoesRealizadas"
+                value={formProfessor.avaliacaoIntervencoesRealizadas}
+                onChange={handleChangeProfessor}
+                rows={4}
+                placeholder="Descreva brevemente como o estudante respondeu às intervenções marcadas, quais estratégias favoreceram sua participação e o que precisa ser mantido ou ajustado."
+              />
             </section>
 
             <div className="form-actions sticky-actions">
