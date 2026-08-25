@@ -2524,28 +2524,6 @@ textarea:focus {
   padding: 0.45rem 0.75rem;
 }
 
-.pei-page .pei-list-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  white-space: nowrap;
-}
-
-.pei-page .pei-delete-button {
-  min-width: 82px;
-  padding: 0.45rem 0.75rem;
-  border: 1px solid #fecaca;
-  background: #ffffff;
-  color: #b91c1c;
-  box-shadow: none;
-}
-
-.pei-page .pei-delete-button:hover:not(:disabled) {
-  border-color: #dc2626;
-  background: #fef2f2;
-  color: #991b1b;
-}
-
 .pei-page .pei-empty-state {
   margin: 0;
   border: 1px dashed #bfdbfe;
