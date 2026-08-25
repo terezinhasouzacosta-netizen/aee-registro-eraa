@@ -173,10 +173,6 @@ function resolverModoAtendimento(item) {
   return "AEE";
 }
 
-function registroPertenceAoModo(item, modoAtivo) {
-  return resolverModoAtendimento(item) === modoAtivo;
-}
-
 function obterRotuloTipoAtendimento(item) {
   return resolverModoAtendimento(item) === "REGULAR"
     ? "Acompanhamento na Sala Regular"
@@ -226,17 +222,13 @@ function AtendimentoAEEPage() {
   const semanasDisponiveis = useMemo(() => {
     const semanas = new Set(
       atendimentos
-        .filter((item) => registroPertenceAoModo(item, modoAtendimento))
         .map((item) => item.semanaReferencia)
         .filter(Boolean)
     );
     return [...semanas].sort((a, b) => (a < b ? 1 : -1));
-  }, [atendimentos, modoAtendimento]);
+  }, [atendimentos]);
 
-  const atendimentosFiltrados = useMemo(
-    () => atendimentos.filter((item) => registroPertenceAoModo(item, modoAtendimento)),
-    [atendimentos, modoAtendimento]
-  );
+  const atendimentosFiltrados = atendimentos;
 
   useEffect(() => {
     if (filtroSemana && !semanasDisponiveis.includes(filtroSemana)) {
@@ -395,18 +387,6 @@ function AtendimentoAEEPage() {
         responsavelNome: currentUser?.displayName || currentUser?.email || "",
       })
     );
-  };
-
-  const handleMudarModoAtendimento = (modo) => {
-    const tipoAtendimento =
-      modo === "REGULAR" ? "Acompanhamento na Sala Regular" : "Atendimento na Sala AEE";
-
-    setModoAtendimento(modo);
-    setFiltroSemana("");
-    setForm((prev) => ({
-      ...prev,
-      tipoAtendimento,
-    }));
   };
 
   const handleChangeForm = (event) => {
@@ -657,7 +637,10 @@ function AtendimentoAEEPage() {
     <main className="alunos-page module-page">
       <header className="page-header">
         <h1>Atendimento AEE</h1>
-        <p>Registro semanal de atendimentos e observações pedagógicas por aluno.</p>
+        <p>
+          Registro semanal dos atendimentos realizados na Sala AEE e das observações pedagógicas
+          por aluno.
+        </p>
       </header>
 
       {feedback ? <p className="toast-success">{feedback}</p> : null}
@@ -703,26 +686,6 @@ function AtendimentoAEEPage() {
         <section className="panel module-form-panel">
           <h2>{registroEmEdicao ? "Editar atendimento" : "Novo atendimento semanal"}</h2>
           <form className="aluno-form" onSubmit={handleSalvar}>
-            <section className="form-section">
-              <h3>Modo de atendimento</h3>
-              <div className="form-actions">
-                <button
-                  type="button"
-                  className={modoAtendimento === "AEE" ? "" : "btn-secondary"}
-                  onClick={() => handleMudarModoAtendimento("AEE")}
-                >
-                  Atendimento na Sala AEE
-                </button>
-                <button
-                  type="button"
-                  className={modoAtendimento === "REGULAR" ? "" : "btn-secondary"}
-                  onClick={() => handleMudarModoAtendimento("REGULAR")}
-                >
-                  Acompanhamento na Sala Regular
-                </button>
-              </div>
-            </section>
-
             <label htmlFor="alunoId">Aluno</label>
             <select id="alunoId" name="alunoId" value={form.alunoId} onChange={handleChangeForm} required>
               <option value="">Selecione</option>
