@@ -28,7 +28,6 @@ const OPCOES_FUNCAO = [
   "Assistente Educacional",
   "Intérprete",
   "Professor(a) da SRM",
-  "Professor(a) do AEE",
   "Professor(a) do Atendimento Domiciliar",
   "Outro",
 ];
