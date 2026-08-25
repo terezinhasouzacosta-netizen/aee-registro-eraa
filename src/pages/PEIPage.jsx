@@ -1156,9 +1156,9 @@ function PEIPage() {
         >
           <aside className="pei-smart-guidance" aria-label="Orientação para metas SMART">
             Para facilitar o acompanhamento, escreva objetivos no formato SMART: específicos,
-            mensuráveis, atingíveis, relevantes e com prazo definido. A meta deve indicar o que o
-            estudante irá desenvolver, como o avanço será observado e em qual período será
-            acompanhado.
+            mensuráveis, atingíveis, relevantes e com prazo definido. A meta deve indicar
+            claramente o que o estudante irá desenvolver, em quais condições ou com quais apoios,
+            como o avanço será observado e em qual período será acompanhado.
           </aside>
           <div className="pei-repeat-grid">
             {[1, 2, 3].map((numeroObjetivo) => (
