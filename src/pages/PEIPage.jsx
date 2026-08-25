@@ -871,8 +871,9 @@ function PEIPage() {
       </header>
 
       <div className="pei-note">
-        Nesta etapa, o PEI pode ser preenchido e salvo como rascunho. Conclusão e impressão
-        serão implementadas em fases posteriores.
+        Nesta etapa, o PEI pode ser preenchido, salvo como rascunho, concluído e impresso. As
+        integrações automáticas com Estudo de Caso, PAEE e Habilidades serão implementadas em
+        fases posteriores.
       </div>
 
       {feedback ? <p className="toast-success">{feedback}</p> : null}
@@ -1373,10 +1374,8 @@ function PEIPage() {
             </button>
           </div>
           <p className="pei-future-note">
-            {peiId
-              ? "Este rascunho já possui um documento salvo e será atualizado pelo mesmo botão."
-              : "O primeiro salvamento criará um novo documento na coleção peis."}
-            {" "}A impressão utiliza a janela do navegador e permite salvar como PDF.
+            O PEI pode ser salvo como rascunho, atualizado, concluído e impresso. A impressão
+            utiliza a janela do navegador e permite salvar como PDF.
           </p>
         </section>
           </form>
