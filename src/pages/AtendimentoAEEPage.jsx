@@ -146,13 +146,23 @@ function habilidadePertenceAoEixo(habilidade, eixoTematico) {
 
 function metaPertenceAoEixo(meta, eixoTematico) {
   const eixoNormalizado = normalizarTexto(eixoTematico);
-  const tituloNormalizado = normalizarTexto(meta?.titulo);
+  const tituloNormalizado = normalizarTexto(meta?.eixoTematico || meta?.eixo || meta?.titulo);
   if (!eixoNormalizado || !tituloNormalizado) return false;
 
   const equivalentes = EIXOS_EQUIVALENTES_HABILIDADES[eixoNormalizado] || [eixoTematico];
   return equivalentes.some(
     (tituloEquivalente) => normalizarTexto(tituloEquivalente) === tituloNormalizado
   );
+}
+
+function obterHabilidadesDoRegistroEmEdicao(registroEmEdicao, eixoSelecionado, selecionadas) {
+  const pertenceAoMesmoEixo =
+    registroEmEdicao &&
+    normalizarTexto(registroEmEdicao.eixoTematico) === normalizarTexto(eixoSelecionado);
+
+  return pertenceAoMesmoEixo && Array.isArray(selecionadas)
+    ? selecionadas.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
 }
 
 function formatarHabilidadesRegistro(item) {
@@ -367,13 +377,14 @@ function AtendimentoAEEPage() {
           ),
         ];
 
-        const habilidadesDoRegistro =
-          registroEmEdicao &&
-          normalizarTexto(registroEmEdicao.eixoTematico) === normalizarTexto(eixoSelecionado) &&
-          Array.isArray(form.habilidadesSelecionadas)
-            ? form.habilidadesSelecionadas.filter(Boolean)
-            : [];
-        const sugestoes = [...new Set([...sugestoesCadastradas, ...habilidadesDoRegistro])];
+        const habilidadesDoRegistro = obterHabilidadesDoRegistroEmEdicao(
+          registroEmEdicao,
+          eixoSelecionado,
+          form.habilidadesSelecionadas
+        );
+        const sugestoes = [...new Set([...sugestoesCadastradas, ...habilidadesDoRegistro])].sort(
+          (a, b) => a.localeCompare(b, "pt-BR")
+        );
 
         setHabilidadesSugeridas(sugestoes);
         setForm((prev) => ({
@@ -383,10 +394,15 @@ function AtendimentoAEEPage() {
             : [],
         }));
       } catch (error) {
-        setHabilidadesSugeridas([]);
+        const habilidadesDoRegistro = obterHabilidadesDoRegistroEmEdicao(
+          registroEmEdicao,
+          eixoSelecionado,
+          form.habilidadesSelecionadas
+        );
+        setHabilidadesSugeridas(habilidadesDoRegistro);
         setForm((prev) => ({
           ...prev,
-          habilidadesSelecionadas: [],
+          habilidadesSelecionadas: habilidadesDoRegistro,
         }));
       } finally {
         setLoadingSondagem(false);
@@ -814,6 +830,11 @@ function AtendimentoAEEPage() {
 
                   <div>
                     <label>Habilidades do aluno por eixo temático</label>
+                    {!loadingSondagem && habilidadesSugeridas.length > 0 ? (
+                      <p className="muted" style={{ margin: "0.35rem 0 0" }}>
+                        Marque as habilidades trabalhadas neste atendimento.
+                      </p>
+                    ) : null}
                     {loadingSondagem ? <p className="muted">Carregando habilidades...</p> : null}
                     {!loadingSondagem && !form.alunoId ? (
                       <p className="muted">Selecione um aluno para carregar as habilidades.</p>
