@@ -2407,6 +2407,81 @@ textarea:focus {
   background: #f8fbff;
 }
 
+.painel-coordenacao-table.painel-coordenacao-table-resumida {
+  width: 100%;
+  min-width: 900px;
+  table-layout: fixed;
+}
+
+.painel-coordenacao-table.painel-coordenacao-table-resumida thead th {
+  padding: 7px 8px;
+  line-height: 1.2;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.painel-coordenacao-table.painel-coordenacao-table-resumida tbody td {
+  padding: 7px 8px;
+  line-height: 1.25;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.painel-coordenacao-table.painel-coordenacao-table-resumida th:nth-child(1),
+.painel-coordenacao-table.painel-coordenacao-table-resumida td:nth-child(1) {
+  width: 17%;
+}
+
+.painel-coordenacao-table.painel-coordenacao-table-resumida th:nth-child(2),
+.painel-coordenacao-table.painel-coordenacao-table-resumida td:nth-child(2) {
+  position: static;
+  width: 9%;
+}
+
+.painel-coordenacao-table.painel-coordenacao-table-resumida th:nth-child(3),
+.painel-coordenacao-table.painel-coordenacao-table-resumida td:nth-child(3) {
+  width: 12%;
+}
+
+.painel-coordenacao-table.painel-coordenacao-table-resumida th:nth-child(4),
+.painel-coordenacao-table.painel-coordenacao-table-resumida td:nth-child(4) {
+  width: 14%;
+}
+
+.painel-coordenacao-table.painel-coordenacao-table-resumida th:nth-child(5),
+.painel-coordenacao-table.painel-coordenacao-table-resumida td:nth-child(5) {
+  width: 15%;
+}
+
+.painel-coordenacao-table.painel-coordenacao-table-resumida th:nth-child(6),
+.painel-coordenacao-table.painel-coordenacao-table-resumida td:nth-child(6) {
+  width: 13%;
+}
+
+.painel-coordenacao-table.painel-coordenacao-table-resumida th:nth-child(7),
+.painel-coordenacao-table.painel-coordenacao-table-resumida td:nth-child(7) {
+  width: 10%;
+}
+
+.painel-coordenacao-table.painel-coordenacao-table-resumida th:nth-child(8),
+.painel-coordenacao-table.painel-coordenacao-table-resumida td:nth-child(8) {
+  width: 10%;
+  min-width: 92px;
+  white-space: nowrap;
+}
+
+.painel-coordenacao-table.painel-coordenacao-table-resumida .col-status,
+.painel-coordenacao-table.painel-coordenacao-table-resumida .col-date,
+.painel-coordenacao-table.painel-coordenacao-table-resumida .col-actions {
+  text-align: center;
+}
+
+.painel-coordenacao-table.painel-coordenacao-table-resumida .btn-ver-aluno {
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+
 .linha-alerta td {
   background: #fff8f8 !important;
 }

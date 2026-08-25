@@ -1032,20 +1032,15 @@ style={{ display: "flex", alignItems: "center", gap: "15px" }}
               <p>Nenhum aluno encontrado para os filtros selecionados.</p>
             ) : (
               <div className="table-wrapper painel-coordenacao-table-wrapper table-container">
-                <table className="alunos-table painel-coordenacao-table">
+                <table className="alunos-table painel-coordenacao-table painel-coordenacao-table-resumida">
                   <thead>
                     <tr>
                       <th>Aluno</th>
                       <th>Turma</th>
-                      <th>Status da sondagem</th>
+                      <th className="col-status">Sondagem</th>
                       <th className="col-date">Último acompanhamento</th>
                       <th className="col-date">Último registro do professor</th>
-                      <th className="col-num">Dificuldades na sondagem</th>
-                      <th className="col-num">Habilidades em andamento</th>
-                      <th className="col-num">Habilidades pausadas</th>
-                      <th className="col-num">Habilidades pendentes</th>
-                      <th className="col-num">Atendimentos AEE</th>
-                      <th className="col-num">Registros de acompanhamento</th>
+                      <th className="col-status">Atendimento AEE</th>
                       <th className="col-status">Nível de atenção</th>
                       <th className="col-actions">Ações</th>
                     </tr>
@@ -1058,12 +1053,11 @@ style={{ display: "flex", alignItems: "center", gap: "15px" }}
                         <td>{item.statusSondagem}</td>
                         <td className="col-date">{formatarData(item.ultimoAcompanhamento)}</td>
                         <td className="col-date">{formatarData(item.ultimoRegistroProfessor)}</td>
-                        <td className="col-num">{item.totalDificuldadesSondagem}</td>
-                        <td className="col-num">{item.habilidadesEmAndamento}</td>
-                        <td className="col-num">{item.habilidadesPausadas}</td>
-                        <td className="col-num">{item.metasPendentes}</td>
-                        <td className="col-num">{item.totalRegistrosAtendimentoAEE}</td>
-                        <td className="col-num">{item.totalRegistrosAcompanhamento}</td>
+                        <td className="col-status">
+                          {item.totalRegistrosAtendimentoAEE > 0
+                            ? `Com atendimento (${item.totalRegistrosAtendimentoAEE})`
+                            : "Sem atendimento"}
+                        </td>
                         <td className="col-status">
                           <span className={`badge-nivel nivel-${normalizarTexto(item.nivelAtencao)}`}>
                             {item.nivelAtencaoLabel}
