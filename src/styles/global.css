@@ -2707,6 +2707,9 @@ textarea:focus {
     font-family: Arial, sans-serif;
     font-size: 10.2pt;
     line-height: 1.42;
+    hyphens: none;
+    word-break: normal;
+    overflow-wrap: break-word;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
@@ -2764,7 +2767,8 @@ textarea:focus {
     color: #111827;
     font-size: 9.8pt;
     line-height: 1.35;
-    overflow-wrap: anywhere;
+    word-break: normal;
+    overflow-wrap: break-word;
     break-inside: avoid;
     page-break-inside: avoid;
   }
@@ -2837,7 +2841,8 @@ textarea:focus {
     text-align: left;
     line-height: 1.4;
     white-space: pre-wrap;
-    overflow-wrap: anywhere;
+    hyphens: none;
+    overflow-wrap: break-word;
     word-break: normal;
   }
 
@@ -2881,7 +2886,8 @@ textarea:focus {
     text-align: justify;
     text-justify: inter-word;
     line-height: 1.42;
-    hyphens: auto;
+    hyphens: none;
+    word-break: normal;
     overflow-wrap: break-word;
   }
 
@@ -2912,7 +2918,9 @@ textarea:focus {
     font-size: 10.2pt;
     line-height: 1.42;
     white-space: pre-wrap;
-    overflow-wrap: anywhere;
+    hyphens: none;
+    word-break: normal;
+    overflow-wrap: break-word;
     orphans: 2;
     widows: 2;
   }
@@ -2924,7 +2932,8 @@ textarea:focus {
   .pei-page .pei-print-span-2 dd {
     text-align: justify;
     text-justify: inter-word;
-    hyphens: auto;
+    hyphens: none;
+    word-break: normal;
     overflow-wrap: break-word;
   }
 
