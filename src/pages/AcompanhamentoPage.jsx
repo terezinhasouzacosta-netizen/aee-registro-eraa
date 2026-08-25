@@ -262,9 +262,10 @@ function formInicial({ alunoId = "", turno = "", responsavelNome = "", funcaoRes
   };
 }
 
-function formInicialProfessor({ alunoId = "", professorNome = "" } = {}) {
+function formInicialProfessor({ alunoId = "", turno = "", professorNome = "" } = {}) {
   return {
     alunoId,
+    turno,
     disciplina: "",
     professorNome,
     bimestre: "",
@@ -532,13 +533,20 @@ function AcompanhamentoPage() {
             turno: alunoAlterado ? alunoSelecionadoAtual?.turno || "" : prev.turno,
           };
         });
-        setFormProfessor((prev) => ({
-          ...prev,
-          alunoId:
+        setFormProfessor((prev) => {
+          const alunoId =
             prev.alunoId && alunosData.some((aluno) => aluno.id === prev.alunoId)
               ? prev.alunoId
-              : alunoPadrao,
-        }));
+              : alunoPadrao;
+          const alunoAlterado = alunoId !== prev.alunoId;
+          const alunoSelecionadoAtual = alunosData.find((aluno) => aluno.id === alunoId);
+
+          return {
+            ...prev,
+            alunoId,
+            turno: alunoAlterado ? alunoSelecionadoAtual?.turno || "" : prev.turno,
+          };
+        });
         setFiltroHistorico((prev) => ({
           ...prev,
           alunoId:
@@ -675,7 +683,18 @@ function AcompanhamentoPage() {
 
   const handleChangeProfessor = (event) => {
     const { name, value } = event.target;
-    setFormProfessor((prev) => ({ ...prev, [name]: value }));
+    setFormProfessor((prev) => {
+      if (name === "alunoId") {
+        const aluno = alunos.find((item) => item.id === value);
+        return {
+          ...prev,
+          alunoId: value,
+          turno: aluno?.turno || "",
+        };
+      }
+
+      return { ...prev, [name]: value };
+    });
   };
 
   const handleAlternarEstrategia = (estrategia) => {
@@ -719,6 +738,7 @@ function AcompanhamentoPage() {
     setFormProfessor(
       formInicialProfessor({
         alunoId: alunos[0]?.id || "",
+        turno: alunos[0]?.turno || "",
         professorNome: nomeUsuarioPadrao,
       })
     );
@@ -790,7 +810,7 @@ function AcompanhamentoPage() {
         alunoId: alunoProfessorSelecionado.id,
         alunoNome: alunoProfessorSelecionado.nome || "",
         turma: alunoProfessorSelecionado.turma || "",
-        turno: alunoProfessorSelecionado.turno || "",
+        turno: formProfessor.turno.trim(),
         disciplina: formProfessor.disciplina.trim(),
         professorNome: formProfessor.professorNome.trim(),
         professorId: currentUser.uid,
@@ -879,6 +899,10 @@ function AcompanhamentoPage() {
       setProfessorEmEdicao(item);
       setFormProfessor({
         alunoId: item.alunoId || "",
+        turno:
+          typeof item.turno === "string"
+            ? item.turno
+            : alunos.find((aluno) => aluno.id === item.alunoId)?.turno || "",
         disciplina: item.disciplina || "",
         professorNome: item.professorNome || nomeUsuarioPadrao,
         bimestre: item.bimestre || "",
@@ -1665,7 +1689,13 @@ function AcompanhamentoPage() {
                 </div>
                 <div>
                   <label htmlFor="turnoProfessor">Turno</label>
-                  <input id="turnoProfessor" value={alunoProfessorSelecionado?.turno || ""} readOnly />
+                  <input
+                    id="turnoProfessor"
+                    name="turno"
+                    value={formProfessor.turno}
+                    onChange={handleChangeProfessor}
+                    placeholder="Ex.: Matutino, Vespertino, Tarde ou Noite"
+                  />
                 </div>
               </div>
 
