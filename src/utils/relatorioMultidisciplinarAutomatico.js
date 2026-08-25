@@ -228,7 +228,7 @@ function resumirRegentes(registros = []) {
 
 function analiseIntegrada({ dificuldades, avancos, resumoSondagem, semDados }) {
   if (semDados) {
-    return "No período selecionado, os dados disponíveis são insuficientes para uma análise multidisciplinar robusta. Recomenda-se ampliar os registros das diferentes frentes de acompanhamento para consolidar diagnósticos pedagógicos mais precisos.";
+    return "No período selecionado, os dados disponíveis são insuficientes para uma análise pedagógica integrada consistente. Recomenda-se ampliar os registros das diferentes frentes de acompanhamento para consolidar diagnósticos pedagógicos mais precisos.";
   }
 
   const dificuldadesComuns = topItens(dificuldades, 5);
@@ -426,7 +426,7 @@ export function gerarRelatorioMultidisciplinarAutomatico({
     `4. REGISTROS DOS MEDIADORES\n${resumoMediadores}`,
     `5. REGISTROS DO ASSISTENTE EDUCACIONAL\n${resumoAssistente}`,
     `6. REGISTROS DOS PROFESSORES REGENTES\n${resumoRegentes}`,
-    `7. ANÁLISE MULTIDISCIPLINAR INTEGRADA\n${analiseMultidisciplinar}`,
+    `7. ANÁLISE PEDAGÓGICA INTEGRADA\n${analiseMultidisciplinar}`,
     `8. ENCAMINHAMENTOS PEDAGÓGICOS\n${encaminhamentos}`,
   ].join("\n\n");
 
@@ -445,4 +445,3 @@ export function gerarRelatorioMultidisciplinarAutomatico({
     },
   };
 }
-

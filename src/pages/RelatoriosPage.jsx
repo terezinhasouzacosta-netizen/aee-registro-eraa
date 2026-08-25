@@ -658,7 +658,7 @@ function RelatoriosPage() {
 
   const handleGerarRelatorioAutomaticoCompleto = async () => {
     if (!alunoSelecionado?.id) {
-      setErro("Selecione um aluno para gerar o relatório automático.");
+      setErro("Selecione um aluno para gerar o relatório pedagógico.");
       return;
     }
     if (
@@ -731,10 +731,10 @@ function RelatoriosPage() {
         textoRelatorio: melhorarTextoPedagogicoInterno(texto),
       }));
       setFeedback(
-        `Relatório multidisciplinar gerado com sucesso. Fontes no período: sondagem (${detalhes.fontes.sondagens}), atendimento AEE (${detalhes.fontes.atendimentosAEE}), acompanhamento (${detalhes.fontes.acompanhamentos}) e monitoramento (${detalhes.fontes.monitoramentos}).`
+        `Relatório pedagógico gerado com sucesso. Fontes no período: sondagem (${detalhes.fontes.sondagens}), atendimento AEE (${detalhes.fontes.atendimentosAEE}), acompanhamento (${detalhes.fontes.acompanhamentos}) e monitoramento (${detalhes.fontes.monitoramentos}).`
       );
     } catch (error) {
-      console.error("[RelatoriosPage] Erro ao gerar relatório automático completo", error);
+      console.error("[RelatoriosPage] Erro ao gerar relatório pedagógico completo", error);
       setErro("Erro ao salvar. Tente novamente");
     } finally {
       setGerandoRelatorioAutomatico(false);
@@ -1033,7 +1033,7 @@ function RelatoriosPage() {
     return (
       <main className="alunos-page">
         <section className="panel">
-          <h1>RELATÓRIO MULTIDISCIPLINAR AUTOMÁTICO DO ALUNO</h1>
+          <h1>Relatório Pedagógico do Aluno</h1>
           <p>Seu perfil não possui permissão para visualizar relatórios.</p>
         </section>
       </main>
@@ -1043,15 +1043,17 @@ function RelatoriosPage() {
   return (
     <main className="alunos-page">
       <header className="page-header">
-        <h1>RELATÓRIO MULTIDISCIPLINAR AUTOMÁTICO DO ALUNO</h1>
-        <p>Geração automática integrada com dados de AEE, mediadores, assistente educacional e professores regentes.</p>
+        <h1>Relatório Pedagógico do Aluno</h1>
+        <p>
+          Organiza informações registradas na plataforma sobre o desenvolvimento, participação,
+          aprendizagem, intervenções e acompanhamento pedagógico do estudante.
+        </p>
         <p className="muted">
-          Orientação: Este relatório deve ser elaborado pelo(a) professor(a) do AEE ou pelo(a)
-          professor(a) do Atendimento Domiciliar, com base nas informações coletadas ao longo do
-          acompanhamento do aluno. Tem como objetivo subsidiar o planejamento pedagógico, orientando
-          os professores regentes e a coordenação pedagógica na definição de intervenções que
-          favoreçam o desenvolvimento, a aprendizagem, a autonomia e a participação dos alunos com
-          deficiência.
+          Orientação: este relatório deve ser elaborado, conferido e validado pelo(a) professor(a)
+          do AEE ou profissional responsável, com base nas informações registradas ao longo do
+          acompanhamento do estudante. O objetivo é subsidiar o planejamento pedagógico, os
+          encaminhamentos e a articulação entre AEE, professores regentes, mediadores, assistentes
+          educacionais, coordenação pedagógica e família.
         </p>
       </header>
 
@@ -1102,7 +1104,7 @@ function RelatoriosPage() {
       </section>
 
       <section className="panel print-relatorio">
-        <h2 className="print-title">RELATÓRIO MULTIDISCIPLINAR AUTOMÁTICO DO ALUNO</h2>
+        <h2 className="print-title">Relatório Pedagógico do Aluno</h2>
 
         {podeGerenciarRelatorio ? (
           <form className="aluno-form no-print" onSubmit={handleSalvarRelatorio}>
@@ -1361,8 +1363,8 @@ function RelatoriosPage() {
                 disabled={gerandoRelatorioAutomatico}
               >
                 {gerandoRelatorioAutomatico
-                  ? "Gerando relatório multidisciplinar..."
-                  : "Gerar relatório multidisciplinar"}
+                  ? "Gerando relatório pedagógico..."
+                  : "Gerar relatório pedagógico"}
               </button>
               <button type="button" className="btn-secondary" onClick={handleGerarRascunho}>
                 Gerar rascunho
@@ -1669,7 +1671,7 @@ function RelatoriosPage() {
 
       <section className="pdf-export-area" aria-hidden="true">
         <article ref={pdfRef} className="pdf-export-content">
-          <h2 className="print-title">RELATÓRIO MULTIDISCIPLINAR AUTOMÁTICO DO ALUNO</h2>
+          <h2 className="print-title">Relatório Pedagógico do Aluno</h2>
 
           <h3>1. DADOS DE IDENTIFICAÇÃO</h3>
           <section className="report-identification">
