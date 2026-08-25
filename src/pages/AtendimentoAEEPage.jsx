@@ -671,151 +671,190 @@ function AtendimentoAEEPage() {
         <section className="panel module-form-panel">
           <h2>{registroEmEdicao ? "Editar atendimento" : "Novo atendimento semanal"}</h2>
           <form className="aluno-form" onSubmit={handleSalvar}>
-            <label htmlFor="alunoId">Aluno</label>
-            <select id="alunoId" name="alunoId" value={form.alunoId} onChange={handleChangeForm} required>
-              <option value="">Selecione</option>
-              {alunos.map((aluno) => (
-                <option key={aluno.id} value={aluno.id}>
-                  {aluno.nome}
-                </option>
-              ))}
-            </select>
-
-            <div className="acompanhamento-inline-grid">
-              <div>
-                <label htmlFor="dataAtendimento">Data do atendimento</label>
-                <input
-                  id="dataAtendimento"
-                  name="dataAtendimento"
-                  type="date"
-                  value={form.dataAtendimento}
-                  onChange={handleChangeForm}
-                  required
-                />
-              </div>
+            <section className="form-section" style={{ display: "grid", gap: "0.85rem" }}>
+              <h3 style={{ fontSize: "1.05rem", fontWeight: 700 }}>Dados do Atendimento</h3>
 
               <div>
-                <label htmlFor="semanaReferencia">Semana de referência</label>
-                <input
-                  id="semanaReferencia"
-                  name="semanaReferencia"
-                  value={form.semanaReferencia}
-                  onChange={handleChangeForm}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="acompanhamento-inline-grid">
-              <div>
-                <label htmlFor="statusPresenca">Chamada semanal</label>
+                <label htmlFor="alunoId">Aluno</label>
                 <select
-                  id="statusPresenca"
-                  name="statusPresenca"
-                  value={form.statusPresenca}
-                  onChange={handleChangeForm}
-                  required
-                >
-                  {STATUS_PRESENCA_OPCOES.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {modoAtendimento === "AEE" ? (
-              <>
-                <label htmlFor="eixoTematico">Eixo temático</label>
-                <select
-                  id="eixoTematico"
-                  name="eixoTematico"
-                  value={form.eixoTematico}
+                  id="alunoId"
+                  name="alunoId"
+                  value={form.alunoId}
                   onChange={handleChangeForm}
                   required
                 >
                   <option value="">Selecione</option>
-                  {EIXOS_TEMATICOS_OPCOES.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
+                  {alunos.map((aluno) => (
+                    <option key={aluno.id} value={aluno.id}>
+                      {aluno.nome}
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div className="acompanhamento-inline-grid">
+                <div>
+                  <label htmlFor="dataAtendimento">Data do atendimento</label>
+                  <input
+                    id="dataAtendimento"
+                    name="dataAtendimento"
+                    type="date"
+                    value={form.dataAtendimento}
+                    onChange={handleChangeForm}
+                    required
+                  />
+                </div>
 
                 <div>
-                  <label>Habilidades do aluno por eixo temático</label>
-                  {loadingSondagem ? <p className="muted">Carregando habilidades...</p> : null}
-                  {!loadingSondagem && !form.alunoId ? (
-                    <p className="muted">Selecione um aluno para carregar as habilidades.</p>
-                  ) : null}
-                  {!loadingSondagem && form.alunoId && !form.eixoTematico ? (
-                    <p className="muted">Selecione um eixo temático para exibir as habilidades.</p>
-                  ) : null}
-                  {!loadingSondagem && form.alunoId && form.eixoTematico && habilidadesSugeridas.length === 0 ? (
-                    <p className="muted">Nenhuma habilidade cadastrada para este aluno neste eixo.</p>
-                  ) : null}
-                  {!loadingSondagem && habilidadesSugeridas.length > 0 ? (
+                  <label htmlFor="semanaReferencia">Semana de referência</label>
+                  <input
+                    id="semanaReferencia"
+                    name="semanaReferencia"
+                    value={form.semanaReferencia}
+                    onChange={handleChangeForm}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="acompanhamento-inline-grid">
+                <div>
+                  <label htmlFor="statusPresenca">Chamada semanal</label>
+                  <select
+                    id="statusPresenca"
+                    name="statusPresenca"
+                    value={form.statusPresenca}
+                    onChange={handleChangeForm}
+                    required
+                  >
+                    {STATUS_PRESENCA_OPCOES.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            {modoAtendimento === "AEE" ? (
+              <>
+                <section className="form-section" style={{ display: "grid", gap: "0.85rem" }}>
+                  <h3 style={{ fontSize: "1.05rem", fontWeight: 700 }}>
+                    Planejamento do Atendimento
+                  </h3>
+
+                  <div>
+                    <label htmlFor="eixoTematico">Eixo temático</label>
                     <select
-                      multiple
-                      className="form-control"
-                      value={form.habilidadesSelecionadas || []}
-                      onChange={(event) => {
-                        const selecionadas = Array.from(event.target.selectedOptions).map(
-                          (option) => option.value
-                        );
-                        setForm((prev) => ({
-                          ...prev,
-                          habilidadesSelecionadas: selecionadas,
-                        }));
-                      }}
-                      style={{ minHeight: "120px" }}
+                      id="eixoTematico"
+                      name="eixoTematico"
+                      value={form.eixoTematico}
+                      onChange={handleChangeForm}
+                      required
                     >
-                      {habilidadesSugeridas.map((habilidade, index) => (
-                        <option key={`${habilidade}-${index}`} value={habilidade}>
-                          {habilidade}
+                      <option value="">Selecione</option>
+                      {EIXOS_TEMATICOS_OPCOES.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
                         </option>
                       ))}
                     </select>
-                  ) : null}
-                </div>
+                  </div>
 
-                <label htmlFor="habilidadesComplementares">Outras habilidades trabalhadas</label>
-                <textarea
-                  id="habilidadesComplementares"
-                  name="habilidadesComplementares"
-                  value={form.habilidadesComplementares}
-                  onChange={handleChangeForm}
-                  rows={3}
-                  placeholder="Registre complementações ou outras habilidades trabalhadas no atendimento."
-                />
+                  <div>
+                    <label>Habilidades do aluno por eixo temático</label>
+                    {loadingSondagem ? <p className="muted">Carregando habilidades...</p> : null}
+                    {!loadingSondagem && !form.alunoId ? (
+                      <p className="muted">Selecione um aluno para carregar as habilidades.</p>
+                    ) : null}
+                    {!loadingSondagem && form.alunoId && !form.eixoTematico ? (
+                      <p className="muted">Selecione um eixo temático para exibir as habilidades.</p>
+                    ) : null}
+                    {!loadingSondagem &&
+                    form.alunoId &&
+                    form.eixoTematico &&
+                    habilidadesSugeridas.length === 0 ? (
+                      <p className="muted">Nenhuma habilidade cadastrada para este aluno neste eixo.</p>
+                    ) : null}
+                    {!loadingSondagem && habilidadesSugeridas.length > 0 ? (
+                      <select
+                        multiple
+                        className="form-control"
+                        value={form.habilidadesSelecionadas || []}
+                        onChange={(event) => {
+                          const selecionadas = Array.from(event.target.selectedOptions).map(
+                            (option) => option.value
+                          );
+                          setForm((prev) => ({
+                            ...prev,
+                            habilidadesSelecionadas: selecionadas,
+                          }));
+                        }}
+                        style={{ minHeight: "140px" }}
+                      >
+                        {habilidadesSugeridas.map((habilidade, index) => (
+                          <option key={`${habilidade}-${index}`} value={habilidade}>
+                            {habilidade}
+                          </option>
+                        ))}
+                      </select>
+                    ) : null}
+                  </div>
 
-                <label htmlFor="dificuldadesObservadas">Dificuldades observadas</label>
-                <textarea
-                  id="dificuldadesObservadas"
-                  name="dificuldadesObservadas"
-                  value={form.dificuldadesObservadas}
-                  onChange={handleChangeForm}
-                  rows={3}
-                />
+                  <div>
+                    <label htmlFor="habilidadesComplementares">Complementações do atendimento</label>
+                    <textarea
+                      id="habilidadesComplementares"
+                      name="habilidadesComplementares"
+                      value={form.habilidadesComplementares}
+                      onChange={handleChangeForm}
+                      rows={5}
+                      style={{ minHeight: "120px", resize: "vertical", lineHeight: "1.5" }}
+                      placeholder="Registre complementações ou outras habilidades trabalhadas no atendimento."
+                    />
+                  </div>
+                </section>
 
-                <label htmlFor="avancosPercebidos">Avanços percebidos</label>
-                <textarea
-                  id="avancosPercebidos"
-                  name="avancosPercebidos"
-                  value={form.avancosPercebidos}
-                  onChange={handleChangeForm}
-                  rows={3}
-                />
+                <section className="form-section" style={{ display: "grid", gap: "0.85rem" }}>
+                  <h3 style={{ fontSize: "1.05rem", fontWeight: 700 }}>Registro Pedagógico</h3>
 
-                <label htmlFor="observacoes">Observações</label>
-                <textarea
-                  id="observacoes"
-                  name="observacoes"
-                  value={form.observacoes}
-                  onChange={handleChangeForm}
-                  rows={3}
-                />
+                  <div>
+                    <label htmlFor="dificuldadesObservadas">Dificuldades observadas</label>
+                    <textarea
+                      id="dificuldadesObservadas"
+                      name="dificuldadesObservadas"
+                      value={form.dificuldadesObservadas}
+                      onChange={handleChangeForm}
+                      rows={5}
+                      style={{ minHeight: "120px", resize: "vertical", lineHeight: "1.5" }}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="avancosPercebidos">Avanços percebidos</label>
+                    <textarea
+                      id="avancosPercebidos"
+                      name="avancosPercebidos"
+                      value={form.avancosPercebidos}
+                      onChange={handleChangeForm}
+                      rows={5}
+                      style={{ minHeight: "120px", resize: "vertical", lineHeight: "1.5" }}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="observacoes">Observações pedagógicas</label>
+                    <textarea
+                      id="observacoes"
+                      name="observacoes"
+                      value={form.observacoes}
+                      onChange={handleChangeForm}
+                      rows={5}
+                      style={{ minHeight: "120px", resize: "vertical", lineHeight: "1.5" }}
+                    />
+                  </div>
+                </section>
               </>
             ) : (
               <>
