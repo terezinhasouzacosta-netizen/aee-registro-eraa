@@ -54,6 +54,7 @@ function formInicial({ alunoId = "", responsavelNome = "" } = {}) {
     dificuldadesObservadas: "",
     avancosPercebidos: "",
     observacoes: "",
+    encaminhamentos: "",
     observacaoSala: "",
     interacao: "",
     participacao: "",
@@ -520,6 +521,7 @@ function AtendimentoAEEPage() {
       avancosPercebidos: modoAtendimento === "AEE" ? form.avancosPercebidos : form.participacao,
       observacoes:
         modoAtendimento === "AEE" ? form.observacoes : form.observacoes,
+      encaminhamentos: form.encaminhamentos,
       observacaoSala: modoAtendimento === "REGULAR" ? form.observacaoSala : "",
       interacao: modoAtendimento === "REGULAR" ? form.interacao : "",
       participacao: modoAtendimento === "REGULAR" ? form.participacao : "",
@@ -592,6 +594,7 @@ function AtendimentoAEEPage() {
       dificuldadesObservadas: item.dificuldadesObservadas || "",
       avancosPercebidos: item.avancosPercebidos || "",
       observacoes: item.observacoes || "",
+      encaminhamentos: item.encaminhamentos || item.encaminhamento || "",
       observacaoSala:
         modo === "REGULAR"
           ? item.observacaoSala || observacoesLegado
@@ -951,6 +954,21 @@ function AtendimentoAEEPage() {
                       style={{ minHeight: "120px", resize: "vertical", lineHeight: "1.5" }}
                     />
                   </div>
+
+                  <div>
+                    <label htmlFor="encaminhamentos">Encaminhamentos e próximos passos</label>
+                    <textarea
+                      id="encaminhamentos"
+                      name="encaminhamentos"
+                      value={form.encaminhamentos}
+                      onChange={handleChangeForm}
+                      rows={6}
+                      style={{ minHeight: "145px", resize: "vertical", lineHeight: "1.5" }}
+                      placeholder={
+                        "Exemplo:\n• orientar a família;\n• reforçar consciência fonológica;\n• revisar leitura de sílabas complexas;\n• trabalhar autonomia nas próximas semanas."
+                      }
+                    />
+                  </div>
                 </section>
               </>
             ) : (
@@ -1120,6 +1138,12 @@ function AtendimentoAEEPage() {
                     </p>
                   </>
                 )}
+
+                {String(item.encaminhamentos || "").trim() ? (
+                  <p className="report-text">
+                    <strong>Encaminhamentos e próximos passos:</strong> {item.encaminhamentos}
+                  </p>
+                ) : null}
 
                 {podeEditar ? (
                   <div className="form-actions">

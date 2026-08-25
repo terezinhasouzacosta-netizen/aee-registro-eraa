@@ -341,6 +341,10 @@ function MonitoramentosPage() {
                           <strong>Observações</strong>
                           {atendimento.observacoes || "Não informado"}
                         </p>
+                        <p>
+                          <strong>Encaminhamentos e próximos passos</strong>
+                          {atendimento.encaminhamentos || "Não informado"}
+                        </p>
                       </div>
                     </article>
                   </li>
