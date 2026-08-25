@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { listarAlunos } from "../services/alunosService";
 import {
   atualizarPei,
   buscarPeiPorId,
@@ -20,7 +21,6 @@ const PRIORIDADES = ["Alta", "Média", "Baixa"];
 const PEIFormContext = createContext(null);
 
 const CAMINHOS_CAMPOS = {
-  "pei-aluno-cadastrado": ["identificacaoEstudante", "alunoCadastrado"],
   "pei-nome-estudante": ["identificacaoEstudante", "nome"],
   "pei-data-nascimento": ["identificacaoEstudante", "dataNascimento"],
   "pei-idade": ["identificacaoEstudante", "idade"],
@@ -234,14 +234,50 @@ function normalizarLista(listaSalva, listaInicial) {
   }));
 }
 
+function calcularIdade(dataNascimento) {
+  const valor = String(dataNascimento || "").trim();
+  const correspondencia = valor.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!correspondencia) return "";
+
+  const [, anoTexto, mesTexto, diaTexto] = correspondencia;
+  const ano = Number(anoTexto);
+  const mes = Number(mesTexto);
+  const dia = Number(diaTexto);
+  const nascimento = new Date(ano, mes - 1, dia);
+
+  if (
+    nascimento.getFullYear() !== ano ||
+    nascimento.getMonth() !== mes - 1 ||
+    nascimento.getDate() !== dia
+  ) {
+    return "";
+  }
+
+  const hoje = new Date();
+  let idade = hoje.getFullYear() - ano;
+  const aniversarioAindaNaoOcorreu =
+    hoje.getMonth() < mes - 1 || (hoje.getMonth() === mes - 1 && hoje.getDate() < dia);
+
+  if (aniversarioAindaNaoOcorreu) idade -= 1;
+  return idade >= 0 ? String(idade) : "";
+}
+
 function normalizarPeiParaFormulario(pei) {
   const inicial = criarFormularioInicial();
+  const identificacaoSalva = pei?.identificacaoEstudante || {};
+  const nomeSalvo =
+    identificacaoSalva.nome || pei?.alunoNome || identificacaoSalva.alunoCadastrado || "";
+
   return {
     ...inicial,
     ...pei,
+    alunoId: pei?.alunoId || "",
+    alunoNome: pei?.alunoNome || nomeSalvo,
     identificacaoEstudante: {
       ...inicial.identificacaoEstudante,
-      ...(pei?.identificacaoEstudante || {}),
+      ...identificacaoSalva,
+      alunoCadastrado: identificacaoSalva.alunoCadastrado || nomeSalvo,
+      nome: nomeSalvo,
     },
     participantesArticulacao: {
       ...inicial.participantesArticulacao,
@@ -541,6 +577,7 @@ function BlocoPEI({ numero, titulo, descricao, children }) {
 function PEIPage() {
   const { currentUser } = useAuth();
   const [form, setForm] = useState(criarFormularioInicial);
+  const [alunos, setAlunos] = useState([]);
   const [peisSalvos, setPeisSalvos] = useState([]);
   const [peiId, setPeiId] = useState("");
   const [carregando, setCarregando] = useState(true);
@@ -572,6 +609,16 @@ function PEIPage() {
     async function carregarRascunhoAnterior() {
       setCarregando(true);
       setErro("");
+
+      try {
+        const alunosData = await listarAlunos();
+        if (ativo) setAlunos(alunosData);
+      } catch (error) {
+        console.error("[PEIPage] Erro ao carregar alunos cadastrados", error);
+        if (ativo) setErro("Não foi possível carregar os alunos cadastrados.");
+      }
+
+      if (!ativo) return;
       await carregarPeisSalvos();
       const rascunhoId = lerPeiIdLocal();
 
@@ -620,7 +667,53 @@ function PEIPage() {
   const atualizarCampo = (id, valor) => {
     const caminho = resolverCaminhoCampo(id);
     if (!caminho) return;
-    setForm((estadoAtual) => atualizarValorNoCaminho(estadoAtual, caminho, valor));
+    setForm((estadoAtual) => {
+      const formularioAtualizado = atualizarValorNoCaminho(estadoAtual, caminho, valor);
+      return id === "pei-nome-estudante"
+        ? { ...formularioAtualizado, alunoNome: valor }
+        : formularioAtualizado;
+    });
+  };
+
+  const handleAlunoSelecionado = (event) => {
+    const alunoId = event.target.value;
+    const aluno = alunos.find((item) => item.id === alunoId) || null;
+
+    setForm((estadoAtual) => {
+      if (!aluno) {
+        return {
+          ...estadoAtual,
+          alunoId: "",
+          alunoNome: estadoAtual.identificacaoEstudante.nome || estadoAtual.alunoNome,
+          identificacaoEstudante: {
+            ...estadoAtual.identificacaoEstudante,
+            alunoCadastrado: "",
+          },
+        };
+      }
+
+      const idadeCadastrada = String(aluno.idade ?? "").trim();
+
+      return {
+        ...estadoAtual,
+        alunoId: aluno.id,
+        alunoNome: aluno.nome || "",
+        identificacaoEstudante: {
+          ...estadoAtual.identificacaoEstudante,
+          alunoCadastrado: aluno.nome || "",
+          nome: aluno.nome || "",
+          dataNascimento: aluno.dataNascimento || "",
+          idade: idadeCadastrada || calcularIdade(aluno.dataNascimento),
+          serieAno: aluno.serieAno || "",
+          turma: aluno.turma || "",
+          turno: aluno.turno || "",
+          escola: aluno.nomeEscola || aluno.escola || "",
+          municipio: aluno.municipio || "",
+          professorAee: aluno.professorAee || "",
+          condicaoDiagnostico: aluno.diagnostico || "",
+        },
+      };
+    });
   };
 
   const handleSalvarRascunho = async (event) => {
@@ -668,7 +761,7 @@ function PEIPage() {
   };
 
   const handleConcluirPei = async () => {
-    if (salvando || concluindo) return;
+    if (salvando || concluindo || form.statusGeral === "concluido") return;
 
     if (!currentUser) {
       setErro("Não foi possível identificar o usuário para concluir o PEI.");
@@ -864,12 +957,28 @@ function PEIPage() {
           descricao="Dados iniciais para contextualizar o planejamento curricular individualizado."
         >
           <div className="pei-fields-grid">
-            <Campo
-              id="pei-aluno-cadastrado"
-              label="Aluno cadastrado"
-              placeholder="Digite ou selecione o estudante em uma fase posterior."
-              className="pei-field-span-2"
-            />
+            <div className="pei-field-span-2">
+              <label htmlFor="pei-aluno-cadastrado">Aluno cadastrado</label>
+              <select
+                id="pei-aluno-cadastrado"
+                value={form.alunoId || ""}
+                onChange={handleAlunoSelecionado}
+              >
+                <option value="">Selecione um estudante cadastrado</option>
+                {form.alunoId && !alunos.some((aluno) => aluno.id === form.alunoId) ? (
+                  <option value={form.alunoId}>
+                    {form.alunoNome ||
+                      form.identificacaoEstudante.nome ||
+                      "Aluno anteriormente vinculado"}
+                  </option>
+                ) : null}
+                {alunos.map((aluno) => (
+                  <option key={aluno.id} value={aluno.id}>
+                    {aluno.nome || "Aluno sem nome informado"}
+                  </option>
+                ))}
+              </select>
+            </div>
             <Campo
               id="pei-nome-estudante"
               label="Nome do estudante"
@@ -1242,11 +1351,17 @@ function PEIPage() {
             </button>
             <button
               type="button"
-              className="pei-concluir-button"
+              className={`pei-concluir-button${
+                form.statusGeral === "concluido" ? " pei-concluir-button-concluido" : ""
+              }`}
               onClick={handleConcluirPei}
               disabled={salvando || concluindo || form.statusGeral === "concluido"}
             >
-              {concluindo ? "Concluindo..." : "Concluir PEI"}
+              {concluindo
+                ? "Concluindo..."
+                : form.statusGeral === "concluido"
+                  ? "PEI já concluído"
+                  : "Concluir PEI"}
             </button>
             <button
               type="button"

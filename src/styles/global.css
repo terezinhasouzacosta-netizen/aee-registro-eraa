@@ -2645,11 +2645,21 @@ textarea:focus {
   border-color: #1e40af;
   background: #1e40af;
   color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(30, 64, 175, 0.18);
 }
 
 .pei-page .pei-concluir-button:hover:not(:disabled) {
   border-color: #1e3a8a;
   background: #1e3a8a;
+}
+
+.pei-page .pei-future-actions .pei-concluir-button-concluido:disabled {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: #166534;
+  box-shadow: none;
+  opacity: 1;
 }
 
 .pei-page .pei-future-actions {
