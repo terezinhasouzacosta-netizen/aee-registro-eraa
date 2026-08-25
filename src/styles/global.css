@@ -2705,17 +2705,19 @@ textarea:focus {
     background: #ffffff;
     color: #111827;
     font-family: Arial, sans-serif;
-    font-size: 10.6pt;
-    line-height: 1.55;
+    font-size: 10.2pt;
+    line-height: 1.42;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
   .pei-page .pei-print-header {
-    padding-bottom: 5mm;
-    margin-bottom: 5mm;
+    padding-bottom: 4mm;
+    margin-bottom: 4mm;
     border-bottom: 1px solid #94a3b8;
     text-align: center;
+    break-after: avoid-page;
+    page-break-after: avoid;
   }
 
   .pei-page .pei-print-brand {
@@ -2728,7 +2730,7 @@ textarea:focus {
   }
 
   .pei-page .pei-print-header h1 {
-    margin: 0 0 5mm;
+    margin: 0 0 4mm;
     color: #111827;
     font-size: 18pt;
     line-height: 1.25;
@@ -2738,7 +2740,7 @@ textarea:focus {
   .pei-page .pei-print-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2.5mm;
+    gap: 2mm;
     text-align: left;
   }
 
@@ -2751,20 +2753,20 @@ textarea:focus {
   .pei-page .pei-print-summary p,
   .pei-page .pei-print-grid > div {
     min-width: 0;
-    padding: 3mm 3.2mm;
+    padding: 2.5mm 2.8mm;
     border: 1px solid #cbd5e1;
     border-radius: 2mm;
     background: #f8fafc;
-    break-inside: avoid;
-    page-break-inside: avoid;
   }
 
   .pei-page .pei-print-summary p {
     margin: 0;
     color: #111827;
-    font-size: 10.2pt;
-    line-height: 1.45;
+    font-size: 9.8pt;
+    line-height: 1.35;
     overflow-wrap: anywhere;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   .pei-page .pei-print-summary strong {
@@ -2772,16 +2774,16 @@ textarea:focus {
   }
 
   .pei-page .pei-print-section {
-    padding-bottom: 4mm;
-    margin-bottom: 4mm;
+    padding-bottom: 3mm;
+    margin-bottom: 3mm;
     border-bottom: 1px solid #e2e8f0;
-    break-inside: avoid-page;
-    page-break-inside: avoid;
+    break-inside: auto;
+    page-break-inside: auto;
   }
 
   .pei-page .pei-print-section h2 {
-    margin: 0 0 3.5mm;
-    padding: 2mm 3mm;
+    margin: 0 0 2.5mm;
+    padding: 1.6mm 2.5mm;
     border-left: 1.2mm solid #2563eb;
     border-radius: 1.5mm;
     background: #eff6ff;
@@ -2793,7 +2795,7 @@ textarea:focus {
   }
 
   .pei-page .pei-print-section h3 {
-    margin: 0 0 2mm;
+    margin: 0 0 1.5mm;
     color: #1e3a8a;
     font-size: 11pt;
     font-weight: 700;
@@ -2827,13 +2829,18 @@ textarea:focus {
     page-break-inside: avoid;
   }
 
+  .pei-page .pei-print-identification-table tr.pei-print-identification-long {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
   .pei-page .pei-print-identification-table th,
   .pei-page .pei-print-identification-table td {
-    padding: 2.8mm 3.2mm;
+    padding: 2.2mm 2.7mm;
     border: 1px solid #cbd5e1;
     vertical-align: top;
     text-align: left;
-    line-height: 1.5;
+    line-height: 1.4;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     word-break: normal;
@@ -2856,26 +2863,34 @@ textarea:focus {
   .pei-page .pei-print-identification-table td {
     background: #ffffff;
     color: #111827;
-    font-size: 10.4pt;
+    font-size: 10pt;
   }
 
   .pei-page .pei-print-identification-long td {
     text-align: justify;
     text-justify: inter-word;
-    line-height: 1.55;
+    line-height: 1.42;
     hyphens: auto;
+    overflow-wrap: break-word;
   }
 
-  .pei-page .pei-print-grid > div,
-  .pei-page .pei-print-item {
+  .pei-page .pei-print-grid > div:not(.pei-print-span-2) {
     break-inside: avoid;
     page-break-inside: avoid;
   }
 
+  .pei-page .pei-print-span-2,
+  .pei-page .pei-print-item {
+    break-inside: auto;
+    page-break-inside: auto;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
   .pei-page .pei-print-grid dt {
-    margin-bottom: 1mm;
+    margin-bottom: 0.7mm;
     color: #1e3a8a;
-    font-size: 11pt;
+    font-size: 10.5pt;
     font-weight: 700;
     line-height: 1.3;
   }
@@ -2883,12 +2898,12 @@ textarea:focus {
   .pei-page .pei-print-grid dd,
   .pei-page .pei-print-section p {
     color: #111827;
-    font-size: 10.7pt;
-    line-height: 1.55;
+    font-size: 10.2pt;
+    line-height: 1.42;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
-    orphans: 3;
-    widows: 3;
+    orphans: 2;
+    widows: 2;
   }
 
   .pei-page .pei-print-span-2 {
@@ -2899,10 +2914,11 @@ textarea:focus {
     text-align: justify;
     text-justify: inter-word;
     hyphens: auto;
+    overflow-wrap: break-word;
   }
 
   .pei-page .pei-print-item {
-    padding: 3.5mm;
+    padding: 3mm;
     border: 1px solid #94a3b8;
     border-radius: 2.5mm;
     background: #f8fbff;
@@ -2920,7 +2936,7 @@ textarea:focus {
   }
 
   .pei-page .pei-print-item + .pei-print-item {
-    margin-top: 3mm;
+    margin-top: 2.5mm;
   }
 
   .pei-page .pei-print-footer {
