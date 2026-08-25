@@ -3,6 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   query,
   serverTimestamp,
@@ -62,11 +63,71 @@ function obterSemanaISO(dataIso) {
   return `${dataUtc.getUTCFullYear()}-S${String(semana).padStart(2, "0")}`;
 }
 
+function normalizarHabilidadesSelecionadas(valor) {
+  if (!Array.isArray(valor)) return [];
+  return [...new Set(valor.map((item) => String(item || "").trim()).filter(Boolean))];
+}
+
+function normalizarAtendimento(data = {}) {
+  const dataAtendimento = String(data.dataAtendimento || data.dataRegistro || "").trim();
+  const criadoEm = data.criadoEm || data.createdAt || null;
+  const atualizadoEm = data.atualizadoEm || data.updatedAt || criadoEm || null;
+
+  return {
+    ...data,
+    alunoId: String(data.alunoId || data.alunoID || "").trim(),
+    alunoNome: String(data.alunoNome || data.nomeAluno || "").trim(),
+    dataAtendimento,
+    semanaReferencia: String(
+      data.semanaReferencia || (dataAtendimento ? obterSemanaISO(dataAtendimento) : "")
+    ).trim(),
+    mesReferencia: String(
+      data.mesReferencia || (dataAtendimento ? obterMesPorData(dataAtendimento) : "")
+    ).trim(),
+    eixoTematico: String(data.eixoTematico || data.eixoObservado || data.eixo || "").trim(),
+    habilidadesSelecionadas: normalizarHabilidadesSelecionadas(data.habilidadesSelecionadas),
+    habilidadesComplementares: String(
+      data.habilidadesComplementares || data.outrasHabilidades || ""
+    ).trim(),
+    dificuldadesObservadas: String(
+      data.dificuldadesObservadas || data.dificuldades || ""
+    ).trim(),
+    avancosPercebidos: String(data.avancosPercebidos || data.avancos || "").trim(),
+    observacoes: String(data.observacoes || data.observacao || "").trim(),
+    responsavelNome: String(data.responsavelNome || data.responsavelRegistro || "").trim(),
+    responsavelEmail: String(data.responsavelEmail || data.emailResponsavel || "").trim(),
+    criadoEm,
+    atualizadoEm,
+    createdAt: data.createdAt || criadoEm,
+    updatedAt: data.updatedAt || atualizadoEm,
+  };
+}
+
 function mapSnapshot(snapshot) {
   return snapshot.docs.map((item) => ({
     id: item.id,
-    ...item.data(),
+    ...normalizarAtendimento(item.data()),
   }));
+}
+
+function filtrarRegistrosNormalizados(registros, { mesReferencia, semanaReferencia } = {}) {
+  let registrosFiltrados = ordenarPorDataDesc(registros);
+  const mes = String(mesReferencia || "").trim();
+  const semana = String(semanaReferencia || "").trim();
+
+  if (mes) {
+    registrosFiltrados = registrosFiltrados.filter(
+      (item) => String(item.mesReferencia || "") === mes
+    );
+  }
+
+  if (semana) {
+    registrosFiltrados = registrosFiltrados.filter(
+      (item) => String(item.semanaReferencia || "") === semana
+    );
+  }
+
+  return registrosFiltrados;
 }
 
 function normalizarModoAtendimento({ modoAtendimento, tipoAtendimento } = {}) {
@@ -102,17 +163,17 @@ function ordenarPorDataDesc(lista) {
 }
 
 function normalizarPayload(payload = {}) {
-  const alunoId = String(payload.alunoId || "").trim();
+  const alunoId = String(payload.alunoId || payload.alunoID || "").trim();
   if (!alunoId) {
     throw new Error("Registro de atendimento inválido: alunoId é obrigatório.");
   }
 
-  const dataAtendimento = String(payload.dataAtendimento || dataAtualISO()).trim();
+  const dataAtendimento = String(
+    payload.dataAtendimento || payload.dataRegistro || dataAtualISO()
+  ).trim();
   const semanaReferencia = String(payload.semanaReferencia || obterSemanaISO(dataAtendimento)).trim();
   const mesReferencia = String(payload.mesReferencia || obterMesPorData(dataAtendimento)).trim();
-  const habilidadesSelecionadas = Array.isArray(payload.habilidadesSelecionadas)
-    ? [...new Set(payload.habilidadesSelecionadas.map((item) => String(item || "").trim()).filter(Boolean))]
-    : [];
+  const habilidadesSelecionadas = normalizarHabilidadesSelecionadas(payload.habilidadesSelecionadas);
   const modoAtendimento = normalizarModoAtendimento(payload);
   const tipoPadrao = tipoAtendimentoPorModo(modoAtendimento);
   const tipoInformado = String(payload.tipoAtendimento || "").trim();
@@ -121,20 +182,24 @@ function normalizarPayload(payload = {}) {
 
   return {
     alunoId,
-    alunoNome: String(payload.alunoNome || "").trim(),
+    alunoNome: String(payload.alunoNome || payload.nomeAluno || "").trim(),
     dataAtendimento,
     semanaReferencia,
     mesReferencia,
     modoAtendimento,
     statusPresenca: String(payload.statusPresenca || "").trim(),
     tipoAtendimento,
-    eixoTematico: String(payload.eixoTematico || "").trim(),
+    eixoTematico: String(payload.eixoTematico || payload.eixoObservado || payload.eixo || "").trim(),
     habilidadesSelecionadas,
-    habilidadesComplementares: String(payload.habilidadesComplementares || "").trim(),
+    habilidadesComplementares: String(
+      payload.habilidadesComplementares || payload.outrasHabilidades || ""
+    ).trim(),
     habilidadesTrabalhadas: String(payload.habilidadesTrabalhadas || "").trim(),
-    dificuldadesObservadas: String(payload.dificuldadesObservadas || "").trim(),
-    avancosPercebidos: String(payload.avancosPercebidos || "").trim(),
-    observacoes: String(payload.observacoes || "").trim(),
+    dificuldadesObservadas: String(
+      payload.dificuldadesObservadas || payload.dificuldades || ""
+    ).trim(),
+    avancosPercebidos: String(payload.avancosPercebidos || payload.avancos || "").trim(),
+    observacoes: String(payload.observacoes || payload.observacao || "").trim(),
     observacaoSala: String(payload.observacaoSala || "").trim(),
     interacao: String(payload.interacao || "").trim(),
     participacao: String(payload.participacao || "").trim(),
@@ -142,7 +207,8 @@ function normalizarPayload(payload = {}) {
     dificuldadesContextoAula: String(payload.dificuldadesContextoAula || "").trim(),
     apoioRecebido: String(payload.apoioRecebido || "").trim(),
     responsavelId: String(payload.responsavelId || "").trim(),
-    responsavelNome: String(payload.responsavelNome || "").trim(),
+    responsavelNome: String(payload.responsavelNome || payload.responsavelRegistro || "").trim(),
+    responsavelEmail: String(payload.responsavelEmail || payload.emailResponsavel || "").trim(),
   };
 }
 
@@ -166,26 +232,59 @@ export async function listarAtendimentosAEE({
     return [];
   }
 
-  const constraints = [where("alunoId", "==", alunoIdFinal)];
-  if (mesReferencia) constraints.push(where("mesReferencia", "==", mesReferencia));
-
-  const atendimentosQuery = query(atendimentosCollection, ...constraints);
+  const atendimentosQuery = query(atendimentosCollection, where("alunoId", "==", alunoIdFinal));
   const snapshot = await getDocs(atendimentosQuery);
-  let registros = ordenarPorDataDesc(mapSnapshot(snapshot));
+  return filtrarRegistrosNormalizados(mapSnapshot(snapshot), {
+    mesReferencia,
+    semanaReferencia,
+  });
+}
 
-  if (semanaReferencia) {
-    const semana = String(semanaReferencia).trim();
-    registros = registros.filter((item) => String(item.semanaReferencia || "") === semana);
+export async function listarAtendimentosAEEPorNome({
+  alunoNome,
+  alunoId,
+  mesReferencia,
+  semanaReferencia,
+  alunoIdsPermitidos,
+} = {}) {
+  const alunoNomeFinal = String(alunoNome || "").trim();
+  const alunoIdFinal = String(alunoId || "").trim();
+  if (!alunoNomeFinal) return [];
+
+  if (
+    alunoIdFinal &&
+    Array.isArray(alunoIdsPermitidos) &&
+    !alunoIdsPermitidos.includes(alunoIdFinal)
+  ) {
+    return [];
   }
 
-  return registros;
+  const consultas = [
+    query(atendimentosCollection, where("alunoNome", "==", alunoNomeFinal)),
+    query(atendimentosCollection, where("nomeAluno", "==", alunoNomeFinal)),
+  ];
+  const snapshots = await Promise.all(consultas.map((consulta) => getDocs(consulta)));
+  const registrosPorId = new Map();
+
+  snapshots.forEach((snapshot) => {
+    mapSnapshot(snapshot).forEach((registro) => registrosPorId.set(registro.id, registro));
+  });
+
+  return filtrarRegistrosNormalizados([...registrosPorId.values()], {
+    mesReferencia,
+    semanaReferencia,
+  });
 }
 
 export async function criarAtendimentoAEE(payload) {
+  const criadoEm = serverTimestamp();
+  const atualizadoEm = serverTimestamp();
   const data = {
     ...normalizarPayload(payload),
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    criadoEm,
+    atualizadoEm,
+    createdAt: criadoEm,
+    updatedAt: atualizadoEm,
   };
   const result = await addDoc(atendimentosCollection, data);
   return result.id;
@@ -193,9 +292,17 @@ export async function criarAtendimentoAEE(payload) {
 
 export async function atualizarAtendimentoAEE(atendimentoId, payload) {
   const atendimentoRef = doc(db, "atendimentosAEE", atendimentoId);
+  const snapshot = await getDoc(atendimentoRef);
+  const dataExistente = snapshot.exists() ? snapshot.data() : {};
+  const criadoEm = dataExistente.criadoEm || dataExistente.createdAt || serverTimestamp();
+  const atualizadoEm = serverTimestamp();
+
   await updateDoc(atendimentoRef, {
     ...normalizarPayload(payload),
-    updatedAt: serverTimestamp(),
+    criadoEm,
+    atualizadoEm,
+    createdAt: dataExistente.createdAt || criadoEm,
+    updatedAt: atualizadoEm,
   });
 }
 

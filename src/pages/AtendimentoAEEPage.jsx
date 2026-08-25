@@ -1,5 +1,4 @@
 ﻿import { useEffect, useMemo, useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
 import { useAuth } from "../hooks/useAuth";
 import { listarAlunos, listarAlunosPorIds } from "../services/alunosService";
 import {
@@ -8,13 +7,13 @@ import {
   excluirAtendimentoAEE,
   gerarSinteseMensalAtendimento,
   listarAtendimentosAEE,
+  listarAtendimentosAEEPorNome,
   obterSemanaReferenciaPorData,
   STATUS_PRESENCA_OPCOES,
   atualizarAtendimentoAEE,
 } from "../services/atendimentoAeeService";
 import { listarMetasPorAlunoId } from "../services/metasService";
 import { buscarIdsAlunosVinculados } from "../services/vinculacoesService";
-import { db } from "../services/firebase";
 import {
   podeAcessarAcompanhamento,
   podeEditarHistoricoAcompanhamento,
@@ -179,15 +178,6 @@ function obterRotuloTipoAtendimento(item) {
     : "Atendimento na Sala AEE";
 }
 
-function ordenarPorDataDesc(lista = []) {
-  return [...lista].sort((a, b) => {
-    const dataA = String(a?.dataAtendimento || "");
-    const dataB = String(b?.dataAtendimento || "");
-    if (dataA !== dataB) return dataA < dataB ? 1 : -1;
-    return 0;
-  });
-}
-
 function AtendimentoAEEPage() {
   const { currentUser, perfil } = useAuth();
   const [alunos, setAlunos] = useState([]);
@@ -297,19 +287,13 @@ function AtendimentoAEEPage() {
           const alunoAtual = alunos.find((item) => item.id === filtroAlunoId);
           const nomeAluno = String(alunoAtual?.nome || "").trim();
           if (nomeAluno) {
-            const atendimentosRef = collection(db, "atendimentosAEE");
-            const porNome = query(
-              atendimentosRef,
-              where("alunoNome", "==", nomeAluno),
-              ...(filtroMes ? [where("mesReferencia", "==", filtroMes)] : [])
-            );
-            const snapshot = await getDocs(porNome);
-            const porNomeData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-            registros = ordenarPorDataDesc(
-              filtroSemana
-                ? porNomeData.filter((item) => String(item.semanaReferencia || "") === String(filtroSemana))
-                : porNomeData
-            );
+            registros = await listarAtendimentosAEEPorNome({
+              alunoNome: nomeAluno,
+              alunoId: filtroAlunoId,
+              mesReferencia: filtroMes || undefined,
+              semanaReferencia: filtroSemana || undefined,
+              alunoIdsPermitidos: idsPermitidos,
+            });
           }
         }
 
@@ -480,6 +464,7 @@ function AtendimentoAEEPage() {
       responsavelId: currentUser.uid,
       responsavelNome:
         form.responsavelNome || currentUser.displayName || currentUser.email || "Usuário",
+      responsavelEmail: currentUser.email || "",
     };
 
     setSalvando(true);
