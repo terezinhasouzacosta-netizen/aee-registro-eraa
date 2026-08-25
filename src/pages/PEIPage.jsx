@@ -388,6 +388,74 @@ function obterDataAtualIsoLocal() {
   return dataLocal.toISOString().slice(0, 10);
 }
 
+function obterValorImpressao(valor) {
+  return String(valor || "").trim() || "Não informado";
+}
+
+function formatarDataImpressao(valor) {
+  if (!valor) return "Não informado";
+
+  if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+    const [ano, mes, dia] = valor.split("-");
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  const dataFormatada = formatarDataLista(valor);
+  return dataFormatada === "-" ? "Não informado" : dataFormatada;
+}
+
+function possuiTextoPreenchido(valor) {
+  if (typeof valor === "string") return Boolean(valor.trim());
+  if (Array.isArray(valor)) return valor.some(possuiTextoPreenchido);
+  if (valor && typeof valor === "object") {
+    return Object.values(valor).some(possuiTextoPreenchido);
+  }
+  return false;
+}
+
+function habilidadePriorizadaPossuiConteudo(item) {
+  return possuiTextoPreenchido(item);
+}
+
+function objetivoMetaPossuiConteudo(item) {
+  return possuiTextoPreenchido(item);
+}
+
+function possuiConteudoMinimoParaImpressao(form) {
+  const identificacao = form.identificacaoEstudante;
+  const possuiEstudante = Boolean(
+    String(identificacao.nome || identificacao.alunoCadastrado || form.alunoNome || "").trim(),
+  );
+  const possuiDadosComplementares = possuiTextoPreenchido([
+    identificacao.dataNascimento,
+    identificacao.anoLetivo,
+    identificacao.serieAno,
+    identificacao.turma,
+    identificacao.periodoVigencia,
+    form.participantesArticulacao,
+    form.basePedagogica,
+    form.planejamentoCurricular,
+    form.habilidadesObjetosPriorizados,
+    form.objetivosMetas,
+    form.metodologiasAtividades,
+    form.recursosAcessibilidadeApoios,
+    form.avaliacaoAprendizagem,
+    form.acompanhamentoRevisao,
+    form.encaminhamentosFinais,
+  ]);
+
+  return possuiEstudante && possuiDadosComplementares;
+}
+
+function CampoImpressao({ rotulo, valor, span = false }) {
+  return (
+    <div className={span ? "pei-print-span-2" : ""}>
+      <dt>{rotulo}</dt>
+      <dd>{obterValorImpressao(valor)}</dd>
+    </div>
+  );
+}
+
 function Campo({ id, label, placeholder, type = "text", className = "" }) {
   const contexto = useContext(PEIFormContext);
   return (
@@ -636,6 +704,19 @@ function PEIPage() {
     }
   };
 
+  const handleImprimirPei = () => {
+    setFeedback("");
+    setAviso("");
+    setErro("");
+
+    if (!possuiConteudoMinimoParaImpressao(form)) {
+      setErro("Antes de imprimir, preencha ou abra um PEI salvo.");
+      return;
+    }
+
+    window.print();
+  };
+
   const handleAbrirPei = async (id) => {
     if (!id || abrindoPeiId || salvando || concluindo) return;
 
@@ -668,6 +749,11 @@ function PEIPage() {
       setAbrindoPeiId("");
     }
   };
+
+  const habilidadesParaImpressao = form.habilidadesObjetosPriorizados.filter(
+    habilidadePriorizadaPossuiConteudo,
+  );
+  const objetivosParaImpressao = form.objetivosMetas.filter(objetivoMetaPossuiConteudo);
 
   return (
     <main className="alunos-page module-page pei-page">
@@ -1134,9 +1220,6 @@ function PEIPage() {
             </div>
           ) : null}
           <div className="form-actions pei-future-actions">
-            <button type="submit" disabled={salvando || concluindo}>
-              {salvando ? "Salvando..." : "Salvar rascunho do PEI"}
-            </button>
             <button
               type="button"
               className="btn-secondary"
@@ -1144,6 +1227,9 @@ function PEIPage() {
               disabled={salvando || concluindo}
             >
               Novo PEI
+            </button>
+            <button type="submit" disabled={salvando || concluindo}>
+              {salvando ? "Salvando..." : "Salvar rascunho do PEI"}
             </button>
             <button
               type="button"
@@ -1153,7 +1239,12 @@ function PEIPage() {
             >
               {concluindo ? "Concluindo..." : "Concluir PEI"}
             </button>
-            <button type="button" className="btn-secondary" disabled title="Impressão será implementada em fase posterior.">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={handleImprimirPei}
+              disabled={salvando || concluindo}
+            >
               Imprimir PEI
             </button>
           </div>
@@ -1161,12 +1252,372 @@ function PEIPage() {
             {peiId
               ? "Este rascunho já possui um documento salvo e será atualizado pelo mesmo botão."
               : "O primeiro salvamento criará um novo documento na coleção peis."}
-            {" "}A impressão permanece como recurso futuro.
+            {" "}A impressão utiliza a janela do navegador e permite salvar como PDF.
           </p>
         </section>
           </form>
         </PEIFormContext.Provider>
       )}
+
+      <section className="pei-print-area" aria-label="PEI para impressão">
+        <header className="pei-print-header">
+          <p className="pei-print-brand">AEE Registro</p>
+          <h1>Plano de Ensino Individualizado — PEI</h1>
+          <div className="pei-print-summary">
+            <p>
+              <strong>Estudante:</strong>{" "}
+              {obterValorImpressao(
+                form.identificacaoEstudante.nome ||
+                  form.identificacaoEstudante.alunoCadastrado ||
+                  form.alunoNome,
+              )}
+            </p>
+            <p>
+              <strong>Ano letivo:</strong>{" "}
+              {obterValorImpressao(
+                form.identificacaoEstudante.anoLetivo || form.anoLetivo,
+              )}
+            </p>
+            <p>
+              <strong>Período de vigência:</strong>{" "}
+              {obterValorImpressao(
+                form.identificacaoEstudante.periodoVigencia || form.periodoVigencia,
+              )}
+            </p>
+            <p>
+              <strong>Data de impressão:</strong>{" "}
+              {formatarDataImpressao(obterDataAtualIsoLocal())}
+            </p>
+          </div>
+        </header>
+
+        <section className="pei-print-section">
+          <h2>1. Identificação do estudante</h2>
+          <dl className="pei-print-grid">
+            <CampoImpressao
+              rotulo="Aluno cadastrado"
+              valor={form.identificacaoEstudante.alunoCadastrado}
+              span
+            />
+            <CampoImpressao
+              rotulo="Nome do estudante"
+              valor={form.identificacaoEstudante.nome}
+              span
+            />
+            <CampoImpressao
+              rotulo="Data de nascimento"
+              valor={formatarDataImpressao(form.identificacaoEstudante.dataNascimento)}
+            />
+            <CampoImpressao rotulo="Idade" valor={form.identificacaoEstudante.idade} />
+            <CampoImpressao
+              rotulo="Ano letivo"
+              valor={form.identificacaoEstudante.anoLetivo}
+            />
+            <CampoImpressao rotulo="Ano/Série" valor={form.identificacaoEstudante.serieAno} />
+            <CampoImpressao rotulo="Turma" valor={form.identificacaoEstudante.turma} />
+            <CampoImpressao rotulo="Turno" valor={form.identificacaoEstudante.turno} />
+            <CampoImpressao rotulo="Escola" valor={form.identificacaoEstudante.escola} span />
+            <CampoImpressao rotulo="Município" valor={form.identificacaoEstudante.municipio} />
+            <CampoImpressao
+              rotulo="Data do planejamento"
+              valor={formatarDataImpressao(form.identificacaoEstudante.dataPlanejamento)}
+            />
+            <CampoImpressao
+              rotulo="Período de vigência"
+              valor={form.identificacaoEstudante.periodoVigencia}
+            />
+            <CampoImpressao
+              rotulo="Professor(a) da sala comum"
+              valor={form.identificacaoEstudante.professorSalaComum}
+            />
+            <CampoImpressao
+              rotulo="Professor(a) do AEE"
+              valor={form.identificacaoEstudante.professorAee}
+            />
+            <CampoImpressao
+              rotulo="Profissional de apoio/mediador"
+              valor={form.identificacaoEstudante.profissionalApoio}
+              span
+            />
+            <CampoImpressao
+              rotulo="Condição do estudante / diagnóstico informado"
+              valor={form.identificacaoEstudante.condicaoDiagnostico}
+              span
+            />
+          </dl>
+        </section>
+
+        <section className="pei-print-section">
+          <h2>2. Participantes e articulação</h2>
+          <dl className="pei-print-grid">
+            <CampoImpressao
+              rotulo="Participantes envolvidos"
+              valor={form.participantesArticulacao.participantesEnvolvidos}
+              span
+            />
+            <CampoImpressao
+              rotulo="Estratégias colaborativas com o AEE"
+              valor={form.participantesArticulacao.estrategiasColaborativasAee}
+              span
+            />
+            <CampoImpressao
+              rotulo="Participação da família"
+              valor={form.participantesArticulacao.participacaoFamilia}
+              span
+            />
+            <CampoImpressao
+              rotulo="Participação do estudante"
+              valor={form.participantesArticulacao.participacaoEstudante}
+              span
+            />
+            <CampoImpressao
+              rotulo="Articulação com outros profissionais ou rede de apoio"
+              valor={form.participantesArticulacao.articulacaoOutrosProfissionais}
+              span
+            />
+          </dl>
+        </section>
+
+        <section className="pei-print-section">
+          <h2>3. Base pedagógica do PEI</h2>
+          <dl className="pei-print-grid">
+            <CampoImpressao
+              rotulo="Potencialidades do estudante"
+              valor={form.basePedagogica.potencialidades}
+              span
+            />
+            <CampoImpressao
+              rotulo="Barreiras de acesso ao currículo"
+              valor={form.basePedagogica.barreirasAcessoCurriculo}
+              span
+            />
+            <CampoImpressao
+              rotulo="Necessidades de apoio na sala comum"
+              valor={form.basePedagogica.necessidadesApoioSalaComum}
+              span
+            />
+            <CampoImpressao
+              rotulo="Resumo do Estudo de Caso/PAEE que orienta este PEI"
+              valor={form.basePedagogica.resumoEstudoCasoPaee}
+              span
+            />
+          </dl>
+        </section>
+
+        <section className="pei-print-section">
+          <h2>4. Planejamento curricular</h2>
+          <dl className="pei-print-grid">
+            <CampoImpressao
+              rotulo="Componente curricular/disciplina"
+              valor={form.planejamentoCurricular.componenteCurricular}
+            />
+            <CampoImpressao
+              rotulo="Período de trabalho"
+              valor={form.planejamentoCurricular.periodoTrabalho}
+            />
+            <CampoImpressao
+              rotulo="Conteúdo/objeto de conhecimento"
+              valor={form.planejamentoCurricular.objetoConhecimento}
+              span
+            />
+            <CampoImpressao
+              rotulo="Conceito central do conteúdo"
+              valor={form.planejamentoCurricular.conceitoCentral}
+              span
+            />
+          </dl>
+        </section>
+
+        <section className="pei-print-section">
+          <h2>5. Habilidades e objetos de conhecimento priorizados</h2>
+          {habilidadesParaImpressao.length ? (
+            habilidadesParaImpressao.map((item, indice) => (
+              <article key={`habilidade-impressao-${indice}`} className="pei-print-item">
+                <h3>Prioridade {indice + 1}</h3>
+                <dl className="pei-print-grid">
+                  <CampoImpressao rotulo="Habilidade priorizada" valor={item.habilidade} span />
+                  <CampoImpressao
+                    rotulo="Objeto de conhecimento priorizado"
+                    valor={item.objetoConhecimento}
+                    span
+                  />
+                  <CampoImpressao rotulo="Prazo de execução" valor={item.prazoExecucao} span />
+                </dl>
+              </article>
+            ))
+          ) : (
+            <p>Nenhuma habilidade priorizada registrada.</p>
+          )}
+        </section>
+
+        <section className="pei-print-section">
+          <h2>6. Objetivos e metas de aprendizagem</h2>
+          {objetivosParaImpressao.length ? (
+            objetivosParaImpressao.map((item, indice) => (
+              <article key={`objetivo-impressao-${indice}`} className="pei-print-item">
+                <h3>Objetivo {indice + 1}</h3>
+                <dl className="pei-print-grid">
+                  <CampoImpressao rotulo="Objetivo/meta" valor={item.objetivoMeta} span />
+                  <CampoImpressao
+                    rotulo="Resultado esperado"
+                    valor={item.resultadoEsperado}
+                    span
+                  />
+                  <CampoImpressao rotulo="Prioridade" valor={item.prioridade} />
+                  <CampoImpressao rotulo="Prazo" valor={item.prazo} />
+                </dl>
+              </article>
+            ))
+          ) : (
+            <p>Nenhum objetivo ou meta registrado.</p>
+          )}
+        </section>
+
+        <section className="pei-print-section">
+          <h2>7. Metodologias e propostas de atividades</h2>
+          <dl className="pei-print-grid">
+            <CampoImpressao
+              rotulo="Metodologias"
+              valor={form.metodologiasAtividades.metodologias}
+              span
+            />
+            <CampoImpressao
+              rotulo="Propostas de atividades"
+              valor={form.metodologiasAtividades.propostasAtividades}
+              span
+            />
+            <CampoImpressao
+              rotulo="Adaptações nas atividades"
+              valor={form.metodologiasAtividades.adaptacoesAtividades}
+              span
+            />
+            <CampoImpressao
+              rotulo="Organização da participação na sala comum"
+              valor={form.metodologiasAtividades.organizacaoParticipacaoSalaComum}
+              span
+            />
+          </dl>
+        </section>
+
+        <section className="pei-print-section">
+          <h2>8. Recursos, acessibilidade e apoios</h2>
+          <dl className="pei-print-grid">
+            <CampoImpressao
+              rotulo="Recursos utilizados"
+              valor={form.recursosAcessibilidadeApoios.recursosUtilizados}
+              span
+            />
+            <CampoImpressao
+              rotulo="Estratégias de acessibilidade curricular"
+              valor={form.recursosAcessibilidadeApoios.acessibilidadeCurricular}
+              span
+            />
+            <CampoImpressao
+              rotulo="Apoios necessários"
+              valor={form.recursosAcessibilidadeApoios.apoiosNecessarios}
+              span
+            />
+            <CampoImpressao
+              rotulo="Tecnologia assistiva ou comunicação alternativa"
+              valor={form.recursosAcessibilidadeApoios.tecnologiaAssistivaComunicacao}
+              span
+            />
+          </dl>
+        </section>
+
+        <section className="pei-print-section">
+          <h2>9. Formas de avaliação da aprendizagem</h2>
+          <dl className="pei-print-grid">
+            <CampoImpressao
+              rotulo="Estratégias de avaliação"
+              valor={form.avaliacaoAprendizagem.estrategiasAvaliacao}
+              span
+            />
+            <CampoImpressao
+              rotulo="Formas de demonstrar aprendizagem"
+              valor={form.avaliacaoAprendizagem.formasDemonstrarAprendizagem}
+              span
+            />
+            <CampoImpressao
+              rotulo="Critérios de observação"
+              valor={form.avaliacaoAprendizagem.criteriosObservacao}
+              span
+            />
+            <CampoImpressao
+              rotulo="Instrumentos/registros utilizados"
+              valor={form.avaliacaoAprendizagem.instrumentosRegistros}
+              span
+            />
+          </dl>
+        </section>
+
+        <section className="pei-print-section">
+          <h2>10. Acompanhamento: desafios e expectativas</h2>
+          <dl className="pei-print-grid">
+            <CampoImpressao
+              rotulo="Registros do processo"
+              valor={form.acompanhamentoRevisao.registrosProcesso}
+              span
+            />
+            <CampoImpressao
+              rotulo="Desafios encontrados"
+              valor={form.acompanhamentoRevisao.desafiosEncontrados}
+              span
+            />
+            <CampoImpressao
+              rotulo="Avanços observados"
+              valor={form.acompanhamentoRevisao.avancosObservados}
+              span
+            />
+            <CampoImpressao
+              rotulo="Expectativas para o próximo bimestre/período"
+              valor={form.acompanhamentoRevisao.expectativasProximoPeriodo}
+              span
+            />
+            <CampoImpressao
+              rotulo="Data prevista para revisão"
+              valor={formatarDataImpressao(form.acompanhamentoRevisao.dataPrevistaRevisao)}
+              span
+            />
+          </dl>
+        </section>
+
+        <section className="pei-print-section">
+          <h2>11. Encaminhamentos finais</h2>
+          <dl className="pei-print-grid">
+            <CampoImpressao
+              rotulo="Encaminhamentos para sala comum"
+              valor={form.encaminhamentosFinais.salaComum}
+              span
+            />
+            <CampoImpressao
+              rotulo="Encaminhamentos para o AEE"
+              valor={form.encaminhamentosFinais.aee}
+              span
+            />
+            <CampoImpressao
+              rotulo="Encaminhamentos para família"
+              valor={form.encaminhamentosFinais.familia}
+              span
+            />
+            <CampoImpressao
+              rotulo="Encaminhamentos para coordenação/gestão"
+              valor={form.encaminhamentosFinais.coordenacaoGestao}
+              span
+            />
+            <CampoImpressao
+              rotulo="Observações finais"
+              valor={form.encaminhamentosFinais.observacoesFinais}
+              span
+            />
+          </dl>
+        </section>
+
+        <footer className="pei-print-footer">
+          Documento preparado na Plataforma AEE Registro em{" "}
+          {formatarDataImpressao(obterDataAtualIsoLocal())}.
+        </footer>
+      </section>
     </main>
   );
 }
