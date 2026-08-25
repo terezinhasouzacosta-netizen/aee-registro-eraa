@@ -98,6 +98,7 @@ function criarFormularioInicial() {
     anoLetivo: "",
     periodoVigencia: "",
     statusGeral: "rascunho",
+    dataConclusao: null,
     identificacaoEstudante: {
       alunoCadastrado: "",
       nome: "",
@@ -305,7 +306,6 @@ function montarPayload(form, currentUser, incluirCriador = false) {
   };
 
   return {
-    ...dados,
     schemaVersao: 1,
     alunoId: dados.alunoId || "",
     alunoNome:
@@ -316,7 +316,19 @@ function montarPayload(form, currentUser, incluirCriador = false) {
     anoLetivo: dados.identificacaoEstudante.anoLetivo || dados.anoLetivo || "",
     periodoVigencia:
       dados.identificacaoEstudante.periodoVigencia || dados.periodoVigencia || "",
-    statusGeral: "rascunho",
+    statusGeral: dados.statusGeral || "rascunho",
+    dataConclusao: dados.dataConclusao || null,
+    identificacaoEstudante: dados.identificacaoEstudante,
+    participantesArticulacao: dados.participantesArticulacao,
+    basePedagogica: dados.basePedagogica,
+    planejamentoCurricular: dados.planejamentoCurricular,
+    habilidadesObjetosPriorizados: dados.habilidadesObjetosPriorizados,
+    objetivosMetas: dados.objetivosMetas,
+    metodologiasAtividades: dados.metodologiasAtividades,
+    recursosAcessibilidadeApoios: dados.recursosAcessibilidadeApoios,
+    avaliacaoAprendizagem: dados.avaliacaoAprendizagem,
+    acompanhamentoRevisao: dados.acompanhamentoRevisao,
+    encaminhamentosFinais: dados.encaminhamentosFinais,
     responsavelPreenchimento: usuario.nome,
     atualizadoPor: usuario,
     ...(incluirCriador ? { criadoPor: usuario } : {}),
@@ -363,8 +375,17 @@ function formatarDataLista(valor) {
 }
 
 function formatarStatus(statusGeral) {
-  const status = String(statusGeral || "rascunho").replaceAll("_", " ");
-  return status.charAt(0).toUpperCase() + status.slice(1);
+  const labels = {
+    rascunho: "Rascunho",
+    concluido: "Concluído",
+  };
+  return labels[statusGeral] || "Rascunho";
+}
+
+function obterDataAtualIsoLocal() {
+  const agora = new Date();
+  const dataLocal = new Date(agora.getTime() - agora.getTimezoneOffset() * 60 * 1000);
+  return dataLocal.toISOString().slice(0, 10);
 }
 
 function Campo({ id, label, placeholder, type = "text", className = "" }) {
@@ -449,6 +470,7 @@ function PEIPage() {
   const [carregandoLista, setCarregandoLista] = useState(false);
   const [abrindoPeiId, setAbrindoPeiId] = useState("");
   const [salvando, setSalvando] = useState(false);
+  const [concluindo, setConcluindo] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [aviso, setAviso] = useState("");
   const [erro, setErro] = useState("");
@@ -526,7 +548,7 @@ function PEIPage() {
 
   const handleSalvarRascunho = async (event) => {
     event.preventDefault();
-    if (salvando) return;
+    if (salvando || concluindo) return;
 
     if (!currentUser) {
       setErro("Não foi possível identificar o usuário para salvar o rascunho do PEI.");
@@ -568,8 +590,54 @@ function PEIPage() {
     setFeedback("Novo PEI iniciado.");
   };
 
+  const handleConcluirPei = async () => {
+    if (salvando || concluindo) return;
+
+    if (!currentUser) {
+      setErro("Não foi possível identificar o usuário para concluir o PEI.");
+      return;
+    }
+
+    const confirmou = window.confirm(
+      "Deseja concluir este PEI? Confira se as informações foram revisadas pela equipe pedagógica.",
+    );
+    if (!confirmou) return;
+
+    setConcluindo(true);
+    setFeedback("");
+    setAviso("");
+    setErro("");
+
+    try {
+      const formConcluido = {
+        ...form,
+        statusGeral: "concluido",
+        dataConclusao: obterDataAtualIsoLocal(),
+      };
+      const payload = montarPayload(formConcluido, currentUser, !peiId);
+      let idAtual = peiId;
+
+      if (idAtual) {
+        await atualizarPei(idAtual, payload);
+      } else {
+        idAtual = await criarPei(payload);
+        setPeiId(idAtual);
+        salvarPeiIdLocal(idAtual);
+      }
+
+      setForm(formConcluido);
+      setFeedback("PEI concluído com sucesso.");
+      await carregarPeisSalvos();
+    } catch (error) {
+      console.error("[PEIPage] Erro ao concluir PEI", error);
+      setErro("Não foi possível concluir o PEI. Tente novamente.");
+    } finally {
+      setConcluindo(false);
+    }
+  };
+
   const handleAbrirPei = async (id) => {
-    if (!id || abrindoPeiId || salvando) return;
+    if (!id || abrindoPeiId || salvando || concluindo) return;
 
     setAbrindoPeiId(id);
     setFeedback("");
@@ -673,7 +741,7 @@ function PEIPage() {
                         type="button"
                         className="btn-secondary pei-open-button"
                         onClick={() => handleAbrirPei(pei.id)}
-                        disabled={abrindoPeiId === pei.id || salvando}
+                        disabled={abrindoPeiId === pei.id || salvando || concluindo}
                       >
                         {abrindoPeiId === pei.id ? "Abrindo..." : "Abrir"}
                       </button>
@@ -1059,20 +1127,31 @@ function PEIPage() {
               permanecer aberto.
             </p>
           </div>
+          {form.statusGeral === "concluido" ? (
+            <div className="pei-concluido-note">
+              Este PEI está marcado como Concluído. As informações permanecem editáveis para
+              ajustes pedagógicos, se necessário.
+            </div>
+          ) : null}
           <div className="form-actions pei-future-actions">
-            <button type="submit" disabled={salvando}>
+            <button type="submit" disabled={salvando || concluindo}>
               {salvando ? "Salvando..." : "Salvar rascunho do PEI"}
             </button>
             <button
               type="button"
               className="btn-secondary"
               onClick={handleNovoPei}
-              disabled={salvando}
+              disabled={salvando || concluindo}
             >
               Novo PEI
             </button>
-            <button type="button" disabled title="Conclusão será implementada em fase posterior.">
-              Concluir PEI
+            <button
+              type="button"
+              className="pei-concluir-button"
+              onClick={handleConcluirPei}
+              disabled={salvando || concluindo || form.statusGeral === "concluido"}
+            >
+              {concluindo ? "Concluindo..." : "Concluir PEI"}
             </button>
             <button type="button" className="btn-secondary" disabled title="Impressão será implementada em fase posterior.">
               Imprimir PEI
@@ -1082,7 +1161,7 @@ function PEIPage() {
             {peiId
               ? "Este rascunho já possui um documento salvo e será atualizado pelo mesmo botão."
               : "O primeiro salvamento criará um novo documento na coleção peis."}
-            {" "}Conclusão e impressão permanecem como recursos futuros.
+            {" "}A impressão permanece como recurso futuro.
           </p>
         </section>
           </form>

@@ -2632,6 +2632,26 @@ textarea:focus {
   background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
 }
 
+.pei-page .pei-concluido-note {
+  border: 1px solid #86efac;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  background: #f0fdf4;
+  color: #166534;
+  font-weight: 600;
+}
+
+.pei-page .pei-concluir-button {
+  border-color: #1e40af;
+  background: #1e40af;
+  color: #ffffff;
+}
+
+.pei-page .pei-concluir-button:hover:not(:disabled) {
+  border-color: #1e3a8a;
+  background: #1e3a8a;
+}
+
 .pei-page .pei-future-actions {
   margin-top: 0;
 }
