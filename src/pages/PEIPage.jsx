@@ -1,3 +1,9 @@
+import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "../hooks/useAuth";
+import { atualizarPei, buscarPeiPorId, criarPei } from "../services/peisService";
+
+const PEI_RASCUNHO_ID_KEY = "peiRascunhoId";
+
 const PRAZOS_PRIORIZACAO = [
   "Curto prazo — 1 mês",
   "Médio prazo — 2 meses",
@@ -6,29 +12,382 @@ const PRAZOS_PRIORIZACAO = [
 
 const PRIORIDADES = ["Alta", "Média", "Baixa"];
 
+const PEIFormContext = createContext(null);
+
+const CAMINHOS_CAMPOS = {
+  "pei-aluno-cadastrado": ["identificacaoEstudante", "alunoCadastrado"],
+  "pei-nome-estudante": ["identificacaoEstudante", "nome"],
+  "pei-data-nascimento": ["identificacaoEstudante", "dataNascimento"],
+  "pei-idade": ["identificacaoEstudante", "idade"],
+  "pei-ano-letivo": ["identificacaoEstudante", "anoLetivo"],
+  "pei-serie": ["identificacaoEstudante", "serieAno"],
+  "pei-turma": ["identificacaoEstudante", "turma"],
+  "pei-turno": ["identificacaoEstudante", "turno"],
+  "pei-escola": ["identificacaoEstudante", "escola"],
+  "pei-municipio": ["identificacaoEstudante", "municipio"],
+  "pei-data-planejamento": ["identificacaoEstudante", "dataPlanejamento"],
+  "pei-periodo-vigencia": ["identificacaoEstudante", "periodoVigencia"],
+  "pei-professor-sala-comum": ["identificacaoEstudante", "professorSalaComum"],
+  "pei-professor-aee": ["identificacaoEstudante", "professorAee"],
+  "pei-profissional-apoio": ["identificacaoEstudante", "profissionalApoio"],
+  "pei-condicao-estudante": ["identificacaoEstudante", "condicaoDiagnostico"],
+  "pei-participantes": ["participantesArticulacao", "participantesEnvolvidos"],
+  "pei-estrategias-colaborativas": ["participantesArticulacao", "estrategiasColaborativasAee"],
+  "pei-participacao-familia": ["participantesArticulacao", "participacaoFamilia"],
+  "pei-participacao-estudante": ["participantesArticulacao", "participacaoEstudante"],
+  "pei-articulacao-profissionais": ["participantesArticulacao", "articulacaoOutrosProfissionais"],
+  "pei-potencialidades": ["basePedagogica", "potencialidades"],
+  "pei-barreiras": ["basePedagogica", "barreirasAcessoCurriculo"],
+  "pei-necessidades-apoio": ["basePedagogica", "necessidadesApoioSalaComum"],
+  "pei-resumo-estudo-paee": ["basePedagogica", "resumoEstudoCasoPaee"],
+  "pei-componente-curricular": ["planejamentoCurricular", "componenteCurricular"],
+  "pei-periodo-trabalho": ["planejamentoCurricular", "periodoTrabalho"],
+  "pei-objeto-conhecimento": ["planejamentoCurricular", "objetoConhecimento"],
+  "pei-conceito-central": ["planejamentoCurricular", "conceitoCentral"],
+  "pei-metodologias": ["metodologiasAtividades", "metodologias"],
+  "pei-propostas-atividades": ["metodologiasAtividades", "propostasAtividades"],
+  "pei-adaptacoes-atividades": ["metodologiasAtividades", "adaptacoesAtividades"],
+  "pei-organizacao-participacao": ["metodologiasAtividades", "organizacaoParticipacaoSalaComum"],
+  "pei-recursos-utilizados": ["recursosAcessibilidadeApoios", "recursosUtilizados"],
+  "pei-acessibilidade-curricular": ["recursosAcessibilidadeApoios", "acessibilidadeCurricular"],
+  "pei-apoios-necessarios": ["recursosAcessibilidadeApoios", "apoiosNecessarios"],
+  "pei-tecnologia-assistiva": ["recursosAcessibilidadeApoios", "tecnologiaAssistivaComunicacao"],
+  "pei-estrategias-avaliacao": ["avaliacaoAprendizagem", "estrategiasAvaliacao"],
+  "pei-formas-demonstrar": ["avaliacaoAprendizagem", "formasDemonstrarAprendizagem"],
+  "pei-criterios-observacao": ["avaliacaoAprendizagem", "criteriosObservacao"],
+  "pei-instrumentos-registros": ["avaliacaoAprendizagem", "instrumentosRegistros"],
+  "pei-registros-processo": ["acompanhamentoRevisao", "registrosProcesso"],
+  "pei-desafios": ["acompanhamentoRevisao", "desafiosEncontrados"],
+  "pei-avancos": ["acompanhamentoRevisao", "avancosObservados"],
+  "pei-expectativas": ["acompanhamentoRevisao", "expectativasProximoPeriodo"],
+  "pei-data-revisao": ["acompanhamentoRevisao", "dataPrevistaRevisao"],
+  "pei-encaminhamentos-sala": ["encaminhamentosFinais", "salaComum"],
+  "pei-encaminhamentos-aee": ["encaminhamentosFinais", "aee"],
+  "pei-encaminhamentos-familia": ["encaminhamentosFinais", "familia"],
+  "pei-encaminhamentos-gestao": ["encaminhamentosFinais", "coordenacaoGestao"],
+  "pei-observacoes-finais": ["encaminhamentosFinais", "observacoesFinais"],
+};
+
+function criarHabilidadesPriorizadas() {
+  return Array.from({ length: 3 }, () => ({
+    habilidade: "",
+    objetoConhecimento: "",
+    prazoExecucao: "",
+  }));
+}
+
+function criarObjetivosMetas() {
+  return Array.from({ length: 3 }, () => ({
+    objetivoMeta: "",
+    resultadoEsperado: "",
+    prioridade: "",
+    prazo: "",
+  }));
+}
+
+function criarFormularioInicial() {
+  return {
+    schemaVersao: 1,
+    alunoId: "",
+    alunoNome: "",
+    anoLetivo: "",
+    periodoVigencia: "",
+    statusGeral: "rascunho",
+    identificacaoEstudante: {
+      alunoCadastrado: "",
+      nome: "",
+      dataNascimento: "",
+      idade: "",
+      anoLetivo: "",
+      serieAno: "",
+      turma: "",
+      turno: "",
+      escola: "",
+      municipio: "",
+      dataPlanejamento: "",
+      periodoVigencia: "",
+      professorSalaComum: "",
+      professorAee: "",
+      profissionalApoio: "",
+      condicaoDiagnostico: "",
+    },
+    participantesArticulacao: {
+      participantesEnvolvidos: "",
+      estrategiasColaborativasAee: "",
+      participacaoFamilia: "",
+      participacaoEstudante: "",
+      articulacaoOutrosProfissionais: "",
+    },
+    basePedagogica: {
+      potencialidades: "",
+      barreirasAcessoCurriculo: "",
+      necessidadesApoioSalaComum: "",
+      resumoEstudoCasoPaee: "",
+    },
+    planejamentoCurricular: {
+      componenteCurricular: "",
+      objetoConhecimento: "",
+      conceitoCentral: "",
+      periodoTrabalho: "",
+    },
+    habilidadesObjetosPriorizados: criarHabilidadesPriorizadas(),
+    objetivosMetas: criarObjetivosMetas(),
+    metodologiasAtividades: {
+      metodologias: "",
+      propostasAtividades: "",
+      adaptacoesAtividades: "",
+      organizacaoParticipacaoSalaComum: "",
+    },
+    recursosAcessibilidadeApoios: {
+      recursosUtilizados: "",
+      acessibilidadeCurricular: "",
+      apoiosNecessarios: "",
+      tecnologiaAssistivaComunicacao: "",
+    },
+    avaliacaoAprendizagem: {
+      estrategiasAvaliacao: "",
+      formasDemonstrarAprendizagem: "",
+      criteriosObservacao: "",
+      instrumentosRegistros: "",
+    },
+    acompanhamentoRevisao: {
+      registrosProcesso: "",
+      desafiosEncontrados: "",
+      avancosObservados: "",
+      expectativasProximoPeriodo: "",
+      dataPrevistaRevisao: "",
+    },
+    encaminhamentosFinais: {
+      salaComum: "",
+      aee: "",
+      familia: "",
+      coordenacaoGestao: "",
+      observacoesFinais: "",
+    },
+  };
+}
+
+function resolverCaminhoCampo(id) {
+  if (CAMINHOS_CAMPOS[id]) return CAMINHOS_CAMPOS[id];
+
+  const habilidadePriorizada = id.match(
+    /^pei-(habilidade-priorizada|objeto-priorizado|prazo-prioridade)-(\d+)$/,
+  );
+  if (habilidadePriorizada) {
+    const campos = {
+      "habilidade-priorizada": "habilidade",
+      "objeto-priorizado": "objetoConhecimento",
+      "prazo-prioridade": "prazoExecucao",
+    };
+    return [
+      "habilidadesObjetosPriorizados",
+      Number(habilidadePriorizada[2]) - 1,
+      campos[habilidadePriorizada[1]],
+    ];
+  }
+
+  const objetivo = id.match(
+    /^pei-(objetivo|resultado|prioridade-objetivo|prazo-objetivo)-(\d+)$/,
+  );
+  if (objetivo) {
+    const campos = {
+      objetivo: "objetivoMeta",
+      resultado: "resultadoEsperado",
+      "prioridade-objetivo": "prioridade",
+      "prazo-objetivo": "prazo",
+    };
+    return ["objetivosMetas", Number(objetivo[2]) - 1, campos[objetivo[1]]];
+  }
+
+  return null;
+}
+
+function obterValorNoCaminho(objeto, caminho) {
+  return caminho?.reduce((valorAtual, chave) => valorAtual?.[chave], objeto) ?? "";
+}
+
+function atualizarValorNoCaminho(objeto, caminho, valor) {
+  const [chaveAtual, ...restante] = caminho;
+  const copia = Array.isArray(objeto) ? [...objeto] : { ...objeto };
+
+  if (restante.length === 0) {
+    copia[chaveAtual] = valor;
+    return copia;
+  }
+
+  const proximoValor = objeto?.[chaveAtual] ?? (typeof restante[0] === "number" ? [] : {});
+  copia[chaveAtual] = atualizarValorNoCaminho(proximoValor, restante, valor);
+  return copia;
+}
+
+function normalizarLista(listaSalva, listaInicial) {
+  const itensSalvos = Array.isArray(listaSalva) ? listaSalva : [];
+  return listaInicial.map((itemInicial, indice) => ({
+    ...itemInicial,
+    ...(itensSalvos[indice] || {}),
+  }));
+}
+
+function normalizarPeiParaFormulario(pei) {
+  const inicial = criarFormularioInicial();
+  return {
+    ...inicial,
+    ...pei,
+    identificacaoEstudante: {
+      ...inicial.identificacaoEstudante,
+      ...(pei?.identificacaoEstudante || {}),
+    },
+    participantesArticulacao: {
+      ...inicial.participantesArticulacao,
+      ...(pei?.participantesArticulacao || {}),
+    },
+    basePedagogica: {
+      ...inicial.basePedagogica,
+      ...(pei?.basePedagogica || {}),
+    },
+    planejamentoCurricular: {
+      ...inicial.planejamentoCurricular,
+      ...(pei?.planejamentoCurricular || {}),
+    },
+    habilidadesObjetosPriorizados: normalizarLista(
+      pei?.habilidadesObjetosPriorizados,
+      inicial.habilidadesObjetosPriorizados,
+    ),
+    objetivosMetas: normalizarLista(pei?.objetivosMetas, inicial.objetivosMetas),
+    metodologiasAtividades: {
+      ...inicial.metodologiasAtividades,
+      ...(pei?.metodologiasAtividades || {}),
+    },
+    recursosAcessibilidadeApoios: {
+      ...inicial.recursosAcessibilidadeApoios,
+      ...(pei?.recursosAcessibilidadeApoios || {}),
+    },
+    avaliacaoAprendizagem: {
+      ...inicial.avaliacaoAprendizagem,
+      ...(pei?.avaliacaoAprendizagem || {}),
+    },
+    acompanhamentoRevisao: {
+      ...inicial.acompanhamentoRevisao,
+      ...(pei?.acompanhamentoRevisao || {}),
+    },
+    encaminhamentosFinais: {
+      ...inicial.encaminhamentosFinais,
+      ...(pei?.encaminhamentosFinais || {}),
+    },
+  };
+}
+
+function normalizarStringsProfundamente(valor) {
+  if (typeof valor === "string") return valor.trim();
+  if (Array.isArray(valor)) return valor.map(normalizarStringsProfundamente);
+  if (valor && typeof valor === "object") {
+    return Object.fromEntries(
+      Object.entries(valor).map(([chave, item]) => [
+        chave,
+        normalizarStringsProfundamente(item),
+      ]),
+    );
+  }
+  return valor;
+}
+
+function montarPayload(form, currentUser, incluirCriador = false) {
+  const dados = normalizarStringsProfundamente(form);
+  const usuario = {
+    uid: currentUser?.uid || "",
+    nome: currentUser?.displayName || currentUser?.email || "",
+    email: currentUser?.email || "",
+  };
+
+  return {
+    ...dados,
+    schemaVersao: 1,
+    alunoId: dados.alunoId || "",
+    alunoNome:
+      dados.identificacaoEstudante.nome ||
+      dados.identificacaoEstudante.alunoCadastrado ||
+      dados.alunoNome ||
+      "",
+    anoLetivo: dados.identificacaoEstudante.anoLetivo || dados.anoLetivo || "",
+    periodoVigencia:
+      dados.identificacaoEstudante.periodoVigencia || dados.periodoVigencia || "",
+    statusGeral: "rascunho",
+    responsavelPreenchimento: usuario.nome,
+    atualizadoPor: usuario,
+    ...(incluirCriador ? { criadoPor: usuario } : {}),
+  };
+}
+
+function salvarPeiIdLocal(peiId) {
+  try {
+    window.localStorage.setItem(PEI_RASCUNHO_ID_KEY, peiId);
+  } catch (error) {
+    console.warn("[PEIPage] Não foi possível salvar o id local do PEI.", error);
+  }
+}
+
+function lerPeiIdLocal() {
+  try {
+    return window.localStorage.getItem(PEI_RASCUNHO_ID_KEY) || "";
+  } catch (error) {
+    console.warn("[PEIPage] Não foi possível ler o id local do PEI.", error);
+    return "";
+  }
+}
+
+function removerPeiIdLocal() {
+  try {
+    window.localStorage.removeItem(PEI_RASCUNHO_ID_KEY);
+  } catch (error) {
+    console.warn("[PEIPage] Não foi possível remover o id local do PEI.", error);
+  }
+}
+
 function Campo({ id, label, placeholder, type = "text", className = "" }) {
+  const contexto = useContext(PEIFormContext);
   return (
     <div className={className}>
       <label htmlFor={id}>{label}</label>
-      <input id={id} name={id} type={type} placeholder={placeholder} />
+      <input
+        id={id}
+        name={id}
+        type={type}
+        placeholder={placeholder}
+        value={contexto.obterValor(id)}
+        onChange={(event) => contexto.atualizarCampo(id, event.target.value)}
+      />
     </div>
   );
 }
 
 function CampoTexto({ id, label, placeholder, rows = 4, className = "pei-field-span-2" }) {
+  const contexto = useContext(PEIFormContext);
   return (
     <div className={className}>
       <label htmlFor={id}>{label}</label>
-      <textarea id={id} name={id} rows={rows} placeholder={placeholder} />
+      <textarea
+        id={id}
+        name={id}
+        rows={rows}
+        placeholder={placeholder}
+        value={contexto.obterValor(id)}
+        onChange={(event) => contexto.atualizarCampo(id, event.target.value)}
+      />
     </div>
   );
 }
 
 function CampoSelect({ id, label, placeholder, options, className = "" }) {
+  const contexto = useContext(PEIFormContext);
   return (
     <div className={className}>
       <label htmlFor={id}>{label}</label>
-      <select id={id} name={id} defaultValue="">
+      <select
+        id={id}
+        name={id}
+        value={contexto.obterValor(id)}
+        onChange={(event) => contexto.atualizarCampo(id, event.target.value)}
+      >
         <option value="" disabled>
           {placeholder}
         </option>
@@ -58,6 +417,114 @@ function BlocoPEI({ numero, titulo, descricao, children }) {
 }
 
 function PEIPage() {
+  const { currentUser } = useAuth();
+  const [form, setForm] = useState(criarFormularioInicial);
+  const [peiId, setPeiId] = useState("");
+  const [carregando, setCarregando] = useState(true);
+  const [salvando, setSalvando] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [aviso, setAviso] = useState("");
+  const [erro, setErro] = useState("");
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarRascunhoAnterior() {
+      setCarregando(true);
+      setErro("");
+      const rascunhoId = lerPeiIdLocal();
+
+      if (!rascunhoId) {
+        if (ativo) setCarregando(false);
+        return;
+      }
+
+      try {
+        const peiSalvo = await buscarPeiPorId(rascunhoId);
+        if (!ativo) return;
+
+        if (!peiSalvo) {
+          removerPeiIdLocal();
+          setPeiId("");
+          setForm(criarFormularioInicial());
+          setAviso("Não foi possível carregar o rascunho anterior do PEI.");
+          return;
+        }
+
+        setForm(normalizarPeiParaFormulario(peiSalvo));
+        setPeiId(peiSalvo.id || rascunhoId);
+        setAviso("Rascunho anterior do PEI carregado.");
+      } catch (error) {
+        console.error("[PEIPage] Erro ao carregar rascunho anterior", error);
+        if (ativo) {
+          removerPeiIdLocal();
+          setPeiId("");
+          setForm(criarFormularioInicial());
+          setAviso("Não foi possível carregar o rascunho anterior do PEI.");
+        }
+      } finally {
+        if (ativo) setCarregando(false);
+      }
+    }
+
+    carregarRascunhoAnterior();
+
+    return () => {
+      ativo = false;
+    };
+  }, [currentUser?.uid]);
+
+  const obterValor = (id) => obterValorNoCaminho(form, resolverCaminhoCampo(id));
+
+  const atualizarCampo = (id, valor) => {
+    const caminho = resolverCaminhoCampo(id);
+    if (!caminho) return;
+    setForm((estadoAtual) => atualizarValorNoCaminho(estadoAtual, caminho, valor));
+  };
+
+  const handleSalvarRascunho = async (event) => {
+    event.preventDefault();
+    if (salvando) return;
+
+    if (!currentUser) {
+      setErro("Não foi possível identificar o usuário para salvar o rascunho do PEI.");
+      return;
+    }
+
+    setSalvando(true);
+    setFeedback("");
+    setAviso("");
+    setErro("");
+
+    try {
+      const payload = montarPayload(form, currentUser, !peiId);
+
+      if (peiId) {
+        await atualizarPei(peiId, payload);
+      } else {
+        const novoPeiId = await criarPei(payload);
+        setPeiId(novoPeiId);
+        salvarPeiIdLocal(novoPeiId);
+      }
+
+      setFeedback("Rascunho do PEI salvo com sucesso.");
+    } catch (error) {
+      console.error("[PEIPage] Erro ao salvar rascunho", error);
+      setErro("Não foi possível salvar o rascunho do PEI. Tente novamente.");
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  const handleNovoPei = () => {
+    setForm(criarFormularioInicial());
+    setPeiId("");
+    removerPeiIdLocal();
+    setErro("");
+    setAviso("");
+    setFeedback("Novo PEI iniciado.");
+  };
+
   return (
     <main className="alunos-page module-page pei-page">
       <header className="page-header">
@@ -72,11 +539,21 @@ function PEIPage() {
       </header>
 
       <div className="pei-note">
-        Nesta etapa, o PEI ainda é uma estrutura visual de preenchimento. O salvamento será
-        implementado em fase posterior.
+        Nesta etapa, o PEI pode ser preenchido e salvo como rascunho. Conclusão e impressão
+        serão implementadas em fases posteriores.
       </div>
 
-      <div className="pei-form">
+      {feedback ? <p className="toast-success">{feedback}</p> : null}
+      {erro ? <p className="toast-error">{erro}</p> : null}
+      {aviso ? <div className="pei-note">{aviso}</div> : null}
+
+      {carregando ? (
+        <section className="panel">
+          <p>Carregando PEI...</p>
+        </section>
+      ) : (
+        <PEIFormContext.Provider value={{ obterValor, atualizarCampo }}>
+          <form className="pei-form" onSubmit={handleSalvarRascunho}>
         <BlocoPEI
           numero="1"
           titulo="Identificação do estudante"
@@ -437,14 +914,20 @@ function PEIPage() {
           <div>
             <h2>Próximas ações</h2>
             <p className="muted">
-              Os botões abaixo são apenas visuais nesta fase e não salvam nem enviam dados.
+              O rascunho atual será atualizado nos próximos salvamentos enquanto este PEI
+              permanecer aberto.
             </p>
           </div>
           <div className="form-actions pei-future-actions">
-            <button type="button" disabled title="Salvamento será implementado em fase posterior.">
-              Salvar rascunho do PEI
+            <button type="submit" disabled={salvando}>
+              {salvando ? "Salvando..." : "Salvar rascunho do PEI"}
             </button>
-            <button type="button" className="btn-secondary" disabled>
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={handleNovoPei}
+              disabled={salvando}
+            >
               Novo PEI
             </button>
             <button type="button" disabled title="Conclusão será implementada em fase posterior.">
@@ -455,10 +938,15 @@ function PEIPage() {
             </button>
           </div>
           <p className="pei-future-note">
-            Salvamento, conclusão e impressão serão implementados em fases posteriores.
+            {peiId
+              ? "Este rascunho já possui um documento salvo e será atualizado pelo mesmo botão."
+              : "O primeiro salvamento criará um novo documento na coleção peis."}
+            {" "}Conclusão e impressão permanecem como recursos futuros.
           </p>
         </section>
-      </div>
+          </form>
+        </PEIFormContext.Provider>
+      )}
     </main>
   );
 }
