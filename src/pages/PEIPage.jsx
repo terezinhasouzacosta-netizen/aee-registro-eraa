@@ -1,6 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { listarAlunos } from "../services/alunosService";
+import {
+  listarAtendimentosAEE,
+  listarAtendimentosAEEPorNome,
+} from "../services/atendimentoAeeService";
 import {
   atualizarPei,
   buscarPeiPorId,
@@ -574,6 +578,110 @@ function BlocoPEI({ numero, titulo, descricao, children }) {
   );
 }
 
+function converterDataAtendimento(valor) {
+  if (!valor) return null;
+  if (valor?.toDate) return valor.toDate();
+
+  const texto = String(valor).trim();
+  const data = /^\d{4}-\d{2}-\d{2}$/.test(texto)
+    ? new Date(`${texto}T12:00:00`)
+    : new Date(texto);
+  return Number.isNaN(data.getTime()) ? null : data;
+}
+
+function separarHabilidadesTexto(valor) {
+  return String(valor || "")
+    .replace(/Selecionadas:\s*/gi, "")
+    .replace(/Complementa(?:ção|ções):\s*/gi, "")
+    .split(/[;|\n]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function extrairHabilidadesAtendimento(atendimento) {
+  const selecionadas = Array.isArray(atendimento?.habilidadesSelecionadas)
+    ? atendimento.habilidadesSelecionadas.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+  const complementares = separarHabilidadesTexto(atendimento?.habilidadesComplementares);
+
+  if (selecionadas.length || complementares.length) {
+    return [...new Set([...selecionadas, ...complementares])];
+  }
+
+  return [...new Set(separarHabilidadesTexto(atendimento?.habilidadesTrabalhadas))];
+}
+
+function obterMaisFrequentes(valores, limite) {
+  const mapa = new Map();
+
+  valores
+    .map((valor) => String(valor || "").trim())
+    .filter(Boolean)
+    .forEach((texto) => {
+      const chave = texto.toLocaleLowerCase("pt-BR");
+      const atual = mapa.get(chave) || { texto, quantidade: 0 };
+      atual.quantidade += 1;
+      mapa.set(chave, atual);
+    });
+
+  return [...mapa.values()]
+    .sort((a, b) => b.quantidade - a.quantidade || a.texto.localeCompare(b.texto, "pt-BR"))
+    .slice(0, limite);
+}
+
+function criarResumoEvolucaoAtendimentos(registros) {
+  const ordenados = [...registros].sort((a, b) => {
+    const dataA = converterDataAtendimento(a.dataAtendimento)?.getTime() || 0;
+    const dataB = converterDataAtendimento(b.dataAtendimento)?.getTime() || 0;
+    return dataB - dataA;
+  });
+
+  return {
+    total: ordenados.length,
+    ultimoAtendimento: ordenados[0]?.dataAtendimento || "",
+    eixoMaisTrabalhado: obterMaisFrequentes(
+      ordenados.map((item) => item.eixoTematico),
+      1,
+    )[0] || null,
+    habilidadesMaisTrabalhadas: obterMaisFrequentes(
+      ordenados.flatMap(extrairHabilidadesAtendimento),
+      5,
+    ),
+    dificuldadesFrequentes: obterMaisFrequentes(
+      ordenados.map((item) => item.dificuldadesObservadas),
+      3,
+    ),
+    avancosFrequentes: obterMaisFrequentes(
+      ordenados.map((item) => item.avancosPercebidos),
+      3,
+    ),
+    ultimosEncaminhamentos: ordenados
+      .filter((item) => String(item.encaminhamentos || "").trim())
+      .slice(0, 3)
+      .map((item) => ({
+        data: item.dataAtendimento,
+        texto: String(item.encaminhamentos).trim(),
+      })),
+  };
+}
+
+function ListaEvolucao({ itens, rotuloQuantidade = "registro" }) {
+  if (!itens.length) return <p className="muted">Não informado.</p>;
+
+  return (
+    <ul style={{ margin: 0, paddingLeft: "1.15rem", lineHeight: 1.55 }}>
+      {itens.map((item) => (
+        <li key={item.texto}>
+          {item.texto}
+          {item.quantidade > 1
+            ? ` (${item.quantidade} ${rotuloQuantidade}${item.quantidade === 1 ? "" : "s"})`
+            : ""}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function PEIPage() {
   const { currentUser } = useAuth();
   const [form, setForm] = useState(criarFormularioInicial);
@@ -588,6 +696,19 @@ function PEIPage() {
   const [feedback, setFeedback] = useState("");
   const [aviso, setAviso] = useState("");
   const [erro, setErro] = useState("");
+  const [atendimentosAee, setAtendimentosAee] = useState([]);
+  const [carregandoEvolucao, setCarregandoEvolucao] = useState(false);
+  const [erroEvolucao, setErroEvolucao] = useState("");
+
+  const alunoNomeEvolucao =
+    form.alunoNome ||
+    form.identificacaoEstudante.nome ||
+    form.identificacaoEstudante.alunoCadastrado ||
+    "";
+  const resumoEvolucao = useMemo(
+    () => criarResumoEvolucaoAtendimentos(atendimentosAee),
+    [atendimentosAee],
+  );
 
   const carregarPeisSalvos = async () => {
     setCarregandoLista(true);
@@ -661,6 +782,49 @@ function PEIPage() {
       ativo = false;
     };
   }, [currentUser?.uid]);
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarEvolucaoAtendimentos() {
+      const alunoId = String(form.alunoId || "").trim();
+      const alunoNome = String(alunoNomeEvolucao || "").trim();
+
+      if (!currentUser || !alunoId) {
+        setAtendimentosAee([]);
+        setErroEvolucao("");
+        setCarregandoEvolucao(false);
+        return;
+      }
+
+      setCarregandoEvolucao(true);
+      setErroEvolucao("");
+
+      try {
+        let registros = await listarAtendimentosAEE({ alunoId });
+
+        if (registros.length === 0 && alunoNome) {
+          registros = await listarAtendimentosAEEPorNome({ alunoId, alunoNome });
+        }
+
+        if (ativo) setAtendimentosAee(registros);
+      } catch (error) {
+        console.error("[PEIPage] Erro ao carregar evolução do Atendimento AEE", error);
+        if (ativo) {
+          setAtendimentosAee([]);
+          setErroEvolucao("Não foi possível carregar a evolução baseada nos atendimentos.");
+        }
+      } finally {
+        if (ativo) setCarregandoEvolucao(false);
+      }
+    }
+
+    carregarEvolucaoAtendimentos();
+
+    return () => {
+      ativo = false;
+    };
+  }, [currentUser, form.alunoId, alunoNomeEvolucao]);
 
   const obterValor = (id) => obterValorNoCaminho(form, resolverCaminhoCampo(id));
 
@@ -1033,6 +1197,98 @@ function PEIPage() {
             />
           </div>
         </BlocoPEI>
+
+        <section className="panel pei-card" aria-labelledby="pei-evolucao-atendimentos-titulo">
+          <div className="pei-card-header">
+            <span className="pei-card-index" aria-hidden="true">↗</span>
+            <div>
+              <h2 id="pei-evolucao-atendimentos-titulo">Evolução baseada nos atendimentos</h2>
+              <p className="muted">
+                Consulta automática dos registros existentes no Atendimento AEE. Estas informações
+                não alteram o preenchimento do PEI.
+              </p>
+            </div>
+          </div>
+
+          {!form.alunoId ? (
+            <p className="pei-empty-state">
+              Selecione um estudante cadastrado para consultar sua evolução pedagógica.
+            </p>
+          ) : null}
+
+          {form.alunoId && carregandoEvolucao ? (
+            <p className="muted">Carregando evolução dos atendimentos...</p>
+          ) : null}
+
+          {form.alunoId && erroEvolucao ? <p className="toast-error">{erroEvolucao}</p> : null}
+
+          {form.alunoId && !carregandoEvolucao && !erroEvolucao && resumoEvolucao.total === 0 ? (
+            <p className="pei-empty-state">
+              Este aluno ainda não possui registros de Atendimento AEE.
+            </p>
+          ) : null}
+
+          {form.alunoId && !carregandoEvolucao && !erroEvolucao && resumoEvolucao.total > 0 ? (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                gap: "0.85rem",
+              }}
+            >
+              <article style={{ padding: "1rem", border: "1px solid #dbe5f0", borderRadius: "12px", background: "#fff" }}>
+                <strong>Total de atendimentos realizados</strong>
+                <p style={{ margin: "0.55rem 0 0", fontSize: "1.35rem", color: "#1d4ed8" }}>
+                  {resumoEvolucao.total}
+                </p>
+              </article>
+              <article style={{ padding: "1rem", border: "1px solid #dbe5f0", borderRadius: "12px", background: "#fff" }}>
+                <strong>Data do último atendimento</strong>
+                <p style={{ margin: "0.55rem 0 0" }}>
+                  {formatarDataImpressao(resumoEvolucao.ultimoAtendimento)}
+                </p>
+              </article>
+              <article style={{ padding: "1rem", border: "1px solid #dbe5f0", borderRadius: "12px", background: "#fff" }}>
+                <strong>Eixo temático mais trabalhado</strong>
+                <p style={{ margin: "0.55rem 0 0" }}>
+                  {resumoEvolucao.eixoMaisTrabalhado?.texto || "Não informado"}
+                </p>
+              </article>
+              <article style={{ padding: "1rem", border: "1px solid #dbe5f0", borderRadius: "12px", background: "#fff" }}>
+                <strong>Habilidades mais trabalhadas</strong>
+                <div style={{ marginTop: "0.55rem" }}>
+                  <ListaEvolucao itens={resumoEvolucao.habilidadesMaisTrabalhadas} rotuloQuantidade="atendimento" />
+                </div>
+              </article>
+              <article style={{ gridColumn: "1 / -1", padding: "1rem", border: "1px solid #dbe5f0", borderRadius: "12px", background: "#fff" }}>
+                <strong>Dificuldades observadas com maior frequência</strong>
+                <div style={{ marginTop: "0.55rem" }}>
+                  <ListaEvolucao itens={resumoEvolucao.dificuldadesFrequentes} />
+                </div>
+              </article>
+              <article style={{ gridColumn: "1 / -1", padding: "1rem", border: "1px solid #dbe5f0", borderRadius: "12px", background: "#fff" }}>
+                <strong>Avanços percebidos com maior frequência</strong>
+                <div style={{ marginTop: "0.55rem" }}>
+                  <ListaEvolucao itens={resumoEvolucao.avancosFrequentes} />
+                </div>
+              </article>
+              <article style={{ gridColumn: "1 / -1", padding: "1rem", border: "1px solid #dbe5f0", borderRadius: "12px", background: "#fff" }}>
+                <strong>Últimos encaminhamentos registrados</strong>
+                {resumoEvolucao.ultimosEncaminhamentos.length ? (
+                  <ul style={{ margin: "0.55rem 0 0", paddingLeft: "1.15rem", lineHeight: 1.55 }}>
+                    {resumoEvolucao.ultimosEncaminhamentos.map((item, index) => (
+                      <li key={`${item.data}-${index}`}>
+                        <strong>{formatarDataImpressao(item.data)}:</strong> {item.texto}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="muted">Não informado.</p>
+                )}
+              </article>
+            </div>
+          ) : null}
+        </section>
 
         <BlocoPEI numero="2" titulo="Participantes e articulação">
           <div className="pei-fields-grid">
