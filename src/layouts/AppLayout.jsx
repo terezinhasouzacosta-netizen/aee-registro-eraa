@@ -1,6 +1,7 @@
 ﻿import { useEffect } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import aeeRegistroLogo from "../assets/aee-registro-logo.png";
 import {
   podeAcessarAcompanhamento,
   podeVisualizarAtendimentoAEE,
@@ -342,20 +343,17 @@ function AppLayout() {
       }}
     >
       <aside className="app-sidebar">
-        <h2 className="sidebar-title">AEE Registro</h2>
+        <div className="sidebar-brand">
+          <img
+            src={aeeRegistroLogo}
+            alt="Logo AEE Registro"
+            className="sidebar-logo-img"
+          />
+          <p className="sidebar-brand-slogan">
+            Acolher • Planejar • Acompanhar • Incluir
+          </p>
+        </div>
         <nav className="sidebar-nav">
-          <div className="sidebar-escola">
-            <img
-              src="/logo-eraa.jpg"
-              alt="Logo da Escola Raimundo Augusto de Araújo"
-              className="sidebar-escola-logo"
-            />
-            <div className="sidebar-escola-textos">
-              <p className="sidebar-escola-nome">Escola Raimundo Augusto de Araújo</p>
-              <p className="sidebar-escola-slogan">Educação Inclusiva e Ensino de Qualidade</p>
-            </div>
-          </div>
-
           <div className="sidebar-section">
             <p className="sidebar-section-title">
               <span className="sidebar-section-icon" aria-hidden="true">🏠</span>
