@@ -1822,6 +1822,11 @@ function AcompanhamentoPage() {
 
             <section className="form-section">
               <h3>Marcadores de intervenção</h3>
+              <p className="tab-helper-text">
+                Marque as intervenções realizadas durante o bimestre. Esses marcadores ajudam a
+                identificar os apoios oferecidos ao estudante e devem ser complementados nas
+                observações do professor.
+              </p>
               <div className="checkbox-group">
                 {MARCADORES_INTERVENCAO_OPCOES.map((marcador) => (
                   <label key={marcador} className="checkbox-item">
