@@ -220,11 +220,6 @@ function PEIPage() {
               label="Conceito central do conteúdo"
               placeholder="Explique qual é a ideia principal que o estudante precisa compreender sobre esse conteúdo."
             />
-            <CampoTexto
-              id="pei-habilidade-bncc"
-              label="Habilidade/BNCC de referência"
-              placeholder="Informe a habilidade da BNCC ou objetivo curricular de referência, quando disponível."
-            />
           </div>
         </BlocoPEI>
 
