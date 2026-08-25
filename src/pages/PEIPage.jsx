@@ -1,6 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { atualizarPei, buscarPeiPorId, criarPei } from "../services/peisService";
+import {
+  atualizarPei,
+  buscarPeiPorId,
+  criarPei,
+  listarPeis,
+} from "../services/peisService";
 
 const PEI_RASCUNHO_ID_KEY = "peiRascunhoId";
 
@@ -343,6 +348,25 @@ function removerPeiIdLocal() {
   }
 }
 
+function formatarDataLista(valor) {
+  if (!valor) return "-";
+  const data = valor?.toDate ? valor.toDate() : new Date(valor);
+  if (Number.isNaN(data.getTime())) return "-";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(data);
+}
+
+function formatarStatus(statusGeral) {
+  const status = String(statusGeral || "rascunho").replaceAll("_", " ");
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
 function Campo({ id, label, placeholder, type = "text", className = "" }) {
   const contexto = useContext(PEIFormContext);
   return (
@@ -419,12 +443,29 @@ function BlocoPEI({ numero, titulo, descricao, children }) {
 function PEIPage() {
   const { currentUser } = useAuth();
   const [form, setForm] = useState(criarFormularioInicial);
+  const [peisSalvos, setPeisSalvos] = useState([]);
   const [peiId, setPeiId] = useState("");
   const [carregando, setCarregando] = useState(true);
+  const [carregandoLista, setCarregandoLista] = useState(false);
+  const [abrindoPeiId, setAbrindoPeiId] = useState("");
   const [salvando, setSalvando] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [aviso, setAviso] = useState("");
   const [erro, setErro] = useState("");
+
+  const carregarPeisSalvos = async () => {
+    setCarregandoLista(true);
+
+    try {
+      const lista = await listarPeis();
+      setPeisSalvos(lista);
+    } catch (error) {
+      console.error("[PEIPage] Erro ao listar PEIs salvos", error);
+      setErro("Não foi possível carregar os PEIs salvos.");
+    } finally {
+      setCarregandoLista(false);
+    }
+  };
 
   useEffect(() => {
     let ativo = true;
@@ -432,6 +473,7 @@ function PEIPage() {
     async function carregarRascunhoAnterior() {
       setCarregando(true);
       setErro("");
+      await carregarPeisSalvos();
       const rascunhoId = lerPeiIdLocal();
 
       if (!rascunhoId) {
@@ -508,6 +550,7 @@ function PEIPage() {
       }
 
       setFeedback("Rascunho do PEI salvo com sucesso.");
+      await carregarPeisSalvos();
     } catch (error) {
       console.error("[PEIPage] Erro ao salvar rascunho", error);
       setErro("Não foi possível salvar o rascunho do PEI. Tente novamente.");
@@ -523,6 +566,39 @@ function PEIPage() {
     setErro("");
     setAviso("");
     setFeedback("Novo PEI iniciado.");
+  };
+
+  const handleAbrirPei = async (id) => {
+    if (!id || abrindoPeiId || salvando) return;
+
+    setAbrindoPeiId(id);
+    setFeedback("");
+    setAviso("");
+    setErro("");
+
+    try {
+      const peiSalvo = await buscarPeiPorId(id);
+
+      if (!peiSalvo) {
+        setAviso("O PEI selecionado não foi encontrado.");
+        await carregarPeisSalvos();
+        return;
+      }
+
+      setForm(normalizarPeiParaFormulario(peiSalvo));
+      setPeiId(peiSalvo.id || id);
+      salvarPeiIdLocal(peiSalvo.id || id);
+      setFeedback("PEI carregado com sucesso.");
+      document.getElementById("pei-formulario")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    } catch (error) {
+      console.error("[PEIPage] Erro ao abrir PEI salvo", error);
+      setErro("Não foi possível abrir o PEI selecionado.");
+    } finally {
+      setAbrindoPeiId("");
+    }
   };
 
   return (
@@ -547,13 +623,78 @@ function PEIPage() {
       {erro ? <p className="toast-error">{erro}</p> : null}
       {aviso ? <div className="pei-note">{aviso}</div> : null}
 
+      <section className="panel pei-salvos-panel" aria-labelledby="peis-salvos-titulo">
+        <div className="pei-list-heading">
+          <div>
+            <h2 id="peis-salvos-titulo">PEIs salvos</h2>
+            <p className="muted">
+              Abra um plano para continuar o preenchimento ou revisar um PEI já iniciado.
+            </p>
+          </div>
+          <span className="pei-count-chip">{peisSalvos.length} registro(s)</span>
+        </div>
+
+        {carregandoLista ? (
+          <p className="muted">Carregando PEIs salvos...</p>
+        ) : peisSalvos.length ? (
+          <div className="pei-table-wrapper">
+            <table className="pei-salvos-table">
+              <thead>
+                <tr>
+                  <th>Nome do estudante</th>
+                  <th>Ano letivo</th>
+                  <th>Período de vigência</th>
+                  <th>Status geral</th>
+                  <th>Componente curricular principal</th>
+                  <th>Atualizado em</th>
+                  <th>Abrir</th>
+                </tr>
+              </thead>
+              <tbody>
+                {peisSalvos.map((pei) => (
+                  <tr key={pei.id}>
+                    <td>
+                      {pei.alunoNome ||
+                        pei.identificacaoEstudante?.nome ||
+                        pei.identificacaoEstudante?.alunoCadastrado ||
+                        "-"}
+                    </td>
+                    <td>{pei.anoLetivo || pei.identificacaoEstudante?.anoLetivo || "-"}</td>
+                    <td>
+                      {pei.periodoVigencia ||
+                        pei.identificacaoEstudante?.periodoVigencia ||
+                        "-"}
+                    </td>
+                    <td>{formatarStatus(pei.statusGeral)}</td>
+                    <td>{pei.planejamentoCurricular?.componenteCurricular || "-"}</td>
+                    <td>{formatarDataLista(pei.atualizadoEm || pei.criadoEm)}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn-secondary pei-open-button"
+                        onClick={() => handleAbrirPei(pei.id)}
+                        disabled={abrindoPeiId === pei.id || salvando}
+                      >
+                        {abrindoPeiId === pei.id ? "Abrindo..." : "Abrir"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="pei-empty-state">Nenhum PEI salvo até o momento.</p>
+        )}
+      </section>
+
       {carregando ? (
         <section className="panel">
           <p>Carregando PEI...</p>
         </section>
       ) : (
         <PEIFormContext.Provider value={{ obterValor, atualizarCampo }}>
-          <form className="pei-form" onSubmit={handleSalvarRascunho}>
+          <form id="pei-formulario" className="pei-form" onSubmit={handleSalvarRascunho}>
         <BlocoPEI
           numero="1"
           titulo="Identificação do estudante"
