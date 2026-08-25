@@ -2792,6 +2792,64 @@ textarea:focus {
     font-size: 10.5pt;
   }
 
+  .pei-page .pei-print-identification-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: #ffffff;
+    color: #111827;
+  }
+
+  .pei-page .pei-print-identification-field-column {
+    width: 34%;
+  }
+
+  .pei-page .pei-print-identification-value-column {
+    width: 66%;
+  }
+
+  .pei-page .pei-print-identification-table thead {
+    display: table-header-group;
+  }
+
+  .pei-page .pei-print-identification-table tr {
+    break-inside: avoid;
+  }
+
+  .pei-page .pei-print-identification-table th,
+  .pei-page .pei-print-identification-table td {
+    padding: 2.3mm 3mm;
+    border: 1px solid #94a3b8;
+    vertical-align: top;
+    text-align: left;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .pei-page .pei-print-identification-table thead th {
+    background: #dbeafe;
+    color: #1e3a8a;
+    font-size: 9.5pt;
+    font-weight: 700;
+  }
+
+  .pei-page .pei-print-identification-table tbody th {
+    background: #f8fafc;
+    color: #334155;
+    font-size: 9pt;
+    font-weight: 700;
+  }
+
+  .pei-page .pei-print-identification-table td {
+    background: #ffffff;
+    color: #111827;
+  }
+
+  .pei-page .pei-print-identification-long td {
+    text-align: justify;
+  }
+
   .pei-page .pei-print-grid > div,
   .pei-page .pei-print-item {
     break-inside: avoid;

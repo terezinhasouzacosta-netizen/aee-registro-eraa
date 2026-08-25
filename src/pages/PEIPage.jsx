@@ -456,6 +456,15 @@ function CampoImpressao({ rotulo, valor, span = false }) {
   );
 }
 
+function LinhaIdentificacaoImpressao({ rotulo, valor, textoLongo = false }) {
+  return (
+    <tr className={textoLongo ? "pei-print-identification-long" : ""}>
+      <th scope="row">{rotulo}</th>
+      <td>{obterValorImpressao(valor)}</td>
+    </tr>
+  );
+}
+
 function Campo({ id, label, placeholder, type = "text", className = "" }) {
   const contexto = useContext(PEIFormContext);
   return (
@@ -1293,58 +1302,69 @@ function PEIPage() {
 
         <section className="pei-print-section">
           <h2>1. Identificação do estudante</h2>
-          <dl className="pei-print-grid">
-            <CampoImpressao
-              rotulo="Aluno cadastrado"
-              valor={form.identificacaoEstudante.alunoCadastrado}
-              span
-            />
-            <CampoImpressao
-              rotulo="Nome do estudante"
-              valor={form.identificacaoEstudante.nome}
-              span
-            />
-            <CampoImpressao
-              rotulo="Data de nascimento"
-              valor={formatarDataImpressao(form.identificacaoEstudante.dataNascimento)}
-            />
-            <CampoImpressao rotulo="Idade" valor={form.identificacaoEstudante.idade} />
-            <CampoImpressao
-              rotulo="Ano letivo"
-              valor={form.identificacaoEstudante.anoLetivo}
-            />
-            <CampoImpressao rotulo="Ano/Série" valor={form.identificacaoEstudante.serieAno} />
-            <CampoImpressao rotulo="Turma" valor={form.identificacaoEstudante.turma} />
-            <CampoImpressao rotulo="Turno" valor={form.identificacaoEstudante.turno} />
-            <CampoImpressao rotulo="Escola" valor={form.identificacaoEstudante.escola} span />
-            <CampoImpressao rotulo="Município" valor={form.identificacaoEstudante.municipio} />
-            <CampoImpressao
-              rotulo="Data do planejamento"
-              valor={formatarDataImpressao(form.identificacaoEstudante.dataPlanejamento)}
-            />
-            <CampoImpressao
-              rotulo="Período de vigência"
-              valor={form.identificacaoEstudante.periodoVigencia}
-            />
-            <CampoImpressao
-              rotulo="Professor(a) da sala comum"
-              valor={form.identificacaoEstudante.professorSalaComum}
-            />
-            <CampoImpressao
-              rotulo="Professor(a) do AEE"
-              valor={form.identificacaoEstudante.professorAee}
-            />
-            <CampoImpressao
-              rotulo="Profissional de apoio/mediador"
-              valor={form.identificacaoEstudante.profissionalApoio}
-              span
-            />
-            <CampoImpressao
-              rotulo="Condição do estudante / diagnóstico informado"
-              valor={form.identificacaoEstudante.condicaoDiagnostico}
-              span
-            />
-          </dl>
+          <table className="pei-print-identification-table">
+            <colgroup>
+              <col className="pei-print-identification-field-column" />
+              <col className="pei-print-identification-value-column" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th scope="col">Campo</th>
+                <th scope="col">Informação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <LinhaIdentificacaoImpressao
+                rotulo="Nome completo"
+                valor={
+                  form.identificacaoEstudante.nome ||
+                  form.identificacaoEstudante.alunoCadastrado ||
+                  form.alunoNome
+                }
+              />
+              <LinhaIdentificacaoImpressao
+                rotulo="Data de nascimento"
+                valor={formatarDataImpressao(form.identificacaoEstudante.dataNascimento)}
+              />
+              <LinhaIdentificacaoImpressao rotulo="Idade" valor={form.identificacaoEstudante.idade} />
+              <LinhaIdentificacaoImpressao
+                rotulo="Ano/Série"
+                valor={form.identificacaoEstudante.serieAno}
+              />
+              <LinhaIdentificacaoImpressao rotulo="Turma" valor={form.identificacaoEstudante.turma} />
+              <LinhaIdentificacaoImpressao rotulo="Turno" valor={form.identificacaoEstudante.turno} />
+              <LinhaIdentificacaoImpressao rotulo="Escola" valor={form.identificacaoEstudante.escola} />
+              <LinhaIdentificacaoImpressao
+                rotulo="Município"
+                valor={form.identificacaoEstudante.municipio}
+              />
+              <LinhaIdentificacaoImpressao
+                rotulo="Data do planejamento"
+                valor={formatarDataImpressao(form.identificacaoEstudante.dataPlanejamento)}
+              />
+              <LinhaIdentificacaoImpressao
+                rotulo="Período de vigência"
+                valor={form.identificacaoEstudante.periodoVigencia}
+              />
+              <LinhaIdentificacaoImpressao
+                rotulo="Professor(a) da sala comum"
+                valor={form.identificacaoEstudante.professorSalaComum}
+              />
+              <LinhaIdentificacaoImpressao
+                rotulo="Professor(a) do AEE"
+                valor={form.identificacaoEstudante.professorAee}
+              />
+              <LinhaIdentificacaoImpressao
+                rotulo="Profissional de apoio/mediador"
+                valor={form.identificacaoEstudante.profissionalApoio}
+              />
+              <LinhaIdentificacaoImpressao
+                rotulo="Condição do estudante / diagnóstico informado"
+                valor={form.identificacaoEstudante.condicaoDiagnostico}
+                textoLongo
+              />
+            </tbody>
+          </table>
         </section>
 
         <section className="pei-print-section">
