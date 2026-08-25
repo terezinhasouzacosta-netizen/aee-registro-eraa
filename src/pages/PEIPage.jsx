@@ -456,9 +456,9 @@ function CampoImpressao({ rotulo, valor, span = false }) {
   );
 }
 
-function LinhaIdentificacaoImpressao({ rotulo, valor, textoLongo = false }) {
+function LinhaIdentificacaoImpressao({ rotulo, valor }) {
   return (
-    <tr className={textoLongo ? "pei-print-identification-long" : ""}>
+    <tr>
       <th scope="row">{rotulo}</th>
       <td>{obterValorImpressao(valor)}</td>
     </tr>
@@ -1358,13 +1358,12 @@ function PEIPage() {
                 rotulo="Profissional de apoio/mediador"
                 valor={form.identificacaoEstudante.profissionalApoio}
               />
-              <LinhaIdentificacaoImpressao
-                rotulo="Condição do estudante / diagnóstico informado"
-                valor={form.identificacaoEstudante.condicaoDiagnostico}
-                textoLongo
-              />
             </tbody>
           </table>
+          <article className="pei-print-identification-diagnosis">
+            <h3>Condição do estudante / diagnóstico informado</h3>
+            <p>{obterValorImpressao(form.identificacaoEstudante.condicaoDiagnostico)}</p>
+          </article>
         </section>
 
         <section className="pei-print-section">

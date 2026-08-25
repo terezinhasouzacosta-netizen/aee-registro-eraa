@@ -2829,11 +2829,6 @@ textarea:focus {
     page-break-inside: avoid;
   }
 
-  .pei-page .pei-print-identification-table tr.pei-print-identification-long {
-    break-inside: auto;
-    page-break-inside: auto;
-  }
-
   .pei-page .pei-print-identification-table th,
   .pei-page .pei-print-identification-table td {
     padding: 2.2mm 2.7mm;
@@ -2866,7 +2861,23 @@ textarea:focus {
     font-size: 10pt;
   }
 
-  .pei-page .pei-print-identification-long td {
+  .pei-page .pei-print-identification-diagnosis {
+    margin-top: 2.5mm;
+    padding: 2.5mm 2.8mm;
+    border: 1px solid #cbd5e1;
+    border-radius: 2mm;
+    background: #f8fafc;
+    break-inside: auto;
+    page-break-inside: auto;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .pei-page .pei-print-identification-diagnosis h3 {
+    margin-bottom: 0.7mm;
+  }
+
+  .pei-page .pei-print-identification-diagnosis p {
     text-align: justify;
     text-justify: inter-word;
     line-height: 1.42;
