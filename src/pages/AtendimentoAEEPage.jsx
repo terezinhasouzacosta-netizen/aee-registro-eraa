@@ -90,6 +90,24 @@ const MAPA_CHAVES_HABILIDADE_EIXO = [
   { chaves: ["coordenacao", "motora"], eixo: "Outro" },
 ];
 
+const EIXOS_EQUIVALENTES_HABILIDADES = {
+  "leitura e escrita": ["Leitura e escrita", "Leitura", "Escrita"],
+  "comunicacao oral": ["Comunicação oral", "Comunicação e Linguagem"],
+  "matematica funcional": ["Matemática funcional", "Raciocínio Lógico-Matemático"],
+  "atencao e concentracao": ["Atenção e concentração", "Atenção e Funções Executivas"],
+  "interacao social": ["Interação social"],
+  "autonomia nas atividades": [
+    "Autonomia nas atividades",
+    "Alimentação, Higiene e Autonomia Pessoal",
+    "Autonomia Escolar",
+  ],
+  "comportamento e autorregulacao": [
+    "Comportamento e autorregulação",
+    "Convivência e Autorregulação",
+  ],
+  outro: ["Outro", "Coordenação Motora"],
+};
+
 function extrairTextoHabilidade(item) {
   if (typeof item === "string") return item.trim();
   if (!item || typeof item !== "object") return "";
@@ -124,6 +142,17 @@ function habilidadePertenceAoEixo(habilidade, eixoTematico) {
   const eixoDaHabilidade = inferirEixoPorHabilidade(habilidade);
   if (!eixoDaHabilidade) return false;
   return normalizarTexto(eixoDaHabilidade) === normalizarTexto(eixo);
+}
+
+function metaPertenceAoEixo(meta, eixoTematico) {
+  const eixoNormalizado = normalizarTexto(eixoTematico);
+  const tituloNormalizado = normalizarTexto(meta?.titulo);
+  if (!eixoNormalizado || !tituloNormalizado) return false;
+
+  const equivalentes = EIXOS_EQUIVALENTES_HABILIDADES[eixoNormalizado] || [eixoTematico];
+  return equivalentes.some(
+    (tituloEquivalente) => normalizarTexto(tituloEquivalente) === tituloNormalizado
+  );
 }
 
 function formatarHabilidadesRegistro(item) {
@@ -329,16 +358,22 @@ function AtendimentoAEEPage() {
           alunoIdsPermitidos: idsPermitidos,
         });
 
-        const sugestoes = [
+        const sugestoesCadastradas = [
           ...new Set(
             (Array.isArray(metasAluno) ? metasAluno : [])
-              .filter(
-                (item) => normalizarTexto(item?.titulo) === normalizarTexto(eixoSelecionado)
-              )
+              .filter((item) => metaPertenceAoEixo(item, eixoSelecionado))
               .map((item) => String(item?.descricao || "").trim())
               .filter(Boolean)
           ),
         ];
+
+        const habilidadesDoRegistro =
+          registroEmEdicao &&
+          normalizarTexto(registroEmEdicao.eixoTematico) === normalizarTexto(eixoSelecionado) &&
+          Array.isArray(form.habilidadesSelecionadas)
+            ? form.habilidadesSelecionadas.filter(Boolean)
+            : [];
+        const sugestoes = [...new Set([...sugestoesCadastradas, ...habilidadesDoRegistro])];
 
         setHabilidadesSugeridas(sugestoes);
         setForm((prev) => ({
@@ -359,7 +394,7 @@ function AtendimentoAEEPage() {
     }
 
     carregarHabilidadesPorEixo();
-  }, [form.alunoId, filtroAlunoId, form.eixoTematico, idsPermitidos]);
+  }, [form.alunoId, filtroAlunoId, form.eixoTematico, idsPermitidos, registroEmEdicao]);
 
   const limparFormulario = () => {
     const alunoBase = filtroAlunoId || form.alunoId || "";
@@ -391,6 +426,21 @@ function AtendimentoAEEPage() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleToggleHabilidade = (habilidade, marcada) => {
+    setForm((prev) => {
+      const selecionadas = Array.isArray(prev.habilidadesSelecionadas)
+        ? prev.habilidadesSelecionadas
+        : [];
+
+      return {
+        ...prev,
+        habilidadesSelecionadas: marcada
+          ? [...new Set([...selecionadas, habilidade])]
+          : selecionadas.filter((item) => item !== habilidade),
+      };
+    });
   };
 
   const handleSalvar = async (event) => {
@@ -775,30 +825,56 @@ function AtendimentoAEEPage() {
                     form.alunoId &&
                     form.eixoTematico &&
                     habilidadesSugeridas.length === 0 ? (
-                      <p className="muted">Nenhuma habilidade cadastrada para este aluno neste eixo.</p>
+                      <p className="muted">Nenhuma habilidade cadastrada para este eixo temático.</p>
                     ) : null}
                     {!loadingSondagem && habilidadesSugeridas.length > 0 ? (
-                      <select
-                        multiple
-                        className="form-control"
-                        value={form.habilidadesSelecionadas || []}
-                        onChange={(event) => {
-                          const selecionadas = Array.from(event.target.selectedOptions).map(
-                            (option) => option.value
-                          );
-                          setForm((prev) => ({
-                            ...prev,
-                            habilidadesSelecionadas: selecionadas,
-                          }));
+                      <div
+                        role="group"
+                        aria-label="Habilidades cadastradas para o eixo temático"
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                          gap: "0.65rem",
+                          marginTop: "0.55rem",
                         }}
-                        style={{ minHeight: "140px" }}
                       >
                         {habilidadesSugeridas.map((habilidade, index) => (
-                          <option key={`${habilidade}-${index}`} value={habilidade}>
-                            {habilidade}
-                          </option>
+                          <label
+                            key={`${habilidade}-${index}`}
+                            style={{
+                              display: "flex",
+                              alignItems: "flex-start",
+                              gap: "0.6rem",
+                              margin: 0,
+                              padding: "0.75rem",
+                              border: "1px solid #dbe5f0",
+                              borderRadius: "10px",
+                              background: "#ffffff",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={(form.habilidadesSelecionadas || []).includes(habilidade)}
+                              onChange={(event) =>
+                                handleToggleHabilidade(habilidade, event.target.checked)
+                              }
+                              style={{
+                                width: "18px",
+                                minWidth: "18px",
+                                height: "18px",
+                                margin: "2px 0 0",
+                                padding: 0,
+                                accentColor: "#1d4ed8",
+                                cursor: "pointer",
+                              }}
+                            />
+                            <span style={{ lineHeight: 1.45, overflowWrap: "anywhere" }}>
+                              {habilidade}
+                            </span>
+                          </label>
                         ))}
-                      </select>
+                      </div>
                     ) : null}
                   </div>
 
