@@ -2527,8 +2527,8 @@ function EstudoCasoPage() {
             <div>
               <h2>Forma de preenchimento</h2>
               <p className="muted">
-                Apenas o modo manual está ativo nesta etapa. Os demais permanecem como recursos
-                futuros.
+                Nesta versão, apenas o preenchimento manual está disponível. As demais opções
+                aparecem como planejamento de recursos futuros e ainda não executam ações.
               </p>
             </div>
           </div>
