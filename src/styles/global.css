@@ -2910,6 +2910,13 @@ textarea:focus {
     font-size: 10.5pt;
     font-weight: 700;
     line-height: 1.3;
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .pei-page .pei-print-grid dt + dd {
+    break-before: avoid-page;
+    page-break-before: avoid;
   }
 
   .pei-page .pei-print-grid dd,
