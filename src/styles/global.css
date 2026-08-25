@@ -1398,6 +1398,36 @@ textarea:focus {
   gap: 0.65rem;
 }
 
+.acompanhamento-page .checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.42rem 0.9rem;
+  align-items: start;
+  margin-bottom: 0.65rem;
+}
+
+.acompanhamento-page .checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.28rem 0;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.acompanhamento-page .checkbox-item input[type="checkbox"] {
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  min-height: 16px;
+  flex: 0 0 16px;
+  margin: 0;
+  padding: 0;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
 .painel-coordenacao-page {
   max-width: none;
   width: 100%;
