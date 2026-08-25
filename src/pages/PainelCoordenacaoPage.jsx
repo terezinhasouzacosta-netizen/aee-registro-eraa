@@ -695,27 +695,11 @@ function PainelCoordenacaoPage() {
 
   return (
     <main className="alunos-page module-page painel-coordenacao-page painel-coordenacao">
-      <div className="painel-topo-institucional">
-<div  
-className="painel-topo-logo"
-style={{ display: "flex", alignItems: "center", gap: "15px" }}
->
-  <img
-    src="/logo-eraa.jpg"
-    alt="Logo da Escola Raimundo Augusto de Araújo"
-    style={{ width: "70px", borderRadius: "10px" }}
-  />
-</div>
-         
+      <header className="painel-topo-institucional">
         <div className="painel-topo-textos">
           <div className="painel-topo-titulo-linha">
-            <h1>
-              <span className="icone-titulo">📊</span> Painel da Coordenação
-            </h1>
-            <span className="painel-topo-selo">ERAA</span>
+            <h1>Painel da Coordenação</h1>
           </div>
-
-          <p className="painel-topo-escola">Escola Raimundo Augusto de Araújo</p>
 
           <p className="painel-topo-descricao">
             Visão institucional para acompanhamento pedagógico dos alunos público-alvo da educação
@@ -727,7 +711,7 @@ style={{ display: "flex", alignItems: "center", gap: "15px" }}
             escolar, permitindo acompanhar, de forma geral, os registros realizados no sistema.
           </p>
         </div>
-      </div>
+      </header>
 
       {erro ? <p className="toast-error">{erro}</p> : null}
 
