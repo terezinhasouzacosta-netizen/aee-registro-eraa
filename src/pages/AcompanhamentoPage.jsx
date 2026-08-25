@@ -236,9 +236,10 @@ function dataAtualISO() {
   return `${ano}-${mes}-${dia}`;
 }
 
-function formInicial({ alunoId = "", responsavelNome = "", funcaoResponsavel = "" } = {}) {
+function formInicial({ alunoId = "", turno = "", responsavelNome = "", funcaoResponsavel = "" } = {}) {
   return {
     alunoId,
+    turno,
     dataRegistro: dataAtualISO(),
     semanaReferencia: "",
     disciplina: "",
@@ -517,13 +518,20 @@ function AcompanhamentoPage() {
 
         setAlunos(alunosData);
         const alunoPadrao = alunosData[0]?.id || "";
-        setForm((prev) => ({
-          ...prev,
-          alunoId:
+        setForm((prev) => {
+          const alunoId =
             prev.alunoId && alunosData.some((aluno) => aluno.id === prev.alunoId)
               ? prev.alunoId
-              : alunoPadrao,
-        }));
+              : alunoPadrao;
+          const alunoAlterado = alunoId !== prev.alunoId;
+          const alunoSelecionadoAtual = alunosData.find((aluno) => aluno.id === alunoId);
+
+          return {
+            ...prev,
+            alunoId,
+            turno: alunoAlterado ? alunoSelecionadoAtual?.turno || "" : prev.turno,
+          };
+        });
         setFormProfessor((prev) => ({
           ...prev,
           alunoId:
@@ -651,7 +659,18 @@ function AcompanhamentoPage() {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => {
+      if (name === "alunoId") {
+        const aluno = alunos.find((item) => item.id === value);
+        return {
+          ...prev,
+          alunoId: value,
+          turno: aluno?.turno || "",
+        };
+      }
+
+      return { ...prev, [name]: value };
+    });
   };
 
   const handleChangeProfessor = (event) => {
@@ -688,6 +707,7 @@ function AcompanhamentoPage() {
     setForm(
       formInicial({
         alunoId: alunos[0]?.id || "",
+        turno: alunos[0]?.turno || "",
         responsavelNome: responsavelNomePadrao,
         funcaoResponsavel: funcaoResponsavelPadrao,
       })
@@ -717,7 +737,7 @@ function AcompanhamentoPage() {
         alunoId: alunoSelecionado.id,
         alunoNome: alunoSelecionado.nome || "",
         turma: alunoSelecionado.turma || "",
-        turno: alunoSelecionado.turno || "",
+        turno: form.turno.trim(),
         responsavelId: currentUser.uid,
         responsavelNome: form.responsavelNome.trim(),
         funcaoResponsavel: form.funcaoResponsavel.trim(),
@@ -825,6 +845,10 @@ function AcompanhamentoPage() {
       setDiarioEmEdicao(item);
       setForm({
         alunoId: item.alunoId || "",
+        turno:
+          typeof item.turno === "string"
+            ? item.turno
+            : alunos.find((aluno) => aluno.id === item.alunoId)?.turno || "",
         dataRegistro: item.dataRegistro || dataAtualISO(),
         semanaReferencia: item.semanaReferencia || "",
         disciplina: item.disciplina || "",
@@ -1380,7 +1404,13 @@ function AcompanhamentoPage() {
                 </div>
                 <div>
                   <label htmlFor="turno">Turno</label>
-                  <input id="turno" value={alunoSelecionado?.turno || ""} readOnly />
+                  <input
+                    id="turno"
+                    name="turno"
+                    value={form.turno}
+                    onChange={handleChange}
+                    placeholder="Ex.: Matutino, Vespertino, Tarde ou Noite"
+                  />
                 </div>
               </div>
 
