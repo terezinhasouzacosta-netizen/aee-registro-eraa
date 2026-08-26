@@ -2312,15 +2312,24 @@ function EstudoCasoPage() {
   return (
     <main className="alunos-page module-page estudo-caso-page">
       <header className="page-header estudo-caso-page-header">
-        <span className="estudo-caso-page-header-icon" aria-hidden="true">
-          <FileSearch />
-        </span>
-        <div>
-          <h1>Estudo de Caso</h1>
-          <p>
-            Registro detalhado das informações pedagógicas, educacionais e do desenvolvimento do
-            estudante.
-          </p>
+        <div className="estudo-caso-hero-heading">
+          <div className="estudo-caso-hero-copy">
+            <h1>ESTUDO DE CASO</h1>
+            <p>
+              Registro das informações pedagógicas, familiares e do desenvolvimento do estudante
+              para subsidiar o planejamento do Atendimento Educacional Especializado.
+            </p>
+          </div>
+
+          <div className="estudo-caso-hero-card" aria-label="Finalidade do Estudo de Caso">
+            <span className="estudo-caso-page-header-icon" aria-hidden="true">
+              <FileSearch />
+            </span>
+            <div>
+              <strong>Estudo de Caso</strong>
+              <p>Base para o planejamento pedagógico individualizado.</p>
+            </div>
+          </div>
         </div>
       </header>
 

@@ -5562,21 +5562,59 @@ textarea:focus {
   }
 
   .page-content .estudo-caso-page .estudo-caso-page-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.2rem 1.3rem;
+    padding: 1.15rem 1.3rem;
     border: 1px solid #1e40af;
     border-radius: 20px;
     background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-    box-shadow: 0 16px 34px rgba(30, 58, 138, 0.18);
+    box-shadow: 0 20px 44px rgba(30, 58, 138, 0.2);
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-hero-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-hero-copy {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-hero-card {
+    display: flex;
+    width: min(100%, 330px);
+    flex: 0 0 330px;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.8rem 0.9rem;
+    border: 1px solid rgba(219, 234, 254, 0.3);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-hero-card strong {
+    display: block;
+    margin-bottom: 0.18rem;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-page-header .estudo-caso-hero-card p {
+    margin: 0;
+    max-width: none;
+    color: #dbeafe;
+    font-size: 0.84rem;
+    line-height: 1.4;
   }
 
   .page-content .estudo-caso-page .estudo-caso-page-header-icon {
     display: inline-flex;
-    width: 50px;
-    height: 50px;
-    flex: 0 0 50px;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
     align-items: center;
     justify-content: center;
     border-radius: 15px;
@@ -5594,12 +5632,13 @@ textarea:focus {
   .page-content .estudo-caso-page .estudo-caso-page-header h1 {
     margin: 0;
     color: #ffffff;
-    font-size: clamp(1.55rem, 2.4vw, 2rem);
+    font-size: clamp(1.7rem, 3vw, 2.25rem);
     line-height: 1.15;
+    letter-spacing: 0.02em;
   }
 
   .page-content .estudo-caso-page .estudo-caso-page-header p {
-    max-width: 760px;
+    max-width: 780px;
     margin: 0.35rem 0 0;
     color: #dbeafe;
     font-size: 0.96rem;
@@ -5821,9 +5860,20 @@ textarea:focus {
     box-shadow: 0 8px 18px rgba(30, 64, 175, 0.13);
   }
 
+  @media (max-width: 900px) {
+    .page-content .estudo-caso-page .estudo-caso-hero-heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .page-content .estudo-caso-page .estudo-caso-hero-card {
+      width: 100%;
+      flex-basis: auto;
+    }
+  }
+
   @media (max-width: 700px) {
     .page-content .estudo-caso-page .estudo-caso-page-header {
-      align-items: flex-start;
       padding: 1rem;
     }
 
