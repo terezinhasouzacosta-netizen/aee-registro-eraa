@@ -264,8 +264,8 @@ button:hover {
   font-weight: 500;
   border: 1px solid transparent;
   border-radius: 11px;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease,
-    color 0.2s ease, transform 0.2s ease;
+  transition: background-color 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease,
+    color 0.22s ease, text-shadow 0.22s ease;
 }
 
 .sidebar-nav a.active {
@@ -309,7 +309,14 @@ button:hover {
 .menu-item:hover {
   background-color: var(--sidebar-hover-bg);
   border-color: rgba(255, 255, 255, 0.14);
-  transform: translateX(2px);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
+  text-shadow: 0 1px 5px rgba(255, 255, 255, 0.12);
+}
+
+.sidebar-nav a:not(.active):hover .sidebar-link-icon {
+  transform: scale(1.05);
 }
 
 .sidebar-nav .sidebar-link-highlight {
@@ -4450,6 +4457,7 @@ textarea:focus {
 .app-shell > .app-sidebar .sidebar-nav a:not(.active):hover {
   background: var(--sidebar-hover-bg) !important;
   border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08) !important;
 }
 
 .sidebar-link-icon {
@@ -4459,7 +4467,7 @@ textarea:focus {
   flex-shrink: 0;
   color: currentColor;
   stroke-width: 2;
-  transition: color 0.2s ease;
+  transition: color 0.22s ease, transform 0.22s ease;
 }
 
 /* Etapa final: ajuste proporcional da tabela de alunos */
