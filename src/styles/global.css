@@ -4963,7 +4963,7 @@ textarea:focus {
 
   .page-content .sondagens-page .sondagem-card-header h3 {
     color: #163b78;
-    font-size: 1.12rem;
+    font-size: 1.16rem;
     font-weight: 700;
     line-height: 1.25;
     letter-spacing: -0.01em;
@@ -4994,6 +4994,12 @@ textarea:focus {
     gap: 0.9rem;
   }
 
+  .page-content .sondagens-page .sondagem-perguntas-list {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 1rem;
+  }
+
   .page-content .sondagens-page :where(
       .sondagem-fields-grid > div,
       .sondagem-text-item,
@@ -5008,14 +5014,17 @@ textarea:focus {
   .page-content .sondagens-page .sondagem-pergunta-item {
     display: flex;
     width: 100%;
+    min-height: 132px;
+    box-sizing: border-box;
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
     gap: 12px;
-    padding: 1rem;
+    padding: 1rem 1.05rem;
     border-color: #dbeafe;
-    border-radius: 13px;
-    background: #f8fbff;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    box-shadow: 0 6px 16px rgba(30, 64, 175, 0.05);
     transition:
       border-color 0.2s ease,
       box-shadow 0.2s ease,
@@ -5027,6 +5036,7 @@ textarea:focus {
     width: 100%;
     margin: 0;
     font-size: 0.94rem;
+    font-weight: 600;
     line-height: 1.55;
   }
 
@@ -5036,6 +5046,7 @@ textarea:focus {
     min-width: 0;
     max-width: none;
     margin: 0;
+    flex-shrink: 0;
   }
 
   .page-content .sondagens-page .sondagem-pergunta-item:focus-within {
