@@ -4627,3 +4627,146 @@ textarea:focus {
   }
 }
 
+/* Padronização visual compartilhada dos módulos (somente tela) */
+@media screen {
+  .page-content .alunos-page {
+    --module-space-xs: 0.4rem;
+    --module-space-sm: 0.7rem;
+    --module-space-md: 1rem;
+    --module-space-lg: 1.25rem;
+    --module-card-radius: 14px;
+    --module-field-radius: 10px;
+    --module-card-border: #dbe5f0;
+    --module-card-shadow: 0 4px 14px rgba(15, 42, 64, 0.06);
+    --module-title-color: #12324a;
+    --module-text-muted: #64748b;
+  }
+
+  .page-content .alunos-page :where(.page-header h1, .dashboard-hero-heading h1, .painel-topo-textos h1) {
+    margin: 0;
+    color: var(--module-title-color);
+    font-size: 1.55rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.012em;
+  }
+
+  .page-content .alunos-page :where(.page-header > p, .page-header > div > p) {
+    margin-top: var(--module-space-xs);
+    margin-bottom: 0;
+    color: #60758d;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .page-content .alunos-page :where(.muted, .tab-helper-text, .card-text) {
+    color: var(--module-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .page-content .alunos-page :where(.panel, .card, .form-section, .dashboard-card,
+      .acompanhamento-card, .estudo-caso-card, .estudo-caso-question-card,
+      .estudo-caso-salvo-card, .meta-card, .metas-sugestao-card,
+      .monitoramento-atendimento-card, .monitoramento-indicador-card,
+      .paee-card, .paee-objective-card, .pei-card, .pei-repeat-card,
+      .sondagem-card, .painel-resumo-card, .alerta-card, .stat-card) {
+    border: 1px solid var(--module-card-border);
+    border-radius: var(--module-card-radius);
+    box-shadow: var(--module-card-shadow);
+  }
+
+  .page-content .alunos-page :where(.panel, .card, .form-section, .dashboard-card,
+      .estudo-caso-card, .estudo-caso-question-card, .estudo-caso-salvo-card,
+      .meta-card, .metas-sugestao-card, .monitoramento-atendimento-card,
+      .monitoramento-indicador-card, .paee-card, .paee-objective-card,
+      .pei-card, .pei-repeat-card, .sondagem-card) {
+    padding: var(--module-space-md);
+  }
+
+  .page-content .alunos-page :where(.panel > h2, .card > h2, .form-section > h2) {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    color: var(--module-title-color);
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .page-content .alunos-page :where(.panel > h3, .card > h3, .form-section > h3) {
+    margin-top: 0;
+    margin-bottom: 0.62rem;
+    color: var(--module-title-color);
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .page-content .alunos-page > :where(.panel, .card, .module-layout, .alunos-grid,
+      .dashboard-grid, .acompanhamento-grid) {
+    margin-top: var(--module-space-md);
+  }
+
+  .page-content .alunos-page :where(.module-layout, .alunos-grid, .dashboard-grid,
+      .acompanhamento-grid, .monitoramento-indicadores-grid,
+      .estudo-caso-counter-grid, .estudo-caso-mode-grid,
+      .metas-sugestoes-grid, .paee-objectives-grid, .pei-repeat-grid) {
+    gap: var(--module-space-md);
+  }
+
+  .page-content .alunos-page :where(.filters-grid, .aluno-form-grid,
+      .estudo-caso-identificacao-grid, .estudo-caso-iniciais-grid,
+      .estudo-caso-question-grid, .paee-fields-grid, .pei-fields-grid,
+      .relatorio-form-grid, .sondagem-fields-grid, .sondagem-form-grid) {
+    gap: 0.85rem var(--module-space-md);
+  }
+
+  .page-content .alunos-page .form-section {
+    margin-bottom: var(--module-space-md);
+  }
+
+  .page-content .alunos-page :where(input:not([type="checkbox"]):not([type="radio"]), select) {
+    min-height: 42px;
+    padding: 0.62rem 0.75rem;
+    border-color: #cfd9e6;
+    border-radius: var(--module-field-radius);
+    font-size: 0.95rem;
+  }
+
+  .page-content .alunos-page textarea {
+    min-height: 96px;
+    padding: 0.7rem 0.75rem;
+    border-color: #cfd9e6;
+    border-radius: var(--module-field-radius);
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+
+  .page-content .alunos-page :where(button, .btn-primary, .btn-secondary, .btn-danger) {
+    min-height: 42px;
+    padding: 0.58rem 0.9rem;
+    border-radius: var(--module-field-radius);
+    line-height: 1.2;
+  }
+
+  .page-content .alunos-page .form-actions {
+    gap: var(--module-space-sm);
+    margin-top: 0.85rem;
+  }
+
+  @media (max-width: 700px) {
+    .page-content .alunos-page {
+      padding: 0.8rem;
+    }
+
+    .page-content .alunos-page :where(.page-header h1, .dashboard-hero-heading h1, .painel-topo-textos h1) {
+      font-size: 1.35rem;
+    }
+
+    .page-content .alunos-page :where(.panel, .card, .form-section, .dashboard-card,
+        .estudo-caso-card, .monitoramento-atendimento-card, .paee-card, .pei-card) {
+      padding: 0.88rem;
+    }
+  }
+}
+
