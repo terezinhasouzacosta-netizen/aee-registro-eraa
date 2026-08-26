@@ -658,6 +658,7 @@ function SondagensPage() {
     return (
       <div key={name} className={containerClassName}>
         <label htmlFor={name}>{label}</label>
+        {helperText ? <p className="muted">{helperText}</p> : null}
         <select
           id={name}
           name={name}
@@ -677,7 +678,6 @@ function SondagensPage() {
               ))
             : null}
         </select>
-        {helperText ? <p className="muted">{helperText}</p> : null}
         {reservado ? (
           <p className="muted">
             Bloco visual preparado para expansão futura, sem impacto nos dados salvos nesta etapa.

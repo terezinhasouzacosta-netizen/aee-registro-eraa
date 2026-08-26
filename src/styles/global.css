@@ -4984,11 +4984,13 @@ textarea:focus {
   }
 
   .page-content .sondagens-page .sondagem-pergunta-item {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(190px, 230px);
-    align-items: center;
-    gap: 0.8rem 1rem;
-    padding: 0.9rem 1rem;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 1rem;
     border-color: #dbeafe;
     border-radius: 13px;
     background: #f8fbff;
@@ -4998,6 +5000,22 @@ textarea:focus {
       background-color 0.2s ease;
   }
 
+  .page-content .sondagens-page .sondagem-pergunta-item > label {
+    display: block;
+    width: 100%;
+    margin: 0;
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+
+  .page-content .sondagens-page .sondagem-pergunta-item > select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+  }
+
   .page-content .sondagens-page .sondagem-pergunta-item:focus-within {
     border-color: #93c5fd;
     background: #ffffff;
@@ -5005,8 +5023,10 @@ textarea:focus {
   }
 
   .page-content .sondagens-page .sondagem-pergunta-item .muted {
-    grid-column: 1 / -1;
+    width: 100%;
     margin: 0;
+    color: #64748b;
+    line-height: 1.5;
   }
 
   .page-content .sondagens-page :where(
@@ -5107,10 +5127,6 @@ textarea:focus {
 
     .page-content .sondagens-page :where(.module-form-panel, .module-list-panel, .sondagem-card) {
       padding: 0.9rem;
-    }
-
-    .page-content .sondagens-page .sondagem-pergunta-item {
-      grid-template-columns: 1fr;
     }
 
     .page-content .sondagens-page :where(.sticky-actions, .meta-card .form-actions) button {
