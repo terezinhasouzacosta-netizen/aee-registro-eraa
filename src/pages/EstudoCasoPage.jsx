@@ -1912,6 +1912,20 @@ function EstudoCasoPage() {
   const resumoGeral = useMemo(() => {
     return obterResumoGeral(perguntasEstado, identificacaoEstudante);
   }, [identificacaoEstudante, perguntasEstado]);
+  const progressoPreenchimento = useMemo(() => {
+    const registrosPerguntas = Object.values(perguntasEstado);
+    const respondidas = registrosPerguntas.filter((registro) =>
+      Boolean(limparTexto(registro?.resposta)),
+    ).length;
+    const total = registrosPerguntas.length;
+
+    return {
+      respondidas,
+      pendentes: Math.max(total - respondidas, 0),
+      total,
+      percentual: total ? Math.round((respondidas / total) * 100) : 0,
+    };
+  }, [perguntasEstado]);
   const carregarListaEstudosSalvos = async () => {
     setCarregandoEstudosSalvos(true);
     try {
@@ -2332,6 +2346,45 @@ function EstudoCasoPage() {
           </div>
         </div>
       </header>
+
+      <section
+        className="panel estudo-caso-progress-panel"
+        aria-labelledby="estudo-caso-progress-title"
+      >
+        <div className="estudo-caso-progress-heading">
+          <div>
+            <h2 id="estudo-caso-progress-title">Progresso do Estudo de Caso</h2>
+            <p className="muted">Acompanhe o preenchimento das perguntas investigativas.</p>
+          </div>
+          <strong className="estudo-caso-progress-percentage">
+            {progressoPreenchimento.percentual}% concluído
+          </strong>
+        </div>
+
+        <div
+          className="estudo-caso-progress-track"
+          role="progressbar"
+          aria-label="Progresso do preenchimento do Estudo de Caso"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow={progressoPreenchimento.percentual}
+        >
+          <span
+            className="estudo-caso-progress-bar"
+            style={{ width: `${progressoPreenchimento.percentual}%` }}
+          />
+        </div>
+
+        <div className="estudo-caso-progress-details">
+          <span>
+            <strong>{progressoPreenchimento.respondidas}</strong> de {progressoPreenchimento.total}{" "}
+            perguntas respondidas
+          </span>
+          <span>
+            <strong>{progressoPreenchimento.pendentes}</strong> pendentes
+          </span>
+        </div>
+      </section>
 
       {feedback ? <p className="toast-success">{feedback}</p> : null}
       {aviso ? <p className="muted">{aviso}</p> : null}
