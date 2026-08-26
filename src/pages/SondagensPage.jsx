@@ -41,28 +41,28 @@ const CAMPOS_SINTESE = [
     key: "sintesePotencialidadesInteresses",
     titulo: "Potencialidades e interesses do estudante",
     placeholder:
-      "Descreva as habilidades, interesses, facilidades e potencialidades demonstradas pelo estudante durante a avaliação.",
+      "Descreva as potencialidades, interesses, habilidades e aspectos positivos demonstrados pelo estudante durante a sondagem.",
     aliases: ["Potencialidades e interesses do estudante"],
   },
   {
     key: "sinteseHabilidadesConsolidadas",
     titulo: "Habilidades consolidadas",
     placeholder:
-      "Informe as habilidades que o estudante já realiza com autonomia ou apresenta de forma consistente.",
+      "Informe as habilidades que o estudante realiza com autonomia, segurança e frequência.",
     aliases: ["Habilidades consolidadas"],
   },
   {
     key: "sinteseHabilidadesDesenvolvimento",
     titulo: "Habilidades em desenvolvimento",
     placeholder:
-      "Registre as habilidades que estão em processo de aquisição e que necessitam de continuidade nas intervenções pedagógicas.",
+      "Registre as habilidades que estão em processo de construção e que apresentam evolução parcial.",
     aliases: ["Habilidades em desenvolvimento"],
   },
   {
     key: "sinteseHabilidadesPrioritarias",
     titulo: "Habilidades prioritárias para intervenções",
     placeholder:
-      "Indique as habilidades que deverão ser priorizadas nos próximos atendimentos e planejamentos do AEE.",
+      "Descreva quais habilidades deverão ser priorizadas no planejamento do AEE e nas próximas intervenções pedagógicas.",
     aliases: [
       "Habilidades prioritárias para intervenções",
       "Habilidades prioritárias para intervenção",
@@ -72,7 +72,7 @@ const CAMPOS_SINTESE = [
     key: "sinteseRecomendacoesEncaminhamentos",
     titulo: "Recomendações pedagógicas e encaminhamentos",
     placeholder:
-      "Descreva recomendações para o professor, família, equipe pedagógica e demais encaminhamentos necessários para favorecer o desenvolvimento do estudante.",
+      "Registre orientações para o professor, família, equipe escolar e encaminhamentos necessários para favorecer o desenvolvimento do estudante.",
     aliases: ["Recomendações pedagógicas e encaminhamentos"],
   },
 ];
@@ -862,7 +862,7 @@ function SondagensPage() {
                     id="observacoes"
                     name="observacoes"
                     rows={4}
-                    placeholder="Registre observações gerais sobre o estudante durante a sondagem, destacando aspectos relevantes do comportamento, participação, comunicação e aprendizagem."
+                    placeholder="Registre aspectos relevantes observados durante a aplicação da sondagem, como comportamento, participação, atenção, interação e outras informações importantes."
                     value={form.observacoes}
                     onChange={handleChange}
                   />
