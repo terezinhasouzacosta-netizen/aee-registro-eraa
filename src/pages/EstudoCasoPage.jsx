@@ -2730,20 +2730,29 @@ function EstudoCasoPage() {
                     {bloco.perguntas.map((pergunta, indicePergunta) => {
                       const chave = `${bloco.id}-${pergunta.id}`;
                       const registro = perguntasEstado[chave];
+                      const perguntaRespondida = Boolean(limparTexto(registro.resposta));
                       const numeracaoPergunta = `${indiceBloco + 1}.${indicePergunta + 1}`;
 
                       return (
-                        <article key={chave} className="estudo-caso-question-card">
+                        <article
+                          key={chave}
+                          className={`estudo-caso-question-card ${
+                            perguntaRespondida ? "is-answered" : "is-pending"
+                          }`}
+                        >
+                          <span
+                            className={`estudo-caso-question-visual-badge ${
+                              perguntaRespondida ? "is-answered" : "is-pending"
+                            }`}
+                            aria-label={perguntaRespondida ? "Pergunta respondida" : "Pergunta pendente"}
+                          >
+                            {perguntaRespondida ? "✔" : "Pendente"}
+                          </span>
+
                           <div className="estudo-caso-question-top">
                             <p className="estudo-caso-question-text">
                               {numeracaoPergunta} {pergunta.enunciado}
                             </p>
-                            <span className={`estudo-caso-status-chip is-${registro.status}`}>
-                              {
-                                STATUS_PERGUNTA_OPTIONS.find((status) => status.value === registro.status)
-                                  ?.label
-                              }
-                            </span>
                           </div>
 
                           <div className="estudo-caso-question-grid">
