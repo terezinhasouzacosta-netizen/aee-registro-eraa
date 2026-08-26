@@ -4945,23 +4945,45 @@ textarea:focus {
     margin-bottom: 1rem;
   }
 
+  .page-content .sondagens-page .sondagem-card-header-horizontal {
+    align-items: center;
+    gap: 0.9rem;
+    margin: -0.1rem -0.1rem 1rem;
+    padding: 0.85rem 0.9rem 1rem;
+    border-bottom: 1px solid #dbeafe;
+    border-radius: 14px 14px 0 0;
+    background: linear-gradient(135deg, #f8fbff 0%, #eff6ff 100%);
+  }
+
+  .page-content .sondagens-page .sondagem-card-header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+  }
+
   .page-content .sondagens-page .sondagem-card-header h3 {
     color: #163b78;
-    font-size: 1.05rem;
+    font-size: 1.12rem;
     font-weight: 700;
-    line-height: 1.3;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
   }
 
   .page-content .sondagens-page .sondagem-card-header .muted {
     color: #64748b;
-    line-height: 1.5;
+    font-size: 0.84rem;
+    line-height: 1.45;
   }
 
   .page-content .sondagens-page .sondagem-card-index {
-    width: 36px;
-    min-width: 36px;
-    height: 36px;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
     background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+    font-size: 1rem;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.24);
   }
 
   .page-content .sondagens-page :where(
