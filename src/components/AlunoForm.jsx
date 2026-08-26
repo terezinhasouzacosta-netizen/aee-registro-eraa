@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Pencil, Save, UserPlus, X } from "lucide-react";
 
 const TIPOS_ACOMPANHAMENTO = [
   "Sem mediação",
@@ -105,8 +106,13 @@ function AlunoForm({ alunoEmEdicao, onSubmit, onCancel, loading }) {
   };
 
   return (
-    <section className="panel">
-      <h2>{alunoEmEdicao ? "Editar aluno" : "Cadastrar aluno"}</h2>
+    <section className="panel alunos-form-card">
+      <h2 className="alunos-card-title">
+        <span className="alunos-card-title-icon" aria-hidden="true">
+          {alunoEmEdicao ? <Pencil /> : <UserPlus />}
+        </span>
+        {alunoEmEdicao ? "Editar aluno" : "Cadastrar aluno"}
+      </h2>
       <p className="muted">
         Este cadastro passa a funcionar como base mestre do estudante, reduzindo redigitação nos
         próximos módulos da plataforma.
@@ -285,11 +291,21 @@ function AlunoForm({ alunoEmEdicao, onSubmit, onCancel, loading }) {
         </section>
 
         <div className="form-actions">
-          <button type="submit" disabled={loading}>
+          <button
+            type="submit"
+            className="alunos-page-button alunos-primary-action"
+            disabled={loading}
+          >
+            {!loading ? <Save aria-hidden="true" /> : null}
             {loading ? "Salvando..." : alunoEmEdicao ? "Salvar edição" : "Cadastrar"}
           </button>
           {alunoEmEdicao ? (
-            <button type="button" className="btn-secondary" onClick={onCancel}>
+            <button
+              type="button"
+              className="btn-secondary alunos-page-button"
+              onClick={onCancel}
+            >
+              <X aria-hidden="true" />
               Cancelar
             </button>
           ) : null}

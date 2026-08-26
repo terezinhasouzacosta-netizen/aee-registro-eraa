@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Users } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import AlunoForm from "../components/AlunoForm";
 import AlunosList from "../components/AlunosList";
@@ -119,13 +120,14 @@ function AlunosPage() {
 
   return (
     <main className="alunos-page alunos-cadastro-page">
-      <header className="page-header">
-        <h1>AEE Registro - Cadastro de Alunos</h1>
-        <p>Gerencie os alunos atendidos pelo AEE em um único lugar.</p>
-        <p className="muted">
-          Orientação: O(a) professor(a) do AEE é responsável pelo cadastro de todos os alunos
-          atendidos na Sala de Recursos Multifuncional.
-        </p>
+      <header className="page-header alunos-page-header">
+        <span className="alunos-page-header-icon" aria-hidden="true">
+          <Users />
+        </span>
+        <div>
+          <h1>Cadastro de Alunos</h1>
+          <p>Gerencie os estudantes atendidos pela Sala de Recursos Multifuncionais.</p>
+        </div>
       </header>
 
       {feedback ? <p className="toast-success">{feedback}</p> : null}

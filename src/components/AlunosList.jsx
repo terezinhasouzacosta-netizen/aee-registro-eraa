@@ -1,3 +1,5 @@
+import { Pencil, Trash2, Users } from "lucide-react";
+
 function formatarSerieTurma(aluno) {
   const serieAno = aluno.serieAno || "";
   const turma = aluno.turma || "";
@@ -26,8 +28,13 @@ function formatarAcompanhamento(aluno) {
 
 function AlunosList({ alunos, onEditar, onExcluir, loading, podeEditar }) {
   return (
-    <section className="panel">
-      <h2>Lista de alunos</h2>
+    <section className="panel alunos-list-card">
+      <h2 className="alunos-card-title">
+        <span className="alunos-card-title-icon" aria-hidden="true">
+          <Users />
+        </span>
+        Lista de alunos
+      </h2>
 
       {loading ? <p>Carregando alunos...</p> : null}
 
@@ -76,16 +83,18 @@ function AlunosList({ alunos, onEditar, onExcluir, loading, podeEditar }) {
                         <div className="form-actions">
                           <button
                             type="button"
-                            className="btn-secondary"
+                            className="btn-secondary alunos-page-button alunos-table-action"
                             onClick={() => onEditar(aluno)}
                           >
+                            <Pencil aria-hidden="true" />
                             Editar
                           </button>
                           <button
                             type="button"
-                            className="btn-danger"
+                            className="btn-danger alunos-page-button alunos-table-action"
                             onClick={() => onExcluir(aluno)}
                           >
+                            <Trash2 aria-hidden="true" />
                             Excluir
                           </button>
                         </div>
