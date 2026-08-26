@@ -5622,8 +5622,67 @@ textarea:focus {
     box-shadow: 0 10px 28px rgba(30, 64, 175, 0.07);
   }
 
-  .page-content .estudo-caso-page :where(.panel, .estudo-caso-card) {
+  .page-content .estudo-caso-page .panel {
     padding: 1.15rem;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-blocks {
+    gap: 1.15rem;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-card {
+    overflow: hidden;
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-card-toggle {
+    align-items: center;
+    padding: 1rem 1.1rem;
+    background: linear-gradient(135deg, #f8fbff 0%, #eff6ff 100%);
+    border-bottom: 1px solid transparent;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-card-toggle:hover {
+    background: linear-gradient(135deg, #f1f7ff 0%, #e6f0ff 100%);
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-card-toggle[aria-expanded="true"] {
+    border-bottom-color: #dbeafe;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-card-header {
+    flex: 1 1 auto;
+    min-width: 0;
+    align-items: center;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-card-heading {
+    display: grid;
+    min-width: 0;
+    gap: 0.28rem;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-card-heading .muted {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-card-index {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-question-list {
+    margin-top: 0;
+    padding: 1rem 1.1rem 1.1rem;
+    gap: 1rem;
   }
 
   .page-content .estudo-caso-page .estudo-caso-salvos-panel {
@@ -5645,7 +5704,29 @@ textarea:focus {
   }
 
   .page-content .estudo-caso-page .estudo-caso-card-header h3 {
-    font-size: 1.05rem;
+    margin: 0;
+    font-size: 1.08rem;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .page-content .estudo-caso-page .estudo-caso-required-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 0.25rem 0.65rem;
+    border: 1px solid #fecaca;
+    border-radius: 999px;
+    background: #fff7f7;
+    color: #b42318;
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.2;
   }
 
   .page-content .estudo-caso-page .estudo-caso-note {
@@ -5675,6 +5756,8 @@ textarea:focus {
   }
 
   .page-content .estudo-caso-page :where(input, select, textarea) {
+    width: 100%;
+    box-sizing: border-box;
     min-height: 44px;
     border-color: #cbd5e1;
     border-radius: 11px;
@@ -5686,10 +5769,23 @@ textarea:focus {
     min-height: 120px;
   }
 
+  .page-content .estudo-caso-page :where(input, textarea)::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+  }
+
+  .page-content .estudo-caso-page :where(
+      .estudo-caso-field,
+      .estudo-caso-question-field
+    ) {
+    width: 100%;
+    min-width: 0;
+  }
+
   .page-content .estudo-caso-page .estudo-caso-question-card {
     gap: 1rem;
     padding: 1rem;
-    background: #ffffff;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
   }
 
   .page-content .estudo-caso-page :where(
@@ -5738,8 +5834,25 @@ textarea:focus {
       border-radius: 13px;
     }
 
-    .page-content .estudo-caso-page :where(.panel, .estudo-caso-card) {
+    .page-content .estudo-caso-page .panel {
       padding: 0.9rem;
+    }
+
+    .page-content .estudo-caso-page .estudo-caso-card {
+      padding: 0;
+    }
+
+    .page-content .estudo-caso-page .estudo-caso-card-toggle {
+      align-items: flex-start;
+      padding: 0.9rem;
+    }
+
+    .page-content .estudo-caso-page .estudo-caso-question-list {
+      padding: 0.9rem;
+    }
+
+    .page-content .estudo-caso-page .estudo-caso-card-side {
+      width: 100%;
     }
 
     .page-content .estudo-caso-page :where(

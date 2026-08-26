@@ -2584,7 +2584,7 @@ function EstudoCasoPage() {
                 >
                   <div className="estudo-caso-card-header">
                     <span className="estudo-caso-card-index">{indiceBloco + 1}</span>
-                    <div>
+                    <div className="estudo-caso-card-heading">
                       <h3>{bloco.titulo}</h3>
                       <p className="muted">{bloco.descricao}</p>
                     </div>
@@ -2857,6 +2857,7 @@ function EstudoCasoPage() {
             rows={24}
             value={previaTexto}
             onChange={(event) => setPreviaTexto(event.target.value)}
+            placeholder="A prévia textual gerada a partir das respostas será exibida aqui."
           />
         </section>
       ) : null}
@@ -2865,7 +2866,10 @@ function EstudoCasoPage() {
         <section className="panel estudo-caso-preview-panel">
           <div className="estudo-caso-section-header">
             <div>
-              <h2>Texto final revisado</h2>
+              <div className="estudo-caso-title-row">
+                <h2>Texto final revisado</h2>
+                <span className="estudo-caso-required-badge">Obrigatório para concluir</span>
+              </div>
               <p className="muted">
                 Este é o campo considerado para a conclusão do Estudo de Caso. Cole aqui a
                 versão revisada, conferida e validada pela professora do AEE.
