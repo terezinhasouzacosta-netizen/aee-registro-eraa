@@ -1456,8 +1456,27 @@ textarea:focus {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  align-items: flex-start;
+  align-items: center;
   margin-top: 1rem;
+}
+
+.dashboard-aee-page .dashboard-hero-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.dashboard-aee-page .dashboard-hero-greeting {
+  max-width: 24ch;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.dashboard-aee-page .dashboard-hero-tagline {
+  margin: 0.7rem 0 0;
+  color: #dbeafe;
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.5;
 }
 
 .dashboard-aee-page .dashboard-hero-kicker {

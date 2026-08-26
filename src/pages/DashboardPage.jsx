@@ -95,8 +95,23 @@ function obterMensagemErro(error, mensagemPadrao) {
   return mensagemPadrao;
 }
 
+function obterSaudacaoPorHorario(dataAtual = new Date()) {
+  const hora = dataAtual.getHours();
+
+  if (hora >= 5 && hora < 12) return "Bom dia";
+  if (hora >= 12 && hora < 18) return "Boa tarde";
+  return "Boa noite";
+}
+
+function obterNomeUsuario(currentUser) {
+  const nomeExibicao = currentUser?.displayName?.trim();
+  if (nomeExibicao) return nomeExibicao;
+
+  return currentUser?.email?.split("@")[0]?.replace(/[._-]+/g, " ")?.trim() || "";
+}
+
 function DashboardPage() {
-  const { currentUser, perfil } = useAuth();
+  const { currentUser, perfil, perfilLabel } = useAuth();
   const location = useLocation();
   const [alunos, setAlunos] = useState([]);
   const [sondagens, setSondagens] = useState([]);
@@ -106,8 +121,9 @@ function DashboardPage() {
 
   const podeLer = podeVisualizarAlunos(perfil);
   const somenteVinculados = visualizaSomenteVinculados(perfil);
-  const primeiroNome = currentUser?.displayName?.trim()?.split(/\s+/)?.[0] || "Profissional";
-  const saudacaoPerfil = perfil || "Equipe AEE";
+  const nomeUsuario = obterNomeUsuario(currentUser);
+  const saudacaoHorario = obterSaudacaoPorHorario();
+  const saudacaoPerfil = perfilLabel || perfil || "Perfil não configurado";
 
   console.log("[DashboardPage] checagem de acesso", {
     rotaAtual: location.pathname,
@@ -229,11 +245,15 @@ function DashboardPage() {
   return (
     <main className="alunos-page module-page dashboard-page-wrapper dashboard-aee-page">
       <header className="page-header dashboard-hero">
-        <div className="dashboard-hero-badge">Ambiente inicial AEE Registro</div>
+        <div className="dashboard-hero-badge">Painel inicial AEE Registro</div>
         <div className="dashboard-hero-heading">
-          <div>
-            <p className="dashboard-hero-kicker">Boas-vindas, {primeiroNome}</p>
-            <h1>Painel inicial</h1>
+          <div className="dashboard-hero-copy">
+            <h1 className="dashboard-hero-greeting">
+              {saudacaoHorario}{nomeUsuario ? `, ${nomeUsuario}` : ""}!
+            </h1>
+            <p className="dashboard-hero-tagline">
+              Transformando registros pedagógicos em decisões para a inclusão.
+            </p>
           </div>
           <div className="dashboard-hero-profile-card" aria-label="Perfil atual">
             <span className="dashboard-icon-badge" aria-hidden="true">A</span>
@@ -243,12 +263,6 @@ function DashboardPage() {
             </div>
           </div>
         </div>
-        <p>Visão geral dos registros de sondagem e monitoramento dos alunos.</p>
-        <p className="muted">
-          Orientação: Este painel inicial apresenta um resumo das informações do sistema,
-          permitindo acompanhar os registros realizados e identificar rapidamente situações que
-          necessitam de atenção pedagógica.
-        </p>
       </header>
 
       {erro ? <p className="toast-error">{erro}</p> : null}
