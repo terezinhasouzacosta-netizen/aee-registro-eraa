@@ -3,6 +3,10 @@ import { flushSync } from "react-dom";
 import {
   Accessibility,
   BookOpenCheck,
+  ChartNoAxesColumnIncreasing,
+  CircleCheckBig,
+  Clock3,
+  Files,
   FileSearch,
   GraduationCap,
   HeartHandshake,
@@ -2399,6 +2403,48 @@ function EstudoCasoPage() {
           <strong className="estudo-caso-progress-percentage">
             {progressoPreenchimento.percentual}% concluído
           </strong>
+        </div>
+
+        <div className="estudo-caso-summary-grid" aria-label="Resumo do preenchimento">
+          <article className="estudo-caso-summary-card">
+            <span className="estudo-caso-summary-icon" aria-hidden="true">
+              <Files />
+            </span>
+            <div>
+              <span>Total de perguntas</span>
+              <strong>{progressoPreenchimento.total}</strong>
+            </div>
+          </article>
+
+          <article className="estudo-caso-summary-card is-respondidas">
+            <span className="estudo-caso-summary-icon" aria-hidden="true">
+              <CircleCheckBig />
+            </span>
+            <div>
+              <span>Respondidas</span>
+              <strong>{progressoPreenchimento.respondidas}</strong>
+            </div>
+          </article>
+
+          <article className="estudo-caso-summary-card is-pendentes">
+            <span className="estudo-caso-summary-icon" aria-hidden="true">
+              <Clock3 />
+            </span>
+            <div>
+              <span>Pendentes</span>
+              <strong>{progressoPreenchimento.pendentes}</strong>
+            </div>
+          </article>
+
+          <article className="estudo-caso-summary-card is-percentual">
+            <span className="estudo-caso-summary-icon" aria-hidden="true">
+              <ChartNoAxesColumnIncreasing />
+            </span>
+            <div>
+              <span>Percentual concluído</span>
+              <strong>{progressoPreenchimento.percentual}%</strong>
+            </div>
+          </article>
         </div>
 
         <div
