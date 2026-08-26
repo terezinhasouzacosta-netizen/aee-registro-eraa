@@ -1,5 +1,16 @@
 ﻿import { useEffect, useMemo, useState } from "react";
-import { ClipboardList, LineChart, Users } from "lucide-react";
+import {
+  ClipboardList,
+  ClipboardPen,
+  FileBarChart,
+  FileText,
+  LayoutDashboard,
+  LineChart,
+  MessagesSquare,
+  Target,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { listarAlunos, listarAlunosPorIds } from "../services/alunosService";
@@ -266,24 +277,89 @@ function DashboardPage() {
         </article>
       </section>
 
-      <section className="panel quick-links no-print dashboard-content-block dashboard-card dashboard-shortcuts">
-        <h2>Atalhos</h2>
-        <div className="form-actions">
-          <Link className="btn-secondary" to="/sondagens">
-            <span className="dashboard-link-icon" aria-hidden="true">S</span>
-            Abrir Sondagem
+      <section className="panel no-print dashboard-content-block dashboard-card dashboard-shortcuts dashboard-quick-actions">
+        <h2>Ações Rápidas</h2>
+        <div className="dashboard-quick-actions-grid">
+          <Link className="dashboard-quick-action" to="/alunos">
+            <span className="dashboard-quick-action-icon" aria-hidden="true">
+              <UserPlus />
+            </span>
+            <span className="dashboard-quick-action-content">
+              <strong>Cadastrar Aluno</strong>
+              <small>Inclua um novo estudante na plataforma.</small>
+            </span>
           </Link>
-          <Link className="btn-secondary" to="/monitoramentos">
-            <span className="dashboard-link-icon" aria-hidden="true">M</span>
-            Abrir Monitoramento
+          <Link className="dashboard-quick-action" to="/estudo-de-caso">
+            <span className="dashboard-quick-action-icon" aria-hidden="true">
+              <FileText />
+            </span>
+            <span className="dashboard-quick-action-content">
+              <strong>Estudo de Caso</strong>
+              <small>Registre e retome o estudo pedagógico.</small>
+            </span>
           </Link>
-          <Link className="btn-secondary" to="/relatorios">
-            <span className="dashboard-link-icon" aria-hidden="true">R</span>
-            Abrir Relatórios
+          <Link className="dashboard-quick-action" to="/sondagens">
+            <span className="dashboard-quick-action-icon" aria-hidden="true">
+              <ClipboardList />
+            </span>
+            <span className="dashboard-quick-action-content">
+              <strong>Nova Sondagem</strong>
+              <small>Inicie uma sondagem diagnóstica.</small>
+            </span>
           </Link>
-          <Link className="btn-secondary" to="/atendimento-aee">
-            <span className="dashboard-link-icon" aria-hidden="true">A</span>
-            Abrir Atendimento AEE
+          <Link className="dashboard-quick-action" to="/metas">
+            <span className="dashboard-quick-action-icon" aria-hidden="true">
+              <Target />
+            </span>
+            <span className="dashboard-quick-action-content">
+              <strong>Habilidades</strong>
+              <small>Organize habilidades e metas pedagógicas.</small>
+            </span>
+          </Link>
+          <Link className="dashboard-quick-action" to="/atendimento-aee">
+            <span className="dashboard-quick-action-icon" aria-hidden="true">
+              <ClipboardPen />
+            </span>
+            <span className="dashboard-quick-action-content">
+              <strong>Atendimento AEE</strong>
+              <small>Registre um atendimento especializado.</small>
+            </span>
+          </Link>
+          <Link className="dashboard-quick-action" to="/acompanhamento">
+            <span className="dashboard-quick-action-icon" aria-hidden="true">
+              <MessagesSquare />
+            </span>
+            <span className="dashboard-quick-action-content">
+              <strong>Acompanhamento</strong>
+              <small>Acesse os registros de acompanhamento.</small>
+            </span>
+          </Link>
+          <Link className="dashboard-quick-action" to="/monitoramentos">
+            <span className="dashboard-quick-action-icon" aria-hidden="true">
+              <LineChart />
+            </span>
+            <span className="dashboard-quick-action-content">
+              <strong>Evolução Pedagógica</strong>
+              <small>Consulte a evolução pelos atendimentos.</small>
+            </span>
+          </Link>
+          <Link className="dashboard-quick-action" to="/relatorios">
+            <span className="dashboard-quick-action-icon" aria-hidden="true">
+              <FileBarChart />
+            </span>
+            <span className="dashboard-quick-action-content">
+              <strong>Relatório Pedagógico</strong>
+              <small>Elabore e consulte relatórios do aluno.</small>
+            </span>
+          </Link>
+          <Link className="dashboard-quick-action" to="/painel-coordenacao">
+            <span className="dashboard-quick-action-icon" aria-hidden="true">
+              <LayoutDashboard />
+            </span>
+            <span className="dashboard-quick-action-content">
+              <strong>Painel da Coordenação</strong>
+              <small>Acompanhe indicadores institucionais.</small>
+            </span>
           </Link>
         </div>
       </section>
