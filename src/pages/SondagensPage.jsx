@@ -40,21 +40,29 @@ const CAMPOS_SINTESE = [
   {
     key: "sintesePotencialidadesInteresses",
     titulo: "Potencialidades e interesses do estudante",
+    placeholder:
+      "Descreva as habilidades, interesses, facilidades e potencialidades demonstradas pelo estudante durante a avaliação.",
     aliases: ["Potencialidades e interesses do estudante"],
   },
   {
     key: "sinteseHabilidadesConsolidadas",
     titulo: "Habilidades consolidadas",
+    placeholder:
+      "Informe as habilidades que o estudante já realiza com autonomia ou apresenta de forma consistente.",
     aliases: ["Habilidades consolidadas"],
   },
   {
     key: "sinteseHabilidadesDesenvolvimento",
     titulo: "Habilidades em desenvolvimento",
+    placeholder:
+      "Registre as habilidades que estão em processo de aquisição e que necessitam de continuidade nas intervenções pedagógicas.",
     aliases: ["Habilidades em desenvolvimento"],
   },
   {
     key: "sinteseHabilidadesPrioritarias",
     titulo: "Habilidades prioritárias para intervenções",
+    placeholder:
+      "Indique as habilidades que deverão ser priorizadas nos próximos atendimentos e planejamentos do AEE.",
     aliases: [
       "Habilidades prioritárias para intervenções",
       "Habilidades prioritárias para intervenção",
@@ -63,6 +71,8 @@ const CAMPOS_SINTESE = [
   {
     key: "sinteseRecomendacoesEncaminhamentos",
     titulo: "Recomendações pedagógicas e encaminhamentos",
+    placeholder:
+      "Descreva recomendações para o professor, família, equipe pedagógica e demais encaminhamentos necessários para favorecer o desenvolvimento do estudante.",
     aliases: ["Recomendações pedagógicas e encaminhamentos"],
   },
 ];
@@ -852,6 +862,7 @@ function SondagensPage() {
                     id="observacoes"
                     name="observacoes"
                     rows={4}
+                    placeholder="Registre observações gerais sobre o estudante durante a sondagem, destacando aspectos relevantes do comportamento, participação, comunicação e aprendizagem."
                     value={form.observacoes}
                     onChange={handleChange}
                   />
@@ -880,6 +891,7 @@ function SondagensPage() {
                           id={campo.key}
                           name={campo.key}
                           rows={4}
+                          placeholder={campo.placeholder}
                           value={form[campo.key]}
                           onChange={handleChange}
                         />

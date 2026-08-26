@@ -5080,6 +5080,11 @@ textarea:focus {
     line-height: 1.5;
   }
 
+  .page-content .sondagens-page textarea::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+  }
+
   .page-content .sondagens-page :where(input, select, textarea):focus {
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
