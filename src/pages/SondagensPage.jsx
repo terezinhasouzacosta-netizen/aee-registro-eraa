@@ -1,4 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from "react";
+import { ClipboardCheck } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { listarAlunos, listarAlunosPorIds } from "../services/alunosService";
 import {
@@ -699,14 +700,22 @@ function SondagensPage() {
 
   return (
     <main className="alunos-page module-page sondagens-page">
-      <header className="page-header">
-        <h1>Sondagem diagnóstica do aluno</h1>
-        <p>Registre diagnósticos iniciais e acompanhe necessidades pedagógicas.</p>
-        <p className="muted">
-          Orientação: O(a) professor(a) do AEE é responsável pela realização da sondagem
-          diagnóstica dos alunos, identificando suas necessidades e subsidiando o planejamento das
-          intervenções pedagógicas.
-        </p>
+      <header className="page-header sondagens-page-header">
+        <span className="sondagens-page-header-icon" aria-hidden="true">
+          <ClipboardCheck />
+        </span>
+        <div>
+          <h1>Sondagem Diagnóstica</h1>
+          <p>
+            Identifique as potencialidades, dificuldades e necessidades pedagógicas do estudante
+            para subsidiar o planejamento das intervenções.
+          </p>
+          <p className="sondagens-page-header-guidance">
+            Orientação: O(a) professor(a) do AEE é responsável pela realização da sondagem
+            diagnóstica dos alunos, identificando suas necessidades e subsidiando o planejamento
+            das intervenções pedagógicas.
+          </p>
+        </div>
       </header>
 
       {feedback ? <p className="toast-success">{feedback}</p> : null}
