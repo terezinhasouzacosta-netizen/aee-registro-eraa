@@ -364,7 +364,9 @@ function AppLayout() {
             className="sidebar-logo-img"
           />
           <p className="sidebar-brand-slogan">
-            Acolher • Planejar • Acompanhar • Incluir
+            Acolher • Planejar
+            <br />
+            Acompanhar • Incluir
           </p>
         </div>
         <nav className="sidebar-nav">
