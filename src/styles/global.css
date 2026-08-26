@@ -250,6 +250,7 @@ button:hover {
   text-decoration: none;
   display: flex;
   align-items: center;
+  gap: 0.65rem;
   min-height: 44px;
   padding: 0.68rem 0.8rem;
   font-size: 14.5px;
@@ -4403,16 +4404,12 @@ textarea:focus {
   background: var(--sidebar-hover-bg) !important;
 }
 
-.sidebar-section-icon {
-  width: 16px;
-  min-width: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  line-height: 1;
-  transform: translateY(-0.5px);
-  opacity: 0.95;
+.sidebar-link-icon {
+  width: 19px;
+  min-width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  color: currentColor;
 }
 
 /* Etapa final: ajuste proporcional da tabela de alunos */

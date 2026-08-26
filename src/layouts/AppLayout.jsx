@@ -1,5 +1,19 @@
 ﻿import { useEffect } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
+import {
+  BookOpen,
+  ClipboardList,
+  ClipboardPen,
+  FileBarChart,
+  FileText,
+  Home,
+  LayoutDashboard,
+  LineChart,
+  MessagesSquare,
+  NotebookPen,
+  Target,
+  Users,
+} from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import aeeRegistroLogo from "../assets/aee-registro-logo.png";
 import {
@@ -356,69 +370,105 @@ function AppLayout() {
         <nav className="sidebar-nav">
           <div className="sidebar-section">
             <p className="sidebar-section-title">
-              <span className="sidebar-section-icon" aria-hidden="true">🏠</span>
               <span>GERAL</span>
             </p>
-            <NavLink to="/">Início</NavLink>
-            {mostrarAlunos ? <NavLink to="/alunos">Alunos</NavLink> : null}
+            <NavLink to="/">
+              <Home className="sidebar-link-icon" aria-hidden="true" />
+              <span>Início</span>
+            </NavLink>
+            {mostrarAlunos ? (
+              <NavLink to="/alunos">
+                <Users className="sidebar-link-icon" aria-hidden="true" />
+                <span>Alunos</span>
+              </NavLink>
+            ) : null}
           </div>
 
           {mostrarSondagem ? (
             <div className="sidebar-section">
               <p className="sidebar-section-title">
-                <span className="sidebar-section-icon" aria-hidden="true">🔍</span>
                 <span>DIAGNÓSTICO</span>
               </p>
-              <NavLink to="/estudo-de-caso">Estudo de Caso</NavLink>
-              <NavLink to="/sondagens">Sondagem</NavLink>
+              <NavLink to="/estudo-de-caso">
+                <FileText className="sidebar-link-icon" aria-hidden="true" />
+                <span>Estudo de Caso</span>
+              </NavLink>
+              <NavLink to="/sondagens">
+                <ClipboardList className="sidebar-link-icon" aria-hidden="true" />
+                <span>Sondagem</span>
+              </NavLink>
             </div>
           ) : null}
 
           {mostrarHabilidades ? (
             <div className="sidebar-section">
               <p className="sidebar-section-title">
-                <span className="sidebar-section-icon" aria-hidden="true">🧠</span>
                 <span>PLANEJAMENTO</span>
               </p>
-              <NavLink to="/metas">Habilidades</NavLink>
-              <NavLink to="/paee">PAEE</NavLink>
-              <NavLink to="/pei">PEI</NavLink>
+              <NavLink to="/metas">
+                <Target className="sidebar-link-icon" aria-hidden="true" />
+                <span>Habilidades</span>
+              </NavLink>
+              <NavLink to="/paee">
+                <BookOpen className="sidebar-link-icon" aria-hidden="true" />
+                <span>PAEE</span>
+              </NavLink>
+              <NavLink to="/pei">
+                <NotebookPen className="sidebar-link-icon" aria-hidden="true" />
+                <span>PEI</span>
+              </NavLink>
             </div>
           ) : null}
 
           {mostrarAtendimentoAEE || mostrarAcompanhamento ? (
             <div className="sidebar-section">
               <p className="sidebar-section-title">
-                <span className="sidebar-section-icon" aria-hidden="true">🎯</span>
                 <span>INTERVENÇÃO</span>
               </p>
               {mostrarAtendimentoAEE ? (
                 <NavLink to="/atendimento-aee" className="sidebar-link-highlight">
-                  Atendimento AEE
+                  <ClipboardPen className="sidebar-link-icon" aria-hidden="true" />
+                  <span>Atendimento AEE</span>
                 </NavLink>
               ) : null}
-              {mostrarAcompanhamento ? <NavLink to="/acompanhamento">Acompanhamento</NavLink> : null}
+              {mostrarAcompanhamento ? (
+                <NavLink to="/acompanhamento">
+                  <MessagesSquare className="sidebar-link-icon" aria-hidden="true" />
+                  <span>Acompanhamento</span>
+                </NavLink>
+              ) : null}
             </div>
           ) : null}
 
           {mostrarMonitoramento || mostrarRelatorios ? (
             <div className="sidebar-section">
               <p className="sidebar-section-title">
-                <span className="sidebar-section-icon" aria-hidden="true">📊</span>
                 <span>AVALIAÇÃO E ANÁLISE</span>
               </p>
-              {mostrarMonitoramento ? <NavLink to="/monitoramentos">Monitoramento</NavLink> : null}
-              {mostrarRelatorios ? <NavLink to="/relatorios">Relatórios</NavLink> : null}
+              {mostrarMonitoramento ? (
+                <NavLink to="/monitoramentos">
+                  <LineChart className="sidebar-link-icon" aria-hidden="true" />
+                  <span>Monitoramento</span>
+                </NavLink>
+              ) : null}
+              {mostrarRelatorios ? (
+                <NavLink to="/relatorios">
+                  <FileBarChart className="sidebar-link-icon" aria-hidden="true" />
+                  <span>Relatórios</span>
+                </NavLink>
+              ) : null}
             </div>
           ) : null}
 
           {mostrarPainelCoordenacao ? (
             <div className="sidebar-section">
               <p className="sidebar-section-title">
-                <span className="sidebar-section-icon" aria-hidden="true">⚙️</span>
                 <span>GESTÃO</span>
               </p>
-              <NavLink to="/painel-coordenacao">Painel da Coordenação</NavLink>
+              <NavLink to="/painel-coordenacao">
+                <LayoutDashboard className="sidebar-link-icon" aria-hidden="true" />
+                <span>Painel da Coordenação</span>
+              </NavLink>
             </div>
           ) : null}
         </nav>
