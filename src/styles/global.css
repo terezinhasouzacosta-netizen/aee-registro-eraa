@@ -263,28 +263,29 @@ button:hover {
   line-height: 1.25;
   font-weight: 500;
   border: 1px solid transparent;
-  border-radius: 11px;
-  transition: background-color 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease,
-    color 0.22s ease, text-shadow 0.22s ease;
+  border-radius: 16px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease, text-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .sidebar-nav a.active {
-  background-color: var(--sidebar-active-bg);
-  color: #163b78;
+  background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+  color: #1d4ed8;
   font-weight: 600;
   border-color: rgba(191, 219, 254, 0.95);
-  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.11);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
 }
 
 .sidebar-nav a::before {
   content: "";
   position: absolute;
-  top: 5px;
-  bottom: 5px;
+  top: 7px;
+  bottom: 7px;
   left: 3px;
   width: 4px;
   border-radius: 999px;
-  background: var(--sidebar-active-accent);
+  background: linear-gradient(180deg, var(--sidebar-active-bar), var(--sidebar-active-accent));
+  box-shadow: 0 0 8px rgba(15, 158, 168, 0.42);
   opacity: 0;
   transform: scaleY(0.45);
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -296,7 +297,7 @@ button:hover {
 }
 
 .sidebar-nav a.active .sidebar-link-icon {
-  color: var(--sidebar-active-accent);
+  color: #1d4ed8;
 }
 
 .menu-item.active {
@@ -313,6 +314,10 @@ button:hover {
   font-weight: 600;
   box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
   text-shadow: 0 1px 5px rgba(255, 255, 255, 0.12);
+}
+
+.sidebar-nav a:hover {
+  transform: translateX(4px);
 }
 
 .sidebar-nav a:not(.active):hover .sidebar-link-icon {
@@ -4473,17 +4478,20 @@ textarea:focus {
 }
 
 .app-shell > .app-sidebar .sidebar-nav a.active {
-  background: var(--sidebar-active-bg) !important;
-  color: #163b78 !important;
+  background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%) !important;
+  color: #1d4ed8 !important;
   border-color: rgba(191, 219, 254, 0.95) !important;
-  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.11) !important;
-  transform: none;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12) !important;
 }
 
 .app-shell > .app-sidebar .sidebar-nav a:not(.active):hover {
   background: var(--sidebar-hover-bg) !important;
   border-color: rgba(255, 255, 255, 0.14);
   box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08) !important;
+}
+
+.app-shell > .app-sidebar .sidebar-nav a:hover {
+  transform: translateX(4px);
 }
 
 .sidebar-link-icon {
