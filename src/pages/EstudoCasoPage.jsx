@@ -1,6 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
-import { FileSearch } from "lucide-react";
+import {
+  Accessibility,
+  BookOpenCheck,
+  FileSearch,
+  GraduationCap,
+  HeartHandshake,
+  House,
+  MessageCircle,
+  Target,
+  UserRound,
+} from "lucide-react";
 import {
   atualizarEstudoCaso,
   buscarEstudoCasoPorId,
@@ -122,12 +132,14 @@ const BLOCOS_ESTUDO_CASO = [
     id: "identificacao-estudante",
     titulo: "Identificação do estudante",
     descricao: "Campos visuais de referência para situar o caso pedagógico do estudante.",
+    icone: UserRound,
     tipo: "identificacao",
   },
   {
     id: "escuta-estudante",
     titulo: "Escuta do estudante",
     descricao: "Perguntas orientadoras para registrar a voz do estudante e sua percepção sobre a escola.",
+    icone: MessageCircle,
     tipo: "textual",
     perguntas: [
       { id: "gosta-escola", enunciado: "O estudante gosta da escola?" },
@@ -161,6 +173,7 @@ const BLOCOS_ESTUDO_CASO = [
     id: "familia",
     titulo: "Família/responsáveis",
     descricao: "Perguntas orientadoras para compreender a visão da família sobre o estudante e sua escolarização.",
+    icone: House,
     tipo: "textual",
     perguntas: [
       {
@@ -198,6 +211,7 @@ const BLOCOS_ESTUDO_CASO = [
     id: "professor-regente",
     titulo: "Professor regente",
     descricao: "Perguntas investigativas para sistematizar o olhar pedagógico da sala regular.",
+    icone: GraduationCap,
     tipo: "textual",
     perguntas: [
       {
@@ -238,6 +252,7 @@ const BLOCOS_ESTUDO_CASO = [
     id: "observacao-pedagogica",
     titulo: "Observação pedagógica escolar",
     descricao: "Registro objetivo da observação pedagógica com opções visuais e espaço para observações complementares.",
+    icone: BookOpenCheck,
     tipo: "objetiva",
     observacoesLabel: "Observações complementares da observação pedagógica",
     perguntas: [
@@ -287,6 +302,7 @@ const BLOCOS_ESTUDO_CASO = [
     id: "barreiras-apoios",
     titulo: "Barreiras, apoios e acessibilidade",
     descricao: "Perguntas para investigar barreiras, recursos existentes e apoios necessários.",
+    icone: Accessibility,
     tipo: "textual",
     perguntas: [
       {
@@ -327,6 +343,7 @@ const BLOCOS_ESTUDO_CASO = [
     id: "informacoes-aee",
     titulo: "Informações do AEE",
     descricao: "Perguntas investigativas para consolidar o olhar pedagógico do AEE.",
+    icone: HeartHandshake,
     tipo: "textual",
     perguntas: [
       {
@@ -371,6 +388,7 @@ const BLOCOS_ESTUDO_CASO = [
     id: "sintese-final",
     titulo: "Síntese pedagógica final",
     descricao: "Perguntas para consolidar a leitura final do caso e orientar os próximos passos pedagógicos.",
+    icone: Target,
     tipo: "textual",
     perguntas: [
       {
@@ -2660,6 +2678,7 @@ function EstudoCasoPage() {
               perguntasEstado,
               identificacaoEstudante,
             );
+            const IconeBloco = bloco.icone;
             const aberto = blocosAbertos[bloco.id];
 
             return (
@@ -2673,7 +2692,12 @@ function EstudoCasoPage() {
                   <div className="estudo-caso-card-header">
                     <span className="estudo-caso-card-index">{indiceBloco + 1}</span>
                     <div className="estudo-caso-card-heading">
-                      <h3>{bloco.titulo}</h3>
+                      <h3>
+                        <span className="estudo-caso-card-title-icon" aria-hidden="true">
+                          <IconeBloco />
+                        </span>
+                        {bloco.titulo}
+                      </h3>
                       <p className="muted">{bloco.descricao}</p>
                     </div>
                   </div>
