@@ -1,4 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from "react";
+import { ClipboardList, LineChart, Users } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { listarAlunos, listarAlunosPorIds } from "../services/alunosService";
@@ -243,17 +244,23 @@ function DashboardPage() {
 
       <section className="dashboard-grid dashboard-content-block dashboard-stats-grid">
         <article className="panel stat-card dashboard-card dashboard-stat-card">
-          <span className="dashboard-card-icon" aria-hidden="true">A</span>
+          <span className="dashboard-card-icon" aria-hidden="true">
+            <Users />
+          </span>
           <h2>Total de alunos</h2>
           <strong>{alunos.length}</strong>
         </article>
         <article className="panel stat-card dashboard-card dashboard-stat-card">
-          <span className="dashboard-card-icon" aria-hidden="true">S</span>
+          <span className="dashboard-card-icon" aria-hidden="true">
+            <ClipboardList />
+          </span>
           <h2>Total de sondagens</h2>
           <strong>{sondagens.length}</strong>
         </article>
         <article className="panel stat-card dashboard-card dashboard-stat-card">
-          <span className="dashboard-card-icon" aria-hidden="true">M</span>
+          <span className="dashboard-card-icon" aria-hidden="true">
+            <LineChart />
+          </span>
           <h2>Total de monitoramentos</h2>
           <strong>{monitoramentos.length}</strong>
         </article>

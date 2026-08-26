@@ -4806,3 +4806,112 @@ textarea:focus {
   }
 }
 
+/* Refinamento visual dos cartoes do Dashboard */
+@media screen {
+  .page-content .dashboard-aee-page .dashboard-content-block {
+    margin-top: 1.15rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 1.15rem;
+  }
+
+  .page-content .dashboard-aee-page :where(
+      .dashboard-card,
+      .dashboard-section-card,
+      .dashboard-shortcuts,
+      .dashboard-meta-card,
+      .dashboard-profile-card
+    ) {
+    border: 1px solid #dbeafe;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(30, 64, 175, 0.08);
+  }
+
+  .page-content .dashboard-aee-page :where(
+      .dashboard-section-card,
+      .dashboard-shortcuts
+    ) {
+    padding: 1.2rem;
+  }
+
+  .page-content .dashboard-aee-page :where(
+      .dashboard-meta-card,
+      .dashboard-profile-card
+    ) {
+    padding: 1rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-stat-card {
+    display: flex;
+    min-height: 172px;
+    height: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.2rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-card-icon {
+    position: relative;
+    z-index: 1;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 0.85rem;
+    border-radius: 12px;
+    color: #1d4ed8;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-card-icon svg {
+    width: 21px;
+    height: 21px;
+    stroke-width: 2;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-stat-card h2 {
+    position: relative;
+    z-index: 1;
+    margin: 0 0 0.4rem;
+    color: #475569;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-stat-card > strong {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    color: #123b6d;
+    font-size: clamp(2rem, 4vw, 2.35rem);
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .page-content .dashboard-aee-page :where(
+      .dashboard-columns,
+      .perfis-grid
+    ) {
+    gap: 1.15rem;
+  }
+
+  @media (max-width: 900px) {
+    .page-content .dashboard-aee-page .dashboard-stats-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 620px) {
+    .page-content .dashboard-aee-page .dashboard-stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .page-content .dashboard-aee-page .dashboard-stat-card {
+      min-height: 158px;
+    }
+  }
+}
+
