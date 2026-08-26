@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
+import { FileSearch } from "lucide-react";
 import {
   atualizarEstudoCaso,
   buscarEstudoCasoPorId,
@@ -2310,13 +2311,17 @@ function EstudoCasoPage() {
 
   return (
     <main className="alunos-page module-page estudo-caso-page">
-      <header className="page-header">
-        <h1>Estudo de Caso</h1>
-        <p>
-          O Estudo de Caso organiza informações pedagógicas sobre o estudante, suas
-          potencialidades, barreiras, necessidades de apoio e encaminhamentos, servindo como base
-          para o PAEE e o PEI.
-        </p>
+      <header className="page-header estudo-caso-page-header">
+        <span className="estudo-caso-page-header-icon" aria-hidden="true">
+          <FileSearch />
+        </span>
+        <div>
+          <h1>Estudo de Caso</h1>
+          <p>
+            Registro detalhado das informações pedagógicas, educacionais e do desenvolvimento do
+            estudante.
+          </p>
+        </div>
       </header>
 
       {feedback ? <p className="toast-success">{feedback}</p> : null}
