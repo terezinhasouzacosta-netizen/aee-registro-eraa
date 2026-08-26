@@ -9,6 +9,7 @@ import {
   MessagesSquare,
   Target,
   UserPlus,
+  UserRound,
   Users,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -105,9 +106,16 @@ function obterSaudacaoPorHorario(dataAtual = new Date()) {
 
 function obterNomeUsuario(currentUser) {
   const nomeExibicao = currentUser?.displayName?.trim();
-  if (nomeExibicao) return nomeExibicao;
+  if (!nomeExibicao) return "";
 
-  return currentUser?.email?.split("@")[0]?.replace(/[._-]+/g, " ")?.trim() || "";
+  const nomeNormalizado = nomeExibicao
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+
+  if (nomeNormalizado === "aee" || nomeNormalizado.startsWith("aee ")) return "";
+  return nomeExibicao;
 }
 
 function DashboardPage() {
@@ -256,7 +264,9 @@ function DashboardPage() {
             </p>
           </div>
           <div className="dashboard-hero-profile-card" aria-label="Perfil atual">
-            <span className="dashboard-icon-badge" aria-hidden="true">A</span>
+            <span className="dashboard-icon-badge" aria-hidden="true">
+              <UserRound />
+            </span>
             <div>
               <strong>{saudacaoPerfil}</strong>
               <p>Acompanhamento institucional da Educação Especial</p>

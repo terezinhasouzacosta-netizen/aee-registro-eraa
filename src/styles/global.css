@@ -1431,8 +1431,8 @@ textarea:focus {
 .dashboard-aee-page .dashboard-hero {
   background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
   border: 1px solid #1e40af;
-  border-radius: 24px;
-  padding: 1.4rem 1.5rem;
+  border-radius: 20px;
+  padding: 1rem 1.25rem;
   color: #ffffff;
   box-shadow: 0 22px 48px rgba(30, 58, 138, 0.22);
 }
@@ -1442,11 +1442,11 @@ textarea:focus {
   align-items: center;
   gap: 0.4rem;
   border-radius: 999px;
-  padding: 0.38rem 0.72rem;
+  padding: 0.3rem 0.65rem;
   background: rgba(219, 234, 254, 0.18);
   border: 1px solid rgba(219, 234, 254, 0.34);
   color: #dbeafe;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   text-transform: uppercase;
@@ -1457,7 +1457,7 @@ textarea:focus {
   justify-content: space-between;
   gap: 1rem;
   align-items: center;
-  margin-top: 1rem;
+  margin-top: 0.7rem;
 }
 
 .dashboard-aee-page .dashboard-hero-copy {
@@ -1472,7 +1472,7 @@ textarea:focus {
 }
 
 .dashboard-aee-page .dashboard-hero-tagline {
-  margin: 0.7rem 0 0;
+  margin: 0.45rem 0 0;
   color: #dbeafe;
   font-size: 1.02rem;
   font-weight: 600;
@@ -1501,12 +1501,12 @@ textarea:focus {
 }
 
 .dashboard-aee-page .dashboard-hero-profile-card {
-  min-width: 250px;
+  min-width: 245px;
   display: flex;
-  gap: 0.75rem;
+  gap: 0.7rem;
   align-items: center;
-  padding: 0.9rem 1rem;
-  border-radius: 18px;
+  padding: 0.72rem 0.85rem;
+  border-radius: 16px;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(219, 234, 254, 0.28);
 }
@@ -1520,7 +1520,8 @@ textarea:focus {
 .dashboard-aee-page .dashboard-hero-profile-card p {
   margin: 0;
   color: #dbeafe;
-  font-size: 0.88rem;
+  font-size: 0.84rem;
+  line-height: 1.4;
 }
 
 .dashboard-aee-page .dashboard-icon-badge,
@@ -1536,10 +1537,16 @@ textarea:focus {
 }
 
 .dashboard-aee-page .dashboard-icon-badge {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
   flex-shrink: 0;
+}
+
+.dashboard-aee-page .dashboard-icon-badge svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2;
 }
 
 .dashboard-aee-page .dashboard-stats-grid {
@@ -4932,6 +4939,7 @@ textarea:focus {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: stretch;
     gap: 1.15rem;
+    margin-top: 0.75rem;
   }
 
   .page-content .dashboard-aee-page :where(
@@ -4972,8 +4980,8 @@ textarea:focus {
   .page-content .dashboard-aee-page .dashboard-card-icon {
     position: relative;
     z-index: 1;
-    width: 42px;
-    height: 42px;
+    width: 46px;
+    height: 46px;
     margin-bottom: 0.85rem;
     border-radius: 12px;
     color: #1d4ed8;
@@ -4982,8 +4990,8 @@ textarea:focus {
   }
 
   .page-content .dashboard-aee-page .dashboard-card-icon svg {
-    width: 21px;
-    height: 21px;
+    width: 23px;
+    height: 23px;
     stroke-width: 2;
   }
 
@@ -5002,7 +5010,7 @@ textarea:focus {
     z-index: 1;
     margin-top: auto;
     color: #123b6d;
-    font-size: clamp(2rem, 4vw, 2.35rem);
+    font-size: clamp(2.2rem, 4.2vw, 2.6rem);
     font-weight: 800;
     line-height: 1;
   }
