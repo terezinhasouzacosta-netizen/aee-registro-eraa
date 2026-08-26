@@ -473,6 +473,28 @@ function obterResumoBloco(bloco, perguntasEstado, identificacaoEstudante) {
   return contarPorStatus(obterRegistrosBloco(bloco, perguntasEstado, identificacaoEstudante));
 }
 
+function obterProgressoVisualBloco(bloco, perguntasEstado, identificacaoEstudante) {
+  const preenchimentos =
+    bloco.tipo === "identificacao"
+      ? IDENTIFICACAO_FIELDS.map((campo) => identificacaoEstudante[campo.id])
+      : bloco.perguntas.map(
+          (pergunta) => perguntasEstado[`${bloco.id}-${pergunta.id}`]?.resposta,
+        );
+  const total = preenchimentos.length;
+  const respondidas = preenchimentos.filter((valor) => Boolean(limparTexto(valor))).length;
+  const pendentes = Math.max(total - respondidas, 0);
+
+  if (total > 0 && respondidas === total) {
+    return { respondidas, pendentes, status: "concluido", statusLabel: "✔ Concluído" };
+  }
+
+  if (respondidas > 0) {
+    return { respondidas, pendentes, status: "andamento", statusLabel: "⏳ Em andamento" };
+  }
+
+  return { respondidas, pendentes, status: "nao-iniciado", statusLabel: "○ Não iniciado" };
+}
+
 function obterResumoGeral(perguntasEstado, identificacaoEstudante) {
   const registros = BLOCOS_ESTUDO_CASO.flatMap((bloco) =>
     obterRegistrosBloco(bloco, perguntasEstado, identificacaoEstudante),
@@ -2633,7 +2655,11 @@ function EstudoCasoPage() {
 
         <div className="estudo-caso-blocks">
           {BLOCOS_ESTUDO_CASO.map((bloco, indiceBloco) => {
-            const resumoBloco = obterResumoBloco(bloco, perguntasEstado, identificacaoEstudante);
+            const progressoBloco = obterProgressoVisualBloco(
+              bloco,
+              perguntasEstado,
+              identificacaoEstudante,
+            );
             const aberto = blocosAbertos[bloco.id];
 
             return (
@@ -2654,11 +2680,18 @@ function EstudoCasoPage() {
 
                   <div className="estudo-caso-card-side">
                     <div className="estudo-caso-card-meta">
-                      <span className="estudo-caso-status-chip is-respondida">
-                        {resumoBloco.respondida} respondidas
+                      <span
+                        className={`estudo-caso-block-progress-badge is-${progressoBloco.status}`}
+                      >
+                        {progressoBloco.statusLabel}
                       </span>
-                      <span className="estudo-caso-status-chip is-pendente">
-                        {resumoBloco.pendente} pendentes
+                      <span className="estudo-caso-block-count is-respondida">
+                        <span aria-hidden="true">✔</span>
+                        Respondidas: <strong>{progressoBloco.respondidas}</strong>
+                      </span>
+                      <span className="estudo-caso-block-count is-pendente">
+                        <span aria-hidden="true">⏳</span>
+                        Pendentes: <strong>{progressoBloco.pendentes}</strong>
                       </span>
                     </div>
                     <span className={`estudo-caso-chevron ${aberto ? "is-open" : ""}`}>⌄</span>

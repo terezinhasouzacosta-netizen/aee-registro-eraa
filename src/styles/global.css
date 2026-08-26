@@ -4129,8 +4129,65 @@ textarea:focus {
 .estudo-caso-page .estudo-caso-card-meta {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.45rem;
   justify-content: flex-end;
+}
+
+.estudo-caso-page .estudo-caso-block-progress-badge,
+.estudo-caso-page .estudo-caso-block-count {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.68rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.estudo-caso-page .estudo-caso-block-progress-badge.is-concluido {
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.estudo-caso-page .estudo-caso-block-progress-badge.is-andamento {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #a16207;
+}
+
+.estudo-caso-page .estudo-caso-block-progress-badge.is-nao-iniciado {
+  border-color: #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.estudo-caso-page .estudo-caso-block-count {
+  border-color: #dbeafe;
+  background: #ffffff;
+  color: #475569;
+  box-shadow: 0 4px 10px rgba(30, 64, 175, 0.06);
+}
+
+.estudo-caso-page .estudo-caso-block-count strong {
+  color: #1e3a8a;
+  font-weight: 800;
+}
+
+.estudo-caso-page .estudo-caso-block-count.is-respondida {
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.estudo-caso-page .estudo-caso-block-count.is-pendente {
+  border-color: #fde68a;
+  color: #a16207;
 }
 
 .estudo-caso-page .estudo-caso-chevron {
