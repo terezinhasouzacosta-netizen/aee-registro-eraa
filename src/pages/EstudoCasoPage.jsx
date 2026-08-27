@@ -431,6 +431,17 @@ const BLOCOS_ESTUDO_CASO = [
   },
 ];
 
+const BLOCOS_PEDAGOGICOS = BLOCOS_ESTUDO_CASO.filter((bloco) =>
+  Array.isArray(bloco.perguntas),
+);
+
+const PERGUNTAS_PEDAGOGICAS = BLOCOS_PEDAGOGICOS.flatMap((bloco) =>
+  bloco.perguntas.map((pergunta) => ({
+    blocoId: bloco.id,
+    perguntaId: pergunta.id,
+  })),
+);
+
 function criarEstadoInicialPerguntas() {
   const estadoInicial = {};
 
@@ -463,66 +474,66 @@ function criarEstadoObservacoesObjetivas() {
   return estadoInicial;
 }
 
-function contarPorStatus(registros) {
-  return registros.reduce(
-    (acc, registro) => {
-      const status = registro?.status || "pendente";
-      acc[status] += 1;
-      acc.total += 1;
-      return acc;
-    },
-    {
-      respondida: 0,
-      pendente: 0,
-      ignorada: 0,
-      revisar: 0,
-      total: 0,
-    },
-  );
+function obterProgressoPerguntas(
+  perguntasEstado,
+  perguntasPedagogicas = PERGUNTAS_PEDAGOGICAS,
+) {
+  const total = perguntasPedagogicas.length;
+  const respondidas = perguntasPedagogicas.filter(({ blocoId, perguntaId }) =>
+    Boolean(limparTexto(perguntasEstado[`${blocoId}-${perguntaId}`]?.resposta)),
+  ).length;
+
+  return {
+    respondidas,
+    pendentes: Math.max(total - respondidas, 0),
+    total,
+    percentual: total ? Math.round((respondidas / total) * 100) : 0,
+  };
 }
 
-function obterRegistrosBloco(bloco, perguntasEstado, identificacaoEstudante) {
-  if (bloco.tipo === "identificacao") {
-    return IDENTIFICACAO_FIELDS.map((campo) => ({
-      status: identificacaoEstudante[campo.id]?.trim() ? "respondida" : "pendente",
-    }));
+function obterProgressoVisualBloco(bloco, perguntasEstado) {
+  if (!Array.isArray(bloco.perguntas)) {
+    return {
+      administrativo: true,
+      respondidas: 0,
+      pendentes: 0,
+      total: 0,
+      percentual: 0,
+      status: "administrativo",
+      statusLabel: "Dados administrativos",
+    };
   }
 
-  return bloco.perguntas.map((pergunta) => perguntasEstado[`${bloco.id}-${pergunta.id}`]);
-}
-
-function obterResumoBloco(bloco, perguntasEstado, identificacaoEstudante) {
-  return contarPorStatus(obterRegistrosBloco(bloco, perguntasEstado, identificacaoEstudante));
-}
-
-function obterProgressoVisualBloco(bloco, perguntasEstado, identificacaoEstudante) {
-  const preenchimentos =
-    bloco.tipo === "identificacao"
-      ? IDENTIFICACAO_FIELDS.map((campo) => identificacaoEstudante[campo.id])
-      : bloco.perguntas.map(
-          (pergunta) => perguntasEstado[`${bloco.id}-${pergunta.id}`]?.resposta,
-        );
-  const total = preenchimentos.length;
-  const respondidas = preenchimentos.filter((valor) => Boolean(limparTexto(valor))).length;
-  const pendentes = Math.max(total - respondidas, 0);
+  const progresso = obterProgressoPerguntas(
+    perguntasEstado,
+    bloco.perguntas.map((pergunta) => ({
+      blocoId: bloco.id,
+      perguntaId: pergunta.id,
+    })),
+  );
+  const { respondidas, pendentes, total } = progresso;
 
   if (total > 0 && respondidas === total) {
-    return { respondidas, pendentes, status: "concluido", statusLabel: "✔ Concluído" };
+    return { ...progresso, status: "concluido", statusLabel: "✔ Concluído" };
   }
 
   if (respondidas > 0) {
-    return { respondidas, pendentes, status: "andamento", statusLabel: "⏳ Em andamento" };
+    return { ...progresso, status: "andamento", statusLabel: "⏳ Em andamento" };
   }
 
-  return { respondidas, pendentes, status: "nao-iniciado", statusLabel: "○ Não iniciado" };
+  return { ...progresso, status: "nao-iniciado", statusLabel: "○ Não iniciado" };
 }
 
-function obterResumoGeral(perguntasEstado, identificacaoEstudante) {
-  const registros = BLOCOS_ESTUDO_CASO.flatMap((bloco) =>
-    obterRegistrosBloco(bloco, perguntasEstado, identificacaoEstudante),
-  );
+function obterResumoGeral(perguntasEstado) {
+  const progresso = obterProgressoPerguntas(perguntasEstado);
 
-  return contarPorStatus(registros);
+  return {
+    respondida: progresso.respondidas,
+    pendente: progresso.pendentes,
+    ignorada: 0,
+    revisar: 0,
+    total: progresso.total,
+  };
 }
 
 function limparTexto(valor) {
@@ -1953,23 +1964,43 @@ function EstudoCasoPage() {
   const [carregandoEstudosSalvos, setCarregandoEstudosSalvos] = useState(false);
   const [abrindoEstudoId, setAbrindoEstudoId] = useState("");
 
-  const resumoGeral = useMemo(() => {
-    return obterResumoGeral(perguntasEstado, identificacaoEstudante);
-  }, [identificacaoEstudante, perguntasEstado]);
-  const progressoPreenchimento = useMemo(() => {
-    const registrosPerguntas = Object.values(perguntasEstado);
-    const respondidas = registrosPerguntas.filter((registro) =>
-      Boolean(limparTexto(registro?.resposta)),
-    ).length;
-    const total = registrosPerguntas.length;
+  const progressoPreenchimento = useMemo(
+    () => obterProgressoPerguntas(perguntasEstado),
+    [perguntasEstado],
+  );
+  const blocosComProgresso = useMemo(
+    () =>
+      BLOCOS_PEDAGOGICOS.map((bloco) => ({
+        bloco,
+        progresso: obterProgressoVisualBloco(bloco, perguntasEstado),
+      })),
+    [perguntasEstado],
+  );
+  const blocoAtual = blocosComProgresso.find(({ progresso }) => progresso.pendentes > 0) || null;
+  const estudoSalvoAtual = useMemo(
+    () => estudosSalvos.find((estudo) => estudo.id === estudoCasoSalvoId) || null,
+    [estudoCasoSalvoId, estudosSalvos],
+  );
+  const proximaEtapaRecomendada = useMemo(() => {
+    if (metaEstudo.status === "concluido") {
+      return "Estudo concluído; mantenha o documento final disponível para consulta.";
+    }
 
-    return {
-      respondidas,
-      pendentes: Math.max(total - respondidas, 0),
-      total,
-      percentual: total ? Math.round((respondidas / total) * 100) : 0,
-    };
-  }, [perguntasEstado]);
+    if (blocoAtual) {
+      const acao = blocoAtual.progresso.respondidas > 0 ? "Concluir" : "Iniciar";
+      return `${acao} o bloco “${blocoAtual.bloco.titulo}”.`;
+    }
+
+    if (!limparTexto(previaTexto)) {
+      return "Gerar a síntese do Estudo de Caso.";
+    }
+
+    if (!limparTexto(textoFinalRevisado)) {
+      return "Revisar e registrar o texto final do Estudo de Caso.";
+    }
+
+    return "Concluir o Estudo de Caso após validar o texto final.";
+  }, [blocoAtual, metaEstudo.status, previaTexto, textoFinalRevisado]);
   const carregarListaEstudosSalvos = async () => {
     setCarregandoEstudosSalvos(true);
     try {
@@ -2135,7 +2166,7 @@ function EstudoCasoPage() {
   };
 
   const montarPayloadEstudoCaso = ({ statusGeral = metaEstudo.status, dataConclusao } = {}) => {
-    const resumoAtualizado = obterResumoGeral(perguntasEstado, identificacaoEstudante);
+    const resumoAtualizado = obterResumoGeral(perguntasEstado);
     const sintesePreviaAtual = limparTexto(previaTexto)
       ? gerarTextoPreviaEstudoCaso({
           metaEstudo,
@@ -2357,13 +2388,6 @@ function EstudoCasoPage() {
     setPreviaVisivel(false);
   };
 
-  const cardsResumo = [
-    { chave: "respondida", rotulo: "Respondidas", valor: resumoGeral.respondida },
-    { chave: "pendente", rotulo: "Pendentes", valor: resumoGeral.pendente },
-    { chave: "ignorada", rotulo: "Ignoradas", valor: resumoGeral.ignorada },
-    { chave: "revisar", rotulo: "Em revisão", valor: resumoGeral.revisar },
-    { chave: "total", rotulo: "Total", valor: resumoGeral.total },
-  ];
   const estudoConcluido = metaEstudo.status === "concluido";
   const exibirTextoFinalRevisado = previaVisivel || Boolean(limparTexto(textoFinalRevisado));
 
@@ -2654,25 +2678,60 @@ function EstudoCasoPage() {
       </section>
 
       <div className="estudo-caso-top-grid">
-        <section className="panel">
+        <section className="panel estudo-caso-resumo-estudo-panel">
           <div className="estudo-caso-section-header">
             <div>
-              <h2>Painel de acompanhamento</h2>
+              <h2>Resumo do Estudo</h2>
               <p className="muted">
-                Contadores locais desta tela, atualizados conforme o preenchimento visual e o
-                status das perguntas.
+                Informações essenciais do estudo atual, sem repetir os indicadores de progresso.
               </p>
             </div>
           </div>
 
-          <div className="estudo-caso-counter-grid">
-            {cardsResumo.map((card) => (
-              <article key={card.chave} className={`estudo-caso-counter-card is-${card.chave}`}>
-                <span className="estudo-caso-counter-label">{card.rotulo}</span>
-                <strong className="estudo-caso-counter-value">{card.valor}</strong>
-              </article>
-            ))}
-          </div>
+          <dl className="estudo-caso-resumo-estudo-grid">
+            <div>
+              <dt>Status do estudo</dt>
+              <dd>
+                <span
+                  className={`estudo-caso-status-chip is-${obterClasseStatusEstudo(metaEstudo.status)}`}
+                >
+                  {obterLabelStatusEstudo(metaEstudo.status)}
+                </span>
+              </dd>
+            </div>
+            <div>
+              <dt>Responsável pelo preenchimento</dt>
+              <dd>{preencherValorOuPadrao(limparTexto(metaEstudo.responsavel))}</dd>
+            </div>
+            <div>
+              <dt>Última atualização</dt>
+              <dd>
+                {preencherValorOuPadrao(
+                  formatarDataListaEstudo(estudoSalvoAtual?.atualizadoEm, true),
+                  estudoCasoSalvoId ? "Não disponível" : "Ainda não salvo",
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>Data de início</dt>
+              <dd>
+                {preencherValorOuPadrao(
+                  formatarDataListaEstudo(metaEstudo.dataInicio),
+                  "Não informada",
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>Bloco atual</dt>
+              <dd>
+                {blocoAtual?.bloco.titulo || "Todos os blocos pedagógicos preenchidos"}
+              </dd>
+            </div>
+            <div className="is-wide">
+              <dt>Próxima etapa recomendada</dt>
+              <dd>{proximaEtapaRecomendada}</dd>
+            </div>
+          </dl>
         </section>
 
         <section className="panel">
@@ -2722,7 +2781,6 @@ function EstudoCasoPage() {
             const progressoBloco = obterProgressoVisualBloco(
               bloco,
               perguntasEstado,
-              identificacaoEstudante,
             );
             const IconeBloco = bloco.icone;
             const aberto = blocosAbertos[bloco.id];
@@ -2755,14 +2813,18 @@ function EstudoCasoPage() {
                       >
                         {progressoBloco.statusLabel}
                       </span>
-                      <span className="estudo-caso-block-count is-respondida">
-                        <span aria-hidden="true">✔</span>
-                        Respondidas: <strong>{progressoBloco.respondidas}</strong>
-                      </span>
-                      <span className="estudo-caso-block-count is-pendente">
-                        <span aria-hidden="true">⏳</span>
-                        Pendentes: <strong>{progressoBloco.pendentes}</strong>
-                      </span>
+                      {!progressoBloco.administrativo ? (
+                        <>
+                          <span className="estudo-caso-block-count is-respondida">
+                            <span aria-hidden="true">✔</span>
+                            Respondidas: <strong>{progressoBloco.respondidas}</strong>
+                          </span>
+                          <span className="estudo-caso-block-count is-pendente">
+                            <span aria-hidden="true">⏳</span>
+                            Pendentes: <strong>{progressoBloco.pendentes}</strong>
+                          </span>
+                        </>
+                      ) : null}
                     </div>
                     <span className={`estudo-caso-chevron ${aberto ? "is-open" : ""}`}>⌄</span>
                   </div>
