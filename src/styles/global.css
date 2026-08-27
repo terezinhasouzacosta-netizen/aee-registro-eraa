@@ -1181,10 +1181,10 @@ textarea:focus {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 8px;
-  padding: 2px 6px 15px;
+  gap: 10px;
+  padding: 8px 6px 16px;
   margin-bottom: 12px;
-  border-bottom: 1px solid var(--sidebar-divider);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .sidebar-logo-img {
@@ -1195,6 +1195,7 @@ textarea:focus {
   object-fit: cover;
   object-position: center 46%;
   margin: 0 auto;
+  transform: translateY(-7px);
   border-radius: 12px;
   background: #ffffff;
   padding: 0;
@@ -1206,10 +1207,10 @@ textarea:focus {
   margin: 0;
   width: 100%;
   max-width: none;
-  color: #ffffff;
-  font-size: 12.5px;
+  color: rgba(248, 250, 252, 0.9);
+  font-size: 13.5px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.48;
   letter-spacing: 0.02em;
   text-align: center;
   opacity: 0.94;
