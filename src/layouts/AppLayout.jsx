@@ -391,13 +391,13 @@ function AppLayout() {
               <p className="sidebar-section-title">
                 <span>DIAGNÓSTICO</span>
               </p>
-              <NavLink to="/estudo-de-caso">
-                <FileText className="sidebar-link-icon" aria-hidden="true" />
-                <span>Estudo de Caso</span>
-              </NavLink>
               <NavLink to="/sondagens">
                 <ClipboardList className="sidebar-link-icon" aria-hidden="true" />
                 <span>Sondagem</span>
+              </NavLink>
+              <NavLink to="/estudo-de-caso">
+                <FileText className="sidebar-link-icon" aria-hidden="true" />
+                <span>Estudo de Caso</span>
               </NavLink>
             </div>
           ) : null}
