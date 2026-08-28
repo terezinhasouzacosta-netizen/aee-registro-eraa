@@ -1,7 +1,18 @@
 ﻿import { useEffect, useState } from "react";
+import {
+  ArrowRight,
+  BookOpenCheck,
+  ChartNoAxesCombined,
+  LockKeyhole,
+  Mail,
+  ShieldCheck,
+  UsersRound,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import logoAeeRegistro from "../assets/aee-registro-logo.png";
 import { useAuth } from "../hooks/useAuth";
 import { signIn } from "../services/authService";
+import "../styles/login.css";
 
 function traduzirErroAuth(error) {
   const code = error?.code || "";
@@ -82,38 +93,130 @@ function LoginPage() {
   };
 
   return (
-    <main className="login-page">
-      <section className="login-card">
-        <h1>AEE Registro</h1>
-        <p>Acesso ao sistema de acompanhamento educacional especializado.</p>
+    <main className="login-page login-page-modern">
+      <span className="login-background-shape is-one" aria-hidden="true" />
+      <span className="login-background-shape is-two" aria-hidden="true" />
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <label htmlFor="email">E-mail</label>
-          <input
-            id="email"
-            type="email"
-            placeholder="seuemail@escola.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
+      <section className="login-shell" aria-label="Acesso ao AEE Registro">
+        <aside className="login-institutional-panel">
+          <div className="login-panel-shape is-one" aria-hidden="true" />
+          <div className="login-panel-shape is-two" aria-hidden="true" />
 
-          <label htmlFor="password">Senha</label>
-          <input
-            id="password"
-            type="password"
-            placeholder="Digite sua senha"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
+          <header className="login-brand">
+            <div className="login-logo-frame">
+              <img src={logoAeeRegistro} alt="AEE Registro" />
+            </div>
+            <div>
+              <span className="login-eyebrow">Gestão pedagógica inclusiva</span>
+              <h1>AEE Registro</h1>
+            </div>
+          </header>
 
-          {error ? <span className="error-text">{error}</span> : null}
+          <div className="login-institutional-copy">
+            <p className="login-system-title">
+              Sistema de Gestão do Atendimento Educacional Especializado
+            </p>
+            <p>
+              Planeje, registre e acompanhe o desenvolvimento dos estudantes em um ambiente
+              seguro, organizado e integrado.
+            </p>
+          </div>
 
-          <button type="submit" disabled={loading || authLoading}>
-            {loading ? "Entrando..." : "Entrar"}
-          </button>
-        </form>
+          <div className="login-education-visual" aria-hidden="true">
+            <div className="login-visual-orbit is-outer" />
+            <div className="login-visual-orbit is-inner" />
+            <div className="login-visual-center">
+              <BookOpenCheck size={40} strokeWidth={1.7} />
+            </div>
+            <div className="login-visual-card is-students">
+              <UsersRound size={19} />
+              <span>Acompanhamento</span>
+            </div>
+            <div className="login-visual-card is-progress">
+              <ChartNoAxesCombined size={19} />
+              <span>Desenvolvimento</span>
+            </div>
+            <div className="login-visual-card is-security">
+              <ShieldCheck size={19} />
+              <span>Dados protegidos</span>
+            </div>
+          </div>
+
+          <blockquote className="login-quote">
+            “Transformando registros pedagógicos em decisões para a inclusão.”
+          </blockquote>
+        </aside>
+
+        <div className="login-access-panel">
+          <section className="login-card">
+            <div className="login-card-heading">
+              <span className="login-access-badge">
+                <ShieldCheck size={15} aria-hidden="true" />
+                Ambiente seguro
+              </span>
+              <h2>Bem-vinda ao AEE Registro</h2>
+              <p className="login-card-copy">
+                Entre com suas credenciais institucionais para acessar a plataforma.
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="login-form">
+              <div className="login-field">
+                <label htmlFor="email">E-mail</label>
+                <div className="login-input-wrapper">
+                  <Mail size={19} aria-hidden="true" />
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="seuemail@escola.com"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    autoComplete="email"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="login-field">
+                <label htmlFor="password">Senha</label>
+                <div className="login-input-wrapper">
+                  <LockKeyhole size={19} aria-hidden="true" />
+                  <input
+                    id="password"
+                    type="password"
+                    placeholder="Digite sua senha"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    autoComplete="current-password"
+                    required
+                  />
+                </div>
+              </div>
+
+              {error ? (
+                <span className="error-text login-error" role="alert" aria-live="polite">
+                  {error}
+                </span>
+              ) : null}
+
+              <button className="login-submit" type="submit" disabled={loading || authLoading}>
+                <span>{loading ? "Entrando..." : "Entrar"}</span>
+                <ArrowRight size={19} aria-hidden="true" />
+              </button>
+            </form>
+
+            <p className="login-restricted-note">
+              <LockKeyhole size={14} aria-hidden="true" />
+              Acesso restrito a profissionais autorizados.
+            </p>
+          </section>
+
+          <footer className="login-footer">
+            <span>AEE Registro</span>
+            <span aria-hidden="true">•</span>
+            <span>Versão 0.0.1</span>
+          </footer>
+        </div>
       </section>
     </main>
   );
