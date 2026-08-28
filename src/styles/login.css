@@ -35,10 +35,10 @@
 }
 
 .login-shell {
-  width: calc(100vw - 8px);
+  width: min(calc(100vw - 32px), 1450px);
   height: calc(100svh - 8px);
   display: grid;
-  grid-template-columns: minmax(0, 59%) minmax(350px, 41%);
+  grid-template-columns: minmax(0, 55%) minmax(350px, 45%);
   overflow: hidden;
   background: #001d47;
 }
