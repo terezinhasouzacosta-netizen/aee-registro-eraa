@@ -1,8 +1,10 @@
 ﻿import { useEffect, useState } from "react";
 import {
   ArrowRight,
-  BookOpenCheck,
-  ChartNoAxesCombined,
+  CalendarCheck2,
+  Check,
+  HeartHandshake,
+  LineChart,
   LockKeyhole,
   Mail,
   ShieldCheck,
@@ -10,9 +12,18 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logoAeeRegistro from "../assets/aee-registro-logo.png";
+import InclusiveEducationIllustration from "../components/login/InclusiveEducationIllustration";
 import { useAuth } from "../hooks/useAuth";
 import { signIn } from "../services/authService";
 import "../styles/login.css";
+
+const RECURSOS_INSTITUCIONAIS = [
+  { label: "Planejamento", Icon: CalendarCheck2 },
+  { label: "Acompanhamento", Icon: UsersRound },
+  { label: "Desenvolvimento", Icon: LineChart },
+  { label: "Inclusão", Icon: HeartHandshake },
+  { label: "Dados protegidos", Icon: ShieldCheck },
+];
 
 function traduzirErroAuth(error) {
   const code = error?.code || "";
@@ -122,24 +133,20 @@ function LoginPage() {
             </p>
           </div>
 
-          <div className="login-education-visual" aria-hidden="true">
-            <div className="login-visual-orbit is-outer" />
-            <div className="login-visual-orbit is-inner" />
-            <div className="login-visual-center">
-              <BookOpenCheck size={40} strokeWidth={1.7} />
-            </div>
-            <div className="login-visual-card is-students">
-              <UsersRound size={19} />
-              <span>Acompanhamento</span>
-            </div>
-            <div className="login-visual-card is-progress">
-              <ChartNoAxesCombined size={19} />
-              <span>Desenvolvimento</span>
-            </div>
-            <div className="login-visual-card is-security">
-              <ShieldCheck size={19} />
-              <span>Dados protegidos</span>
-            </div>
+          <div className="login-education-visual">
+            <InclusiveEducationIllustration />
+          </div>
+
+          <div className="login-feature-grid" aria-label="Recursos institucionais">
+            {RECURSOS_INSTITUCIONAIS.map(({ label, Icon }) => (
+              <div className="login-feature-card" key={label}>
+                <span className="login-feature-icon" aria-hidden="true">
+                  <Icon size={17} strokeWidth={1.9} />
+                </span>
+                <span>{label}</span>
+                <Check className="login-feature-check" size={13} aria-hidden="true" />
+              </div>
+            ))}
           </div>
 
           <blockquote className="login-quote">
@@ -212,9 +219,12 @@ function LoginPage() {
           </section>
 
           <footer className="login-footer">
-            <span>AEE Registro</span>
-            <span aria-hidden="true">•</span>
-            <span>Versão 0.0.1</span>
+            <div className="login-footer-meta">
+              <strong>AEE Registro</strong>
+              <span aria-hidden="true">•</span>
+              <span>Versão 1.0.0</span>
+            </div>
+            <p>Sistema Institucional de Gestão do Atendimento Educacional Especializado</p>
           </footer>
         </div>
       </section>
