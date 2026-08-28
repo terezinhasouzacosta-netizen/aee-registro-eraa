@@ -14,19 +14,43 @@ import {
   Target,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import logoAeeRegistro from "../assets/aee-registro-logo.png";
+import logoAeeRegistro from "../assets/aee-registro-logo-transparent.png";
 import inclusiveEducationPhoto from "../assets/login-inclusive-education.webp";
 import { useAuth } from "../hooks/useAuth";
 import { signIn } from "../services/authService";
 import "../styles/login.css";
 
 const RECURSOS_INSTITUCIONAIS = [
-  { label: "Sondagem", Icon: ClipboardList },
-  { label: "Estudo de Caso", Icon: BookOpenText },
-  { label: "PAEE", Icon: Target },
-  { label: "PEI", Icon: FilePenLine },
-  { label: "Monitoramento", Icon: BarChart3 },
-  { label: "Relatórios Inteligentes", Icon: FileText },
+  {
+    label: "Sondagem",
+    Icon: ClipboardList,
+    description: "Identifique potencialidades, dificuldades e necessidades de apoio.",
+  },
+  {
+    label: "Estudo de Caso",
+    Icon: BookOpenText,
+    description: "Organize informações e acompanhe a evolução pedagógica do estudante.",
+  },
+  {
+    label: "PEI",
+    Icon: FilePenLine,
+    description: "Planeje objetivos, estratégias e intervenções individualizadas.",
+  },
+  {
+    label: "PAEE",
+    Icon: Target,
+    description: "Organize o Plano de Atendimento Educacional Especializado.",
+  },
+  {
+    label: "Monitoramento",
+    Icon: BarChart3,
+    description: "Acompanhe indicadores, avanços e evidências de aprendizagem.",
+  },
+  {
+    label: "Relatórios Inteligentes",
+    Icon: FileText,
+    description: "Visualize registros, indicadores e relatórios pedagógicos.",
+  },
 ];
 
 function traduzirErroAuth(error) {
@@ -119,24 +143,24 @@ function LoginPage() {
           <div className="login-panel-shape is-two" aria-hidden="true" />
 
           <header className="login-brand">
-            <span className="login-eyebrow">Gestão Pedagógica da Educação Inclusiva</span>
-            <div className="login-logo-frame">
-              <img src={logoAeeRegistro} alt="AEE Registro" />
+            <span className="login-eyebrow">
+              Gestão Pedagógica <strong>Inclusiva</strong>
+            </span>
+            <div className="login-brand-composition">
+              <div className="login-logo-frame">
+                <img src={logoAeeRegistro} alt="AEE Registro" />
+              </div>
+              <div className="login-institutional-copy">
+                <p className="login-system-title">
+                  Sistema de Gestão Pedagógica da Educação Inclusiva
+                </p>
+                <p className="login-institutional-description">
+                  Planeje, registre e acompanhe o desenvolvimento dos estudantes em um ambiente
+                  seguro, organizado e integrado.
+                </p>
+              </div>
             </div>
           </header>
-
-          <div className="login-institutional-copy">
-            <p className="login-system-title">
-              Sistema de Gestão Pedagógica da Educação Inclusiva
-            </p>
-            <p className="login-institutional-tagline">
-              Transformando registros pedagógicos em decisões para a inclusão.
-            </p>
-            <p className="login-institutional-description">
-              Planeje, registre, acompanhe e fortaleça o desenvolvimento dos estudantes em um
-              ambiente organizado, seguro e integrado.
-            </p>
-          </div>
 
           <figure className="login-education-photo" aria-label="Atendimento educacional inclusivo">
             <img
@@ -146,15 +170,31 @@ function LoginPage() {
           </figure>
 
           <div className="login-feature-grid" aria-label="Recursos institucionais">
-            {RECURSOS_INSTITUCIONAIS.map(({ label, Icon }) => (
+            {RECURSOS_INSTITUCIONAIS.map(({ label, Icon, description }) => (
               <div className="login-feature-card" key={label}>
                 <span className="login-feature-icon" aria-hidden="true">
-                  <Icon size={17} strokeWidth={1.9} />
+                  <Icon size={25} strokeWidth={2} />
                 </span>
-                <span>{label}</span>
+                <strong>{label}</strong>
+                <span className="login-feature-description">{description}</span>
+                <span className="login-feature-accent" aria-hidden="true" />
               </div>
             ))}
           </div>
+
+          <footer className="login-institutional-footer">
+            <blockquote>
+              <span aria-hidden="true">“</span>
+              Transformando registros pedagógicos
+              <br />
+              em <strong>decisões para a inclusão.</strong>
+              <span aria-hidden="true">”</span>
+            </blockquote>
+            <p>
+              Plataforma desenvolvida para apoiar a gestão pedagógica da Educação Especial na
+              perspectiva da Educação Inclusiva.
+            </p>
+          </footer>
         </aside>
 
         <div className="login-access-panel">
@@ -164,9 +204,9 @@ function LoginPage() {
                 <ShieldCheck size={15} aria-hidden="true" />
                 Ambiente Institucional Seguro
               </span>
-              <h1>Acesso Institucional</h1>
+              <h1>Acesso à Plataforma</h1>
               <p className="login-card-copy">
-                Acesse a plataforma utilizando seu e-mail institucional e sua senha.
+                Utilize seu e-mail institucional e sua senha para acessar o sistema.
               </p>
             </div>
 
@@ -178,7 +218,7 @@ function LoginPage() {
                   <input
                     id="email"
                     type="email"
-                    placeholder="seuemail@escola.com"
+                    placeholder="Digite seu e-mail institucional"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     autoComplete="email"
@@ -214,15 +254,14 @@ function LoginPage() {
                     )}
                   </button>
                 </div>
-                <a
-                  className="login-forgot-password"
-                  href="#recuperacao-de-senha"
-                  aria-disabled="true"
-                  onClick={(event) => event.preventDefault()}
-                  title="Recuperação de senha disponível em breve"
-                >
-                  Esqueceu sua senha?
-                </a>
+                <label className="login-show-password">
+                  <input
+                    type="checkbox"
+                    checked={showPassword}
+                    onChange={(event) => setShowPassword(event.target.checked)}
+                  />
+                  <span>Mostrar senha</span>
+                </label>
               </div>
 
               {error ? (
@@ -235,6 +274,16 @@ function LoginPage() {
                 <span>{loading ? "Entrando..." : "Entrar"}</span>
                 <ArrowRight size={19} aria-hidden="true" />
               </button>
+
+              <a
+                className="login-forgot-password"
+                href="#recuperacao-de-senha"
+                aria-disabled="true"
+                onClick={(event) => event.preventDefault()}
+                title="Recuperação de senha disponível em breve"
+              >
+                Esqueceu sua senha?
+              </a>
             </form>
 
             <p className="login-restricted-note">
