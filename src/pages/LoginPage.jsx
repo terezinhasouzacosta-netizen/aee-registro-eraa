@@ -117,10 +117,7 @@ function LoginPage() {
             <div className="login-logo-frame">
               <img src={logoAeeRegistro} alt="AEE Registro" />
             </div>
-            <div>
-              <span className="login-eyebrow">Gestão pedagógica inclusiva</span>
-              <h1>AEE Registro</h1>
-            </div>
+            <span className="login-eyebrow">Gestão pedagógica inclusiva</span>
           </header>
 
           <div className="login-institutional-copy">
@@ -161,9 +158,9 @@ function LoginPage() {
                 <ShieldCheck size={15} aria-hidden="true" />
                 Ambiente seguro
               </span>
-              <h2>Bem-vinda ao AEE Registro</h2>
+              <h1>Acesso Institucional</h1>
               <p className="login-card-copy">
-                Entre com suas credenciais institucionais para acessar a plataforma.
+                Utilize seu e-mail institucional e sua senha para acessar a plataforma.
               </p>
             </div>
 
