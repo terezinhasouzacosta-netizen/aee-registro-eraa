@@ -14,7 +14,7 @@ import {
   Target,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import logoAeeRegistro from "../assets/aee-registro-logo-transparent.png";
+import logoAeeRegistro from "../assets/aee-registro-logo-login-white.png";
 import inclusiveEducationPhoto from "../assets/login-inclusive-education.webp";
 import { useAuth } from "../hooks/useAuth";
 import { signIn } from "../services/authService";
