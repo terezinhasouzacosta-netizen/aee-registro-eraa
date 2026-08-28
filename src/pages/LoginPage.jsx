@@ -163,7 +163,7 @@ function LoginPage() {
                 </p>
                 <p className="login-institutional-description">
                   Planeje, registre e acompanhe o desenvolvimento dos estudantes em um ambiente
-                  seguro, organizado e integrado.
+                  seguro, organizado e colaborativo.
                 </p>
               </div>
             </div>

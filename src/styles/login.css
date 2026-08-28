@@ -62,6 +62,19 @@
     linear-gradient(150deg, #001f4d 0%, #003873 55%, #00224e 100%);
 }
 
+.login-institutional-panel::before {
+  position: absolute;
+  right: -12%;
+  bottom: 18%;
+  width: 54%;
+  aspect-ratio: 1.8;
+  border: 1px solid rgba(125, 211, 252, 0.1);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+  transform: rotate(-8deg);
+}
+
 .login-panel-shape {
   position: absolute;
   z-index: 0;
@@ -240,7 +253,7 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-  padding: clamp(7px, 0.75vw, 11px) clamp(4px, 0.42vw, 7px) 8px;
+  padding: clamp(8px, 0.8vw, 12px) clamp(5px, 0.48vw, 8px) 9px;
   border: 1px solid rgba(125, 211, 252, 0.42);
   border-radius: 9px;
   color: #ffffff;
@@ -302,7 +315,7 @@
 .login-feature-description {
   margin-top: 3px;
   color: #dcecff;
-  font-size: clamp(0.46rem, 0.52vw, 0.57rem);
+  font-size: clamp(0.5rem, 0.58vw, 0.64rem);
   line-height: 1.42;
 }
 
@@ -707,8 +720,8 @@
 
   .login-feature-card {
     min-height: clamp(118px, 16vh, 140px);
-    padding-top: 7px;
-    padding-bottom: 6px;
+    padding-top: 8px;
+    padding-bottom: 7px;
   }
 
   .login-feature-icon {
@@ -806,7 +819,7 @@
   }
 
   .login-feature-description {
-    font-size: 0.58rem;
+    font-size: 0.63rem;
   }
 
   .login-institutional-footer {
