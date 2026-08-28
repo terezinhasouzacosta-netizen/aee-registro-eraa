@@ -1,28 +1,32 @@
 ﻿import { useEffect, useState } from "react";
 import {
   ArrowRight,
-  CalendarCheck2,
-  Check,
-  HeartHandshake,
-  LineChart,
+  BarChart3,
+  BookOpenText,
+  ClipboardList,
+  Eye,
+  EyeOff,
+  FilePenLine,
+  FileText,
   LockKeyhole,
   Mail,
   ShieldCheck,
-  UsersRound,
+  Target,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logoAeeRegistro from "../assets/aee-registro-logo.png";
-import InclusiveEducationIllustration from "../components/login/InclusiveEducationIllustration";
+import inclusiveEducationPhoto from "../assets/login-inclusive-education.webp";
 import { useAuth } from "../hooks/useAuth";
 import { signIn } from "../services/authService";
 import "../styles/login.css";
 
 const RECURSOS_INSTITUCIONAIS = [
-  { label: "Planejamento", Icon: CalendarCheck2 },
-  { label: "Acompanhamento", Icon: UsersRound },
-  { label: "Desenvolvimento", Icon: LineChart },
-  { label: "Inclusão", Icon: HeartHandshake },
-  { label: "Dados protegidos", Icon: ShieldCheck },
+  { label: "Sondagem", Icon: ClipboardList },
+  { label: "Estudo de Caso", Icon: BookOpenText },
+  { label: "PAEE", Icon: Target },
+  { label: "PEI", Icon: FilePenLine },
+  { label: "Monitoramento", Icon: BarChart3 },
+  { label: "Relatórios Inteligentes", Icon: FileText },
 ];
 
 function traduzirErroAuth(error) {
@@ -47,6 +51,7 @@ function LoginPage() {
   const { currentUser, perfilCarregado, authLoading, authError } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -114,25 +119,31 @@ function LoginPage() {
           <div className="login-panel-shape is-two" aria-hidden="true" />
 
           <header className="login-brand">
+            <span className="login-eyebrow">Gestão Pedagógica da Educação Inclusiva</span>
             <div className="login-logo-frame">
               <img src={logoAeeRegistro} alt="AEE Registro" />
             </div>
-            <span className="login-eyebrow">Gestão pedagógica inclusiva</span>
           </header>
 
           <div className="login-institutional-copy">
             <p className="login-system-title">
-              Sistema de Gestão do Atendimento Educacional Especializado
+              Sistema de Gestão Pedagógica da Educação Inclusiva
             </p>
-            <p>
-              Planeje, registre e acompanhe o desenvolvimento dos estudantes em um ambiente
-              seguro, organizado e integrado.
+            <p className="login-institutional-tagline">
+              Transformando registros pedagógicos em decisões para a inclusão.
+            </p>
+            <p className="login-institutional-description">
+              Planeje, registre, acompanhe e fortaleça o desenvolvimento dos estudantes em um
+              ambiente organizado, seguro e integrado.
             </p>
           </div>
 
-          <div className="login-education-visual">
-            <InclusiveEducationIllustration />
-          </div>
+          <figure className="login-education-photo" aria-label="Atendimento educacional inclusivo">
+            <img
+              src={inclusiveEducationPhoto}
+              alt="Professora acompanhando um estudante em uma atividade pedagógica"
+            />
+          </figure>
 
           <div className="login-feature-grid" aria-label="Recursos institucionais">
             {RECURSOS_INSTITUCIONAIS.map(({ label, Icon }) => (
@@ -141,14 +152,9 @@ function LoginPage() {
                   <Icon size={17} strokeWidth={1.9} />
                 </span>
                 <span>{label}</span>
-                <Check className="login-feature-check" size={13} aria-hidden="true" />
               </div>
             ))}
           </div>
-
-          <blockquote className="login-quote">
-            “Transformando registros pedagógicos em decisões para a inclusão.”
-          </blockquote>
         </aside>
 
         <div className="login-access-panel">
@@ -156,11 +162,11 @@ function LoginPage() {
             <div className="login-card-heading">
               <span className="login-access-badge">
                 <ShieldCheck size={15} aria-hidden="true" />
-                Ambiente seguro
+                Ambiente Institucional Seguro
               </span>
               <h1>Acesso Institucional</h1>
               <p className="login-card-copy">
-                Utilize seu e-mail institucional e sua senha para acessar a plataforma.
+                Acesse a plataforma utilizando seu e-mail institucional e sua senha.
               </p>
             </div>
 
@@ -187,14 +193,36 @@ function LoginPage() {
                   <LockKeyhole size={19} aria-hidden="true" />
                   <input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Digite sua senha"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     autoComplete="current-password"
                     required
                   />
+                  <button
+                    className="login-password-toggle"
+                    type="button"
+                    onClick={() => setShowPassword((visible) => !visible)}
+                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                    aria-pressed={showPassword}
+                  >
+                    {showPassword ? (
+                      <EyeOff size={18} aria-hidden="true" />
+                    ) : (
+                      <Eye size={18} aria-hidden="true" />
+                    )}
+                  </button>
                 </div>
+                <a
+                  className="login-forgot-password"
+                  href="#recuperacao-de-senha"
+                  aria-disabled="true"
+                  onClick={(event) => event.preventDefault()}
+                  title="Recuperação de senha disponível em breve"
+                >
+                  Esqueceu sua senha?
+                </a>
               </div>
 
               {error ? (
@@ -219,9 +247,9 @@ function LoginPage() {
             <div className="login-footer-meta">
               <strong>AEE Registro</strong>
               <span aria-hidden="true">•</span>
-              <span>Versão 1.0.0</span>
+              <span>Versão 1.0</span>
             </div>
-            <p>Sistema Institucional de Gestão do Atendimento Educacional Especializado</p>
+            <p>Sistema de Gestão Pedagógica da Educação Inclusiva</p>
           </footer>
         </div>
       </section>
