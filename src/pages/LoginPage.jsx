@@ -84,7 +84,7 @@ function LoginPage() {
   return (
     <main className="login-page">
       <section className="login-card">
-        <h1>AEE Registro - Teste de Publicação</h1>
+        <h1>AEE Registro</h1>
         <p>Acesso ao sistema de acompanhamento educacional especializado.</p>
 
         <form onSubmit={handleSubmit} className="login-form">
