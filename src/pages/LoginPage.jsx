@@ -138,6 +138,13 @@ function LoginPage() {
       <span className="login-background-shape is-two" aria-hidden="true" />
 
       <section className="login-shell" aria-label="Acesso ao AEE Registro">
+        <header className="login-mobile-brand">
+          <div className="login-mobile-logo-frame">
+            <img src={logoAeeRegistro} alt="AEE Registro" />
+          </div>
+          <p>Sistema de Gestão Pedagógica da Educação Inclusiva</p>
+        </header>
+
         <aside className="login-institutional-panel">
           <div className="login-panel-shape is-one" aria-hidden="true" />
           <div className="login-panel-shape is-two" aria-hidden="true" />

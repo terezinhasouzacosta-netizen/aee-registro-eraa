@@ -43,6 +43,10 @@
   background: #001d47;
 }
 
+.login-mobile-brand {
+  display: none;
+}
+
 .login-institutional-panel {
   position: relative;
   min-width: 0;
@@ -135,10 +139,19 @@
 }
 
 .login-logo-frame {
+  position: relative;
+  isolation: isolate;
   width: min(82%, 150px);
   aspect-ratio: 700 / 514;
   display: block;
   justify-self: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 7px 18px rgba(0, 16, 45, 0.1);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
 }
 
 .login-logo-frame img {
@@ -679,6 +692,70 @@
   }
 }
 
+@media (min-width: 901px) and (min-height: 721px) {
+  .login-shell {
+    height: 82svh;
+  }
+
+  .login-institutional-panel {
+    padding-top: 18px;
+    padding-bottom: 10px;
+  }
+
+  .login-brand-composition {
+    margin-top: 13px;
+  }
+
+  .login-education-photo {
+    height: clamp(174px, 24vh, 216px);
+    flex-basis: clamp(174px, 24vh, 216px);
+    margin-top: -25px;
+  }
+
+  .login-feature-card {
+    min-height: clamp(118px, 16vh, 140px);
+    padding-top: 7px;
+    padding-bottom: 6px;
+  }
+
+  .login-feature-icon {
+    width: clamp(38px, 4.1vw, 47px);
+    height: clamp(38px, 4.1vw, 47px);
+    margin-bottom: 4px;
+  }
+
+  .login-institutional-footer {
+    gap: 5px;
+    margin-top: 5px;
+  }
+
+  .login-access-panel {
+    padding-top: 38px;
+    padding-bottom: 10px;
+  }
+
+  .login-access-badge {
+    margin-bottom: 25px;
+  }
+
+  .login-card-heading {
+    margin-bottom: 24px;
+  }
+
+  .login-page-modern .login-form {
+    gap: 17px;
+  }
+
+  .login-page-modern .login-card .login-restricted-note {
+    margin-top: 18px;
+    padding-block: 19px;
+  }
+
+  .login-footer {
+    padding-top: 12px;
+  }
+}
+
 @media (max-width: 900px) {
   .login-page.login-page-modern {
     display: block;
@@ -762,8 +839,61 @@
 }
 
 @media (max-width: 560px) {
+  .login-shell {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .login-mobile-brand {
+    order: 1;
+    min-height: 126px;
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    color: #ffffff;
+    background:
+      radial-gradient(circle at 75% 15%, rgba(14, 165, 233, 0.18), transparent 35%),
+      linear-gradient(145deg, #001f4d, #003873);
+  }
+
+  .login-mobile-logo-frame {
+    width: 92px;
+    aspect-ratio: 700 / 514;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+      0 7px 18px rgba(0, 16, 45, 0.1);
+    backdrop-filter: blur(7px);
+  }
+
+  .login-mobile-logo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: saturate(1.15) brightness(1.08);
+  }
+
+  .login-mobile-brand p {
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(1.05rem, 5.2vw, 1.35rem);
+    font-weight: 750;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+  }
+
   .login-institutional-panel {
+    order: 3;
     padding: 20px 16px 22px;
+  }
+
+  .login-institutional-panel .login-brand {
+    display: none;
   }
 
   .login-eyebrow {
@@ -787,7 +917,7 @@
   .login-education-photo {
     width: calc(100% + 32px);
     height: 190px;
-    margin: -8px -16px 0;
+    margin: -20px -16px 0;
   }
 
   .login-feature-grid {
@@ -825,23 +955,37 @@
   }
 
   .login-access-panel {
-    padding: 34px 20px 22px;
+    order: 2;
+    min-height: calc(100svh - 126px);
+    justify-content: flex-start;
+    padding: 24px 20px 20px;
   }
 
-  .login-access-badge {
-    margin-bottom: 24px;
+  .login-access-badge,
+  .login-card-copy,
+  .login-page-modern .login-card .login-restricted-note,
+  .login-access-panel > .login-footer {
+    display: none;
+  }
+
+  .login-card-heading {
+    margin-bottom: 20px;
   }
 
   .login-page-modern .login-card h1 {
     font-size: 1.65rem;
   }
 
-  .login-page-modern .login-card .login-card-copy {
-    font-size: 0.82rem;
+  .login-page-modern .login-form {
+    gap: 15px;
   }
 
-  .login-footer {
-    margin-top: 38px;
+  .login-page-modern .login-form .login-submit {
+    min-height: 46px;
+  }
+
+  .login-page-modern .login-form .login-forgot-password {
+    margin-top: -3px;
   }
 }
 
