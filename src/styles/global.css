@@ -5505,6 +5505,374 @@ textarea:focus {
   }
 }
 
+/* Indicadores pedagogicos institucionais do Dashboard */
+@media screen {
+  .page-content .dashboard-aee-page .dashboard-indicators-panel {
+    overflow: hidden;
+    padding: clamp(1rem, 2vw, 1.35rem);
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-heading,
+  .page-content .dashboard-aee-page .dashboard-indicators-section-heading {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-heading {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-title {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-heading-icon {
+    display: inline-flex;
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-heading-icon svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-heading h2,
+  .page-content .dashboard-aee-page .dashboard-indicators-section-heading h3,
+  .page-content .dashboard-aee-page .dashboard-distribution-header h3 {
+    margin: 0;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-heading p,
+  .page-content .dashboard-aee-page .dashboard-indicators-section-heading p,
+  .page-content .dashboard-aee-page .dashboard-distribution-header p {
+    margin: 0.22rem 0 0;
+    color: #64748b;
+    line-height: 1.45;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-heading p {
+    font-size: 0.9rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-update {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.48rem 0.68rem;
+    color: #166534;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-update > span {
+    color: #22c55e;
+    font-size: 0.68rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-section-heading {
+    margin-top: 1.15rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-section-heading h3 {
+    color: #173b6c;
+    font-size: 1rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-section-heading p {
+    font-size: 0.82rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-section-heading > span {
+    flex: 0 0 auto;
+    padding: 0.35rem 0.58rem;
+    color: #1d4ed8;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 700;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-document-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.7rem;
+    margin-top: 0.75rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-document-card {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.68rem;
+    padding: 0.8rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-document-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.07);
+  }
+
+  .page-content .dashboard-aee-page .dashboard-document-icon,
+  .page-content .dashboard-aee-page .dashboard-indicator-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-document-icon {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-document-icon svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-document-card > div {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 0.08rem 0.5rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-document-card span:not(.dashboard-document-icon) {
+    overflow: hidden;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-document-card strong {
+    grid-row: span 2;
+    color: #0f172a;
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-document-card small {
+    color: #64748b;
+    font-size: 0.7rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-document-success .dashboard-document-icon {
+    color: #15803d;
+    background: #dcfce7;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-document-warning .dashboard-document-icon {
+    color: #a16207;
+    background: #fef9c3;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-document-info .dashboard-document-icon {
+    color: #1d4ed8;
+    background: #dbeafe;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distributions-heading {
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distributions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin-top: 0.75rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-card {
+    min-width: 0;
+    padding: 0.95rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 15px;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-header {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    gap: 0.65rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicator-icon {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    color: #1d4ed8;
+    background: #dbeafe;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicator-icon svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-violet .dashboard-indicator-icon {
+    color: #6d28d9;
+    background: #ede9fe;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-amber .dashboard-indicator-icon {
+    color: #a16207;
+    background: #fef3c7;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-green .dashboard-indicator-icon {
+    color: #15803d;
+    background: #dcfce7;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-header h3 {
+    color: #173b6c;
+    font-size: 0.94rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-header p {
+    font-size: 0.75rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-list {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-label {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.7rem;
+    margin-bottom: 0.27rem;
+    color: #334155;
+    font-size: 0.78rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-label > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-label strong {
+    flex: 0 0 auto;
+    color: #0f172a;
+    font-size: 0.78rem;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-label small {
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-track {
+    height: 7px;
+    overflow: hidden;
+    background: #e2e8f0;
+    border-radius: 999px;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-track > span {
+    display: block;
+    min-width: 3px;
+    height: 100%;
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+    border-radius: inherit;
+    transition: width 0.35s ease;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-violet .dashboard-distribution-track > span {
+    background: linear-gradient(90deg, #7c3aed, #a78bfa);
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-amber .dashboard-distribution-track > span {
+    background: linear-gradient(90deg, #d97706, #fbbf24);
+  }
+
+  .page-content .dashboard-aee-page .dashboard-distribution-green .dashboard-distribution-track > span {
+    background: linear-gradient(90deg, #16a34a, #4ade80);
+  }
+
+  .page-content .dashboard-aee-page .dashboard-indicators-empty {
+    margin: 0;
+    padding: 0.8rem;
+    color: #64748b;
+    background: #f8fafc;
+    border-radius: 10px;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 1120px) {
+    .page-content .dashboard-aee-page .dashboard-document-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 760px) {
+    .page-content .dashboard-aee-page .dashboard-indicators-heading,
+    .page-content .dashboard-aee-page .dashboard-indicators-section-heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .page-content .dashboard-aee-page .dashboard-indicators-update {
+      white-space: normal;
+    }
+
+    .page-content .dashboard-aee-page .dashboard-distributions-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .page-content .dashboard-aee-page .dashboard-document-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .page-content .dashboard-aee-page .dashboard-indicators-title {
+      align-items: flex-start;
+    }
+
+    .page-content .dashboard-aee-page .dashboard-indicators-heading-icon {
+      width: 40px;
+      height: 40px;
+      flex-basis: 40px;
+      border-radius: 12px;
+    }
+  }
+}
+
 /* Refinamento visual da pagina de Cadastro de Alunos */
 @media screen {
   .page-content .alunos-cadastro-page {

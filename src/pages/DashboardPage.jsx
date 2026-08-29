@@ -1,15 +1,22 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import {
+  BadgeCheck,
   BarChart3,
   BookOpen,
   ClipboardList,
   ClipboardPen,
+  Clock3,
+  FileCheck2,
   FileBarChart,
   FileText,
+  GraduationCap,
   LayoutDashboard,
   LineChart,
   MessagesSquare,
   NotebookPen,
+  School,
+  Stethoscope,
+  SunMedium,
   Target,
   UserPlus,
   UserRound,
@@ -18,7 +25,10 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { listarAlunos, listarAlunosPorIds } from "../services/alunosService";
+import { listarEstudosCaso } from "../services/estudosCasoService";
 import { listarMonitoramentos } from "../services/monitoramentosService";
+import { listarPaees, listarPaeesPorAlunoId } from "../services/paeesService";
+import { listarPeis, listarPeisPorAlunoId } from "../services/peisService";
 import { listarSondagens } from "../services/sondagensService";
 import { buscarIdsAlunosVinculados } from "../services/vinculacoesService";
 import { podeVisualizarAlunos, visualizaSomenteVinculados } from "../utils/permissions";
@@ -121,12 +131,175 @@ function obterNomeUsuario(currentUser) {
   return nomeExibicao;
 }
 
+const ORDEM_DIAGNOSTICOS = [
+  "TEA",
+  "TDAH",
+  "Deficiência Intelectual (DI)",
+  "Dislexia",
+  "Deficiência Física",
+  "Deficiência Visual",
+  "Deficiência Auditiva",
+  "Síndrome de Down",
+  "Altas Habilidades/Superdotação",
+  "Outros",
+  "Não informado",
+];
+
+function normalizarTexto(valor) {
+  return String(valor || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function classificarDiagnostico(valor) {
+  const diagnostico = normalizarTexto(valor);
+  if (!diagnostico) return "Não informado";
+  if (/altas habilidades|superdot/.test(diagnostico)) return "Altas Habilidades/Superdotação";
+  if (/tdah|deficit de atencao|hiperativ/.test(diagnostico)) return "TDAH";
+  if (/\btea\b|autis/.test(diagnostico)) return "TEA";
+  if (/sindrome de down|\bdown\b/.test(diagnostico)) return "Síndrome de Down";
+  if (/dislexia/.test(diagnostico)) return "Dislexia";
+  if (/deficiencia visual|baixa visao|cegueira/.test(diagnostico)) return "Deficiência Visual";
+  if (/deficiencia auditiva|surdez|surdo/.test(diagnostico)) return "Deficiência Auditiva";
+  if (/deficiencia fisica|mobilidade|motora/.test(diagnostico)) return "Deficiência Física";
+  if (/deficiencia intelectual|\bdi\b/.test(diagnostico)) {
+    return "Deficiência Intelectual (DI)";
+  }
+  return "Outros";
+}
+
+function agruparDistribuicao(alunos, obterValor, ordemPreferencial) {
+  const contagens = alunos.reduce((resultado, aluno) => {
+    const valor = obterValor(aluno) || "Não informado";
+    resultado.set(valor, (resultado.get(valor) || 0) + 1);
+    return resultado;
+  }, new Map());
+
+  const ordem = ordemPreferencial || [];
+  return Array.from(contagens, ([label, total]) => ({
+    label,
+    total,
+    percentual: alunos.length ? Math.round((total / alunos.length) * 100) : 0,
+  })).sort((a, b) => {
+    if (ordem.length) {
+      const indiceA = ordem.indexOf(a.label);
+      const indiceB = ordem.indexOf(b.label);
+      return (indiceA < 0 ? ordem.length : indiceA) - (indiceB < 0 ? ordem.length : indiceB);
+    }
+    if (a.label === "Não informado") return 1;
+    if (b.label === "Não informado") return -1;
+    return a.label.localeCompare(b.label, "pt-BR", { numeric: true });
+  });
+}
+
+function obterRegistrosMaisRecentes(registros) {
+  return registros.reduce((resultado, registro) => {
+    if (!registro.alunoId) return resultado;
+    const atual = resultado.get(registro.alunoId);
+    const obterTempo = (item) => {
+      const data = item?.atualizadoEm || item?.criadoEm || item?.updatedAt || item?.createdAt;
+      if (data?.toDate) return data.toDate().getTime();
+      const dataConvertida = new Date(data || 0);
+      return Number.isNaN(dataConvertida.getTime()) ? 0 : dataConvertida.getTime();
+    };
+    if (!atual || obterTempo(registro) > obterTempo(atual)) {
+      resultado.set(registro.alunoId, registro);
+    }
+    return resultado;
+  }, new Map());
+}
+
+function registroConcluido(registro) {
+  if (!registro) return false;
+  return normalizarTexto(registro.statusGeral || registro.status).includes("conclu") || Boolean(registro.dataConclusao);
+}
+
+function estaEmInvestigacaoDiagnostica(aluno) {
+  const indicadorDireto = normalizarTexto(aluno?.emInvestigacao);
+  const situacao = normalizarTexto(
+    aluno?.situacaoDiagnostica ||
+      aluno?.statusDiagnostico ||
+      aluno?.statusAvaliacao ||
+      aluno?.situacaoAvaliacao
+  );
+
+  return (
+    aluno?.emInvestigacao === true ||
+    indicadorDireto === "sim" ||
+    /investig|avaliacao|avaliando|em analise/.test(situacao)
+  );
+}
+
+function possuiHipoteseDiagnostica(aluno) {
+  const situacao = normalizarTexto(aluno?.situacaoDiagnostica || aluno?.statusDiagnostico);
+  return Boolean(
+    String(aluno?.hipoteseDiagnostica || aluno?.diagnostico || "").trim() ||
+      /hipotese/.test(situacao)
+  );
+}
+
+function DistributionCard({ icon: Icon, title, description, data, tone = "blue" }) {
+  return (
+    <article className={`dashboard-distribution-card dashboard-distribution-${tone}`}>
+      <header className="dashboard-distribution-header">
+        <span className="dashboard-indicator-icon" aria-hidden="true"><Icon /></span>
+        <div>
+          <h3>{title}</h3>
+          <p>{description}</p>
+        </div>
+      </header>
+      {data.length ? (
+        <div className="dashboard-distribution-list">
+          {data.map((item) => (
+            <div className="dashboard-distribution-row" key={item.label}>
+              <div className="dashboard-distribution-label">
+                <span>{item.label}</span>
+                <strong>{item.total} <small>({item.percentual}%)</small></strong>
+              </div>
+              <div
+                className="dashboard-distribution-track"
+                role="progressbar"
+                aria-label={`${item.label}: ${item.percentual}%`}
+                aria-valuenow={item.percentual}
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                <span style={{ width: `${item.percentual}%` }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : <p className="dashboard-indicators-empty">Nenhum aluno disponível para este indicador.</p>}
+    </article>
+  );
+}
+
+function DocumentationCard({ icon: Icon, label, value, total, tone, mostrarPercentual = true }) {
+  const percentual = total ? Math.round((value / total) * 100) : 0;
+  return (
+    <article className={`dashboard-document-card dashboard-document-${tone}`}>
+      <span className="dashboard-document-icon" aria-hidden="true"><Icon /></span>
+      <div>
+        <span>{label}</span>
+        <strong>{value}</strong>
+        {mostrarPercentual ? <small>{percentual}% dos alunos</small> : null}
+      </div>
+    </article>
+  );
+}
+
 function DashboardPage() {
   const { currentUser, perfil, perfilLabel } = useAuth();
   const location = useLocation();
   const [alunos, setAlunos] = useState([]);
   const [sondagens, setSondagens] = useState([]);
   const [monitoramentos, setMonitoramentos] = useState([]);
+  const [peis, setPeis] = useState([]);
+  const [paees, setPaees] = useState([]);
+  const [estudosCaso, setEstudosCaso] = useState([]);
+  const [indicadoresAtualizadosEm, setIndicadoresAtualizadosEm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
 
@@ -146,10 +319,12 @@ function DashboardPage() {
   });
 
   useEffect(() => {
-    async function carregarPainel() {
+    let efeitoAtivo = true;
+
+    async function carregarPainel({ silencioso = false } = {}) {
       if (!currentUser || !podeLer) return;
 
-      setLoading(true);
+      if (!silencioso) setLoading(true);
       setErro("");
 
       try {
@@ -163,23 +338,56 @@ function DashboardPage() {
           alunosData = await listarAlunos();
         }
 
-        const [sondagensData, monitoramentosData] = await Promise.all([
+        const peisRequest = Array.isArray(idsPermitidos)
+          ? Promise.all(idsPermitidos.map((alunoId) => listarPeisPorAlunoId(alunoId))).then((listas) => listas.flat())
+          : listarPeis();
+        const paeesRequest = Array.isArray(idsPermitidos)
+          ? Promise.all(idsPermitidos.map((alunoId) => listarPaeesPorAlunoId(alunoId))).then((listas) => listas.flat())
+          : listarPaees();
+        const estudosRequest = Array.isArray(idsPermitidos)
+          ? Promise.all(idsPermitidos.map((alunoId) => listarEstudosCaso({ alunoId }))).then((listas) => listas.flat())
+          : listarEstudosCaso();
+
+        const [sondagensData, monitoramentosData, peisData, paeesData, estudosData] = await Promise.all([
           listarSondagens({ alunoIdsPermitidos: idsPermitidos }),
           listarMonitoramentos({ alunoIdsPermitidos: idsPermitidos }),
+          peisRequest,
+          paeesRequest,
+          estudosRequest,
         ]);
 
+        if (!efeitoAtivo) return;
         setAlunos(alunosData);
         setSondagens(sondagensData);
         setMonitoramentos(monitoramentosData);
+        setPeis(peisData);
+        setPaees(paeesData);
+        setEstudosCaso(estudosData);
+        setIndicadoresAtualizadosEm(new Date());
       } catch (error) {
+        if (!efeitoAtivo) return;
         setErro(obterMensagemErro(error, "Não foi possível carregar os indicadores do painel."));
       } finally {
-        setLoading(false);
+        if (efeitoAtivo && !silencioso) setLoading(false);
       }
     }
 
     carregarPainel();
-  }, [currentUser, perfil]);
+
+    const atualizarAoRetomar = () => carregarPainel({ silencioso: true });
+    const atualizarAoExibir = () => {
+      if (document.visibilityState === "visible") atualizarAoRetomar();
+    };
+
+    window.addEventListener("focus", atualizarAoRetomar);
+    document.addEventListener("visibilitychange", atualizarAoExibir);
+
+    return () => {
+      efeitoAtivo = false;
+      window.removeEventListener("focus", atualizarAoRetomar);
+      document.removeEventListener("visibilitychange", atualizarAoExibir);
+    };
+  }, [currentUser, perfil, podeLer, somenteVinculados]);
 
   const monitoramentosRecentes = useMemo(
     () => [...monitoramentos].slice(0, 6),
@@ -209,6 +417,71 @@ function DashboardPage() {
 
     return alunos.filter((aluno) => !monitoramentosRecentesPorAluno.has(aluno.id));
   }, [alunos, monitoramentos]);
+
+  const indicadoresPedagogicos = useMemo(() => {
+    const totalAlunos = alunos.length;
+    const peisRecentes = obterRegistrosMaisRecentes(peis);
+    const paeesRecentes = obterRegistrosMaisRecentes(paees);
+    const estudosRecentes = obterRegistrosMaisRecentes(estudosCaso);
+    const alunosComSondagem = new Set(sondagens.map((item) => item.alunoId).filter(Boolean));
+
+    const peiConcluido = alunos.filter((aluno) => registroConcluido(peisRecentes.get(aluno.id))).length;
+    const paeeConcluido = alunos.filter((aluno) => registroConcluido(paeesRecentes.get(aluno.id))).length;
+    const estudoConcluido = alunos.filter((aluno) => registroConcluido(estudosRecentes.get(aluno.id))).length;
+    const comLaudo = alunos.filter((aluno) => normalizarTexto(aluno.laudo) === "sim").length;
+    const situacaoDiagnostica = alunos.reduce(
+      (totais, aluno) => {
+        if (normalizarTexto(aluno.laudo) === "sim") {
+          totais.comLaudo += 1;
+        } else if (estaEmInvestigacaoDiagnostica(aluno)) {
+          totais.emInvestigacao += 1;
+        } else if (possuiHipoteseDiagnostica(aluno)) {
+          totais.comHipotese += 1;
+        } else {
+          totais.semLaudoNemHipotese += 1;
+        }
+        return totais;
+      },
+      { comLaudo: 0, comHipotese: 0, emInvestigacao: 0, semLaudoNemHipotese: 0 }
+    );
+
+    const diagnosticos = agruparDistribuicao(
+      alunos,
+      (aluno) => classificarDiagnostico(aluno.diagnostico),
+      ORDEM_DIAGNOSTICOS
+    );
+    const series = agruparDistribuicao(alunos, (aluno) => String(aluno.serieAno || "").trim());
+    const turnos = agruparDistribuicao(alunos, (aluno) => String(aluno.turno || "").trim());
+    const escolas = agruparDistribuicao(alunos, (aluno) => String(aluno.nomeEscola || "").trim());
+    const totalEscolasInformadas = new Set(
+      alunos.map((aluno) => normalizarTexto(aluno.nomeEscola)).filter(Boolean)
+    ).size;
+
+    return {
+      totalAlunos,
+      diagnosticos,
+      series,
+      turnos,
+      escolas,
+      exibirEscolas: totalEscolasInformadas > 1,
+      situacaoDiagnostica: [
+        { label: "Com laudo", value: situacaoDiagnostica.comLaudo, tone: "success", icon: FileCheck2 },
+        { label: "Com hipótese diagnóstica", value: situacaoDiagnostica.comHipotese, tone: "info", icon: ClipboardList },
+        { label: "Em investigação/avaliação", value: situacaoDiagnostica.emInvestigacao, tone: "warning", icon: Clock3 },
+        { label: "Sem laudo e sem hipótese diagnóstica", value: situacaoDiagnostica.semLaudoNemHipotese, tone: "warning", icon: FileText },
+      ],
+      documentacao: [
+        { label: "Alunos com laudo", value: comLaudo, tone: "success", icon: FileCheck2 },
+        { label: "Alunos sem laudo", value: totalAlunos - comLaudo, tone: "warning", icon: Clock3 },
+        { label: "PEI concluído", value: peiConcluido, tone: "success", icon: BadgeCheck },
+        { label: "PEI pendente", value: totalAlunos - peiConcluido, tone: "warning", icon: Clock3 },
+        { label: "PAEE concluído", value: paeeConcluido, tone: "success", icon: BadgeCheck },
+        { label: "PAEE pendente", value: totalAlunos - paeeConcluido, tone: "warning", icon: Clock3 },
+        { label: "Sondagem concluída", value: alunos.filter((aluno) => alunosComSondagem.has(aluno.id)).length, tone: "info", icon: ClipboardList },
+        { label: "Estudo de Caso concluído", value: estudoConcluido, tone: "info", icon: FileText },
+      ],
+    };
+  }, [alunos, estudosCaso, paees, peis, sondagens]);
 
   useEffect(() => {
     const seletores = [
@@ -302,6 +575,99 @@ function DashboardPage() {
           <h2>Total de monitoramentos</h2>
           <strong>{monitoramentos.length}</strong>
         </article>
+      </section>
+
+      <section className="panel dashboard-content-block dashboard-card dashboard-indicators-panel" aria-labelledby="indicadores-pedagogicos-titulo">
+        <header className="dashboard-indicators-heading">
+          <div className="dashboard-indicators-title">
+            <span className="dashboard-indicators-heading-icon" aria-hidden="true"><BarChart3 /></span>
+            <div>
+              <h2 id="indicadores-pedagogicos-titulo">Indicadores Pedagógicos da Escola</h2>
+              <p>Visão consolidada a partir do Cadastro de Alunos e dos módulos pedagógicos.</p>
+            </div>
+          </div>
+          <div className="dashboard-indicators-update" aria-live="polite">
+            <span aria-hidden="true">●</span>
+            {loading
+              ? "Atualizando indicadores..."
+              : indicadoresAtualizadosEm
+                ? `Atualizado em ${indicadoresAtualizadosEm.toLocaleDateString("pt-BR")} às ${indicadoresAtualizadosEm.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`
+                : "Indicadores disponíveis ao carregar o painel"}
+          </div>
+        </header>
+
+        <div className="dashboard-indicators-section-heading">
+          <div>
+            <h3>Resumo Pedagógico</h3>
+            <p>Cada indicador representa alunos únicos; pendências incluem módulos ainda não iniciados.</p>
+          </div>
+          <span>{indicadoresPedagogicos.totalAlunos} alunos acompanhados</span>
+        </div>
+        <div className="dashboard-document-grid">
+          {indicadoresPedagogicos.documentacao.map((indicador) => (
+            <DocumentationCard
+              key={indicador.label}
+              {...indicador}
+              total={indicadoresPedagogicos.totalAlunos}
+            />
+          ))}
+        </div>
+
+        <div className="dashboard-indicators-section-heading dashboard-distributions-heading">
+          <div>
+            <h3>🩺 Situação Diagnóstica dos Estudantes</h3>
+            <p>Quantidades calculadas exclusivamente a partir das informações atuais do Cadastro de Alunos.</p>
+          </div>
+        </div>
+        <div className="dashboard-document-grid">
+          {indicadoresPedagogicos.situacaoDiagnostica.map((indicador) => (
+            <DocumentationCard
+              key={indicador.label}
+              {...indicador}
+              total={indicadoresPedagogicos.totalAlunos}
+              mostrarPercentual={false}
+            />
+          ))}
+        </div>
+
+        <div className="dashboard-indicators-section-heading dashboard-distributions-heading">
+          <div>
+            <h3>Perfil dos estudantes</h3>
+            <p>Distribuições calculadas diretamente com as informações atuais do cadastro.</p>
+          </div>
+        </div>
+        <div className="dashboard-distributions-grid">
+          <DistributionCard
+            icon={Stethoscope}
+            title="Diagnósticos principais"
+            description="Classificação institucional conforme o diagnóstico informado no cadastro."
+            data={indicadoresPedagogicos.diagnosticos}
+            tone="blue"
+          />
+          <DistributionCard
+            icon={GraduationCap}
+            title="Alunos por série/ano"
+            description="Distribuição dos estudantes por etapa de escolarização."
+            data={indicadoresPedagogicos.series}
+            tone="violet"
+          />
+          <DistributionCard
+            icon={SunMedium}
+            title="Alunos por turno"
+            description="Organização dos estudantes por turno informado."
+            data={indicadoresPedagogicos.turnos}
+            tone="amber"
+          />
+          {indicadoresPedagogicos.exibirEscolas ? (
+            <DistributionCard
+              icon={School}
+              title="Escola"
+              description="Comparativo exibido porque há mais de uma escola cadastrada."
+              data={indicadoresPedagogicos.escolas}
+              tone="green"
+            />
+          ) : null}
+        </div>
       </section>
 
       <section className="panel no-print dashboard-content-block dashboard-card dashboard-shortcuts dashboard-quick-actions">
