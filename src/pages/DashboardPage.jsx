@@ -1,5 +1,7 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import {
+  BarChart3,
+  BookOpen,
   ClipboardList,
   ClipboardPen,
   FileBarChart,
@@ -7,6 +9,7 @@ import {
   LayoutDashboard,
   LineChart,
   MessagesSquare,
+  NotebookPen,
   Target,
   UserPlus,
   UserRound,
@@ -303,14 +306,27 @@ function DashboardPage() {
 
       <section className="panel no-print dashboard-content-block dashboard-card dashboard-shortcuts dashboard-quick-actions">
         <h2>Ações Rápidas</h2>
-        <div className="dashboard-quick-actions-grid">
-          <Link className="dashboard-quick-action" to="/alunos">
+        <p className="dashboard-quick-actions-group-title">Ação principal</p>
+        <div className="dashboard-quick-action-primary-wrap">
+          <Link className="dashboard-quick-action dashboard-quick-action-primary" to="/alunos">
             <span className="dashboard-quick-action-icon" aria-hidden="true">
               <UserPlus />
             </span>
             <span className="dashboard-quick-action-content">
-              <strong>Cadastrar Aluno</strong>
+              <strong>Cadastrar Novo Aluno</strong>
               <small>Inclua um novo estudante na plataforma.</small>
+            </span>
+          </Link>
+        </div>
+        <p className="dashboard-quick-actions-group-title">Módulos pedagógicos</p>
+        <div className="dashboard-quick-actions-grid">
+          <Link className="dashboard-quick-action" to="/sondagens">
+            <span className="dashboard-quick-action-icon" aria-hidden="true">
+              <ClipboardList />
+            </span>
+            <span className="dashboard-quick-action-content">
+              <strong>Nova Sondagem</strong>
+              <small>Inicie uma sondagem diagnóstica.</small>
             </span>
           </Link>
           <Link className="dashboard-quick-action" to="/estudo-de-caso">
@@ -322,15 +338,6 @@ function DashboardPage() {
               <small>Registre e retome o estudo pedagógico.</small>
             </span>
           </Link>
-          <Link className="dashboard-quick-action" to="/sondagens">
-            <span className="dashboard-quick-action-icon" aria-hidden="true">
-              <ClipboardList />
-            </span>
-            <span className="dashboard-quick-action-content">
-              <strong>Nova Sondagem</strong>
-              <small>Inicie uma sondagem diagnóstica.</small>
-            </span>
-          </Link>
           <Link className="dashboard-quick-action" to="/metas">
             <span className="dashboard-quick-action-icon" aria-hidden="true">
               <Target />
@@ -338,6 +345,24 @@ function DashboardPage() {
             <span className="dashboard-quick-action-content">
               <strong>Habilidades</strong>
               <small>Organize habilidades e metas pedagógicas.</small>
+            </span>
+          </Link>
+          <Link className="dashboard-quick-action" to="/paee">
+            <span className="dashboard-quick-action-icon" aria-hidden="true">
+              <BookOpen />
+            </span>
+            <span className="dashboard-quick-action-content">
+              <strong>PAEE</strong>
+              <small>Organize o Plano de Atendimento Educacional Especializado.</small>
+            </span>
+          </Link>
+          <Link className="dashboard-quick-action" to="/pei">
+            <span className="dashboard-quick-action-icon" aria-hidden="true">
+              <NotebookPen />
+            </span>
+            <span className="dashboard-quick-action-content">
+              <strong>PEI</strong>
+              <small>Acesse o Plano Educacional Individualizado.</small>
             </span>
           </Link>
           <Link className="dashboard-quick-action" to="/atendimento-aee">
@@ -363,8 +388,8 @@ function DashboardPage() {
               <LineChart />
             </span>
             <span className="dashboard-quick-action-content">
-              <strong>Evolução Pedagógica</strong>
-              <small>Consulte a evolução pelos atendimentos.</small>
+              <strong>Monitoramento</strong>
+              <small>Acompanhe os indicadores pedagógicos do estudante.</small>
             </span>
           </Link>
           <Link className="dashboard-quick-action" to="/relatorios">
@@ -374,6 +399,15 @@ function DashboardPage() {
             <span className="dashboard-quick-action-content">
               <strong>Relatório Pedagógico</strong>
               <small>Elabore e consulte relatórios do aluno.</small>
+            </span>
+          </Link>
+          <Link className="dashboard-quick-action" to="/monitoramentos">
+            <span className="dashboard-quick-action-icon" aria-hidden="true">
+              <BarChart3 />
+            </span>
+            <span className="dashboard-quick-action-content">
+              <strong>Evolução Pedagógica</strong>
+              <small>Consulte a evolução pelos atendimentos.</small>
             </span>
           </Link>
           <Link className="dashboard-quick-action" to="/painel-coordenacao">

@@ -5280,6 +5280,26 @@ textarea:focus {
 
 /* Acoes rapidas do Dashboard */
 @media screen {
+  .page-content .dashboard-aee-page .dashboard-quick-actions-group-title {
+    margin: 1rem 0 0.55rem;
+    color: #64748b;
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .page-content .dashboard-aee-page .dashboard-quick-action-primary-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page-content .dashboard-aee-page .dashboard-quick-action-primary {
+    border-color: #93c5fd;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    box-shadow: 0 7px 20px rgba(30, 64, 175, 0.1);
+  }
+
   .page-content .dashboard-aee-page .dashboard-quick-actions-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
