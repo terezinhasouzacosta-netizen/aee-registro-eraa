@@ -1,0 +1,288 @@
+{
+  "apresentacao": {
+    "descricao": "Percurso acadêmico fictício da Plataforma AEE Registro, organizado exclusivamente para demonstração do Produto Educacional.",
+    "isolamento": "Todos os registros pertencem somente a este arquivo demonstrativo local e não representam estudante, família, escola ou profissional real."
+  },
+  "casoPedagogico": {
+    "id": "demo-caso-01",
+    "aluno": {
+      "id": "demo-aluno-01",
+      "nomeExibicao": "Lucas Gabriel Martins",
+      "idade": "13 anos",
+      "serieAno": "8º ano",
+      "turma": "Turma demonstrativa 8A",
+      "turno": "Tarde",
+      "escola": "Escola Demonstrativa Horizonte",
+      "professorAee": "Profissional AEE fictício",
+      "finalidade": "Exclusivamente demonstrativa",
+      "diagnosticoPrincipal": "TEA",
+      "laudo": "Informação fictícia para contextualização acadêmica",
+      "comorbidades": "Nenhuma condição associada informada no caso fictício",
+      "contexto": "Estudante fictício do 8º ano, interessado em ciências, tecnologia e recursos visuais, acompanhado no percurso demonstrativo do AEE.",
+      "status": "Cadastro demonstrativo estruturado"
+    },
+    "sondagem": {
+      "id": "demo-sondagem-01",
+      "status": "Concluída",
+      "periodo": "Período acadêmico fictício",
+      "eixos": [
+        { "nome": "Comunicação e Linguagem", "nivel": "Realiza parcialmente", "observacao": "Comunica conhecimentos e interesses; necessita apoio para solicitar ajuda e sustentar diálogo em grupo." },
+        { "nome": "Interação Social", "nivel": "Realiza com apoio", "observacao": "Participa melhor em duplas ou grupos com papéis definidos e regras antecipadas." },
+        { "nome": "Convivência e Autorregulação", "nivel": "Realiza com apoio", "observacao": "Responde bem à previsibilidade e precisa de preparação para mudanças inesperadas." },
+        { "nome": "Locomoção, Orientação e Segurança", "nivel": "Não observado", "observacao": "Eixo preservado na estrutura institucional, sem observação adicional neste ciclo demonstrativo." },
+        { "nome": "Alimentação, Higiene e Autonomia Pessoal", "nivel": "Não observado", "observacao": "Eixo preservado na estrutura institucional, sem observação adicional neste ciclo demonstrativo." },
+        { "nome": "Autonomia Escolar", "nivel": "Realiza parcialmente", "observacao": "Organiza materiais conhecidos; utiliza checklist para iniciar, acompanhar e concluir tarefas longas." },
+        { "nome": "Coordenação Motora", "nivel": "Realiza com autonomia", "observacao": "Manipula materiais escolares e recursos digitais com segurança." },
+        { "nome": "Leitura", "nivel": "Realiza com autonomia", "observacao": "Compreende textos informativos e localiza informações explícitas com segurança." },
+        { "nome": "Escrita", "nivel": "Realiza parcialmente", "observacao": "Produz ideias pertinentes, mas precisa de organizadores para sequenciar parágrafos e revisar o texto." },
+        { "nome": "Atenção e Funções Executivas", "nivel": "Realiza parcialmente", "observacao": "Mantém foco em temas de interesse e amplia permanência quando a tarefa é dividida em etapas." },
+        { "nome": "Memória", "nivel": "Não observado", "observacao": "Eixo preservado na estrutura institucional, sem observação adicional neste ciclo demonstrativo." },
+        { "nome": "Raciocínio Lógico-Matemático", "nivel": "Realiza com apoio", "observacao": "Resolve situações quando os dados são destacados e as etapas são apresentadas visualmente." }
+      ],
+      "potencialidades": [
+        "Raciocínio visual e atenção a detalhes.",
+        "Interesse consistente por ciências e tecnologia.",
+        "Boa compreensão de textos informativos estruturados.",
+        "Persistência quando compreende o objetivo e a sequência da atividade."
+      ],
+      "habilidadesConsolidadas": [
+        "Leitura de textos curtos com localização de informações explícitas.",
+        "Uso funcional de recursos digitais para pesquisa e registro.",
+        "Organização de materiais em rotinas conhecidas."
+      ],
+      "habilidadesEmDesenvolvimento": [
+        "Organização de produção escrita em introdução, desenvolvimento e conclusão.",
+        "Compreensão e execução de instruções com múltiplas etapas.",
+        "Participação em atividades coletivas com alternância de turnos.",
+        "Solicitação de ajuda ou pausa de forma autônoma."
+      ],
+      "prioridadesIntervencao": [
+        "Planejamento e conclusão de tarefas por meio de agenda visual e checklist.",
+        "Organização da comunicação oral e escrita com apoio visual.",
+        "Autorregulação diante de mudanças e demandas extensas.",
+        "Interação colaborativa em pequenos grupos com papéis definidos."
+      ],
+      "recomendacoes": "Manter instruções objetivas, antecipação de mudanças, organizadores gráficos, tempo de processamento e oportunidades de escolha na forma de responder."
+    },
+    "estudoCaso": {
+      "id": "demo-estudo-caso-01",
+      "status": "Concluído",
+      "totalPerguntas": 55,
+      "respondidas": 55,
+      "blocos": [
+        {
+          "id": "identificacao-estudante",
+          "titulo": "Identificação do estudante",
+          "tipo": "identificacao",
+          "fonteInformacao": "Cadastro demonstrativo local",
+          "perguntas": [],
+          "campos": [
+            { "label": "Nome", "value": "Lucas Gabriel Martins" },
+            { "label": "Idade", "value": "13 anos" },
+            { "label": "Ano/Série", "value": "8º ano" },
+            { "label": "Turma", "value": "Turma demonstrativa 8A" },
+            { "label": "Turno", "value": "Tarde" },
+            { "label": "Escola", "value": "Escola Demonstrativa Horizonte" }
+          ]
+        },
+        {
+          "id": "escuta-estudante",
+          "titulo": "Escuta do estudante",
+          "fonteInformacao": "Escuta do estudante fictício",
+          "perguntas": [
+            { "id": "gosta-escola", "pergunta": "O estudante gosta da escola?", "resposta": "Sim. Relata gostar especialmente das aulas de Ciências e das atividades com tecnologia." },
+            { "id": "tem-amigos", "pergunta": "Tem amigos ou colegas com quem gosta de ficar?", "resposta": "Mantém vínculo com dois colegas e prefere interações em grupos pequenos." },
+            { "id": "atividades-preferidas", "pergunta": "Quais atividades mais gosta de fazer?", "resposta": "Pesquisas, experiências, jogos de estratégia, leitura de curiosidades e produção digital." },
+            { "id": "tarefas-dificeis", "pergunta": "Quais tarefas são mais difíceis para ele?", "resposta": "Produções escritas longas, instruções extensas e trabalhos em grupo sem divisão clara de funções." },
+            { "id": "expressa-necessidades", "pergunta": "Expressa necessidades, desejos e interesses? De que maneira?", "resposta": "Expressa interesses com clareza; ainda precisa de apoio para pedir ajuda ou comunicar necessidade de pausa." },
+            { "id": "satisfeito-apoios", "pergunta": "Está satisfeito com os apoios que recebe?", "resposta": "Considera úteis os roteiros visuais, o tempo adicional e a antecipação das etapas." },
+            { "id": "gostaria-outros-apoios", "pergunta": "Gostaria de receber outros apoios? Quais?", "resposta": "Solicita instruções mais curtas, exemplos prontos e aviso prévio quando houver mudanças." }
+          ]
+        },
+        {
+          "id": "familia",
+          "titulo": "Família/responsáveis",
+          "fonteInformacao": "Relato da família fictícia",
+          "perguntas": [
+            { "id": "opiniao-familia", "pergunta": "Qual é a opinião da família sobre a vida escolar do estudante?", "resposta": "A família fictícia observa interesse pela aprendizagem, com maior conforto quando a rotina é previsível." },
+            { "id": "participacao-familia", "pergunta": "A família participa de reuniões ou atividades da escola?", "resposta": "Participa das reuniões previstas no caso demonstrativo e compartilha observações sobre estratégias funcionais." },
+            { "id": "habilidades-familia", "pergunta": "A família identifica habilidades do estudante? Quais?", "resposta": "Destaca memória para temas de interesse, domínio de recursos digitais e atenção a detalhes." },
+            { "id": "necessidades-familia", "pergunta": "A família identifica necessidades ou dificuldades? Quais?", "resposta": "Aponta dificuldade para iniciar tarefas longas, lidar com mudanças e organizar relatos escritos." },
+            { "id": "expectativas-familia", "pergunta": "Quais expectativas a família tem sobre o desenvolvimento e escolarização?", "resposta": "Ampliação da autonomia, participação social e uso dos conhecimentos em diferentes componentes curriculares." },
+            { "id": "rotina-casa", "pergunta": "Como é a rotina do estudante em casa?", "resposta": "Beneficia-se de agenda visual, horários previsíveis e divisão das tarefas em pequenas etapas." },
+            { "id": "saude-consideracoes", "pergunta": "Há informações sobre saúde, medicação, sono, alimentação ou sensibilidade que a escola precisa considerar?", "resposta": "O caso fictício registra sensibilidade a ruídos intensos e necessidade eventual de ambiente com menos estímulos." }
+          ]
+        },
+        {
+          "id": "professor-regente",
+          "titulo": "Professor regente",
+          "fonteInformacao": "Registro do professor regente fictício",
+          "perguntas": [
+            { "id": "participa-turma", "pergunta": "O estudante participa das atividades propostas para a turma?", "resposta": "Participa quando compreende a finalidade, as etapas e o produto esperado." },
+            { "id": "grau-participacao", "pergunta": "Participa integralmente, parcialmente ou não participa?", "resposta": "Participa parcialmente em propostas abertas e integralmente nas atividades estruturadas." },
+            { "id": "facilidades", "pergunta": "Quais atividades realiza com facilidade?", "resposta": "Leitura informativa, pesquisa orientada, classificação, uso de tabelas e apresentações digitais." },
+            { "id": "dificuldades", "pergunta": "Quais atividades realiza com dificuldade?", "resposta": "Produção textual extensa, interpretação de comandos implícitos e colaboração sem papéis definidos." },
+            { "id": "interacao-colegas", "pergunta": "Como interage com os colegas?", "resposta": "Interage de modo respeitoso, principalmente em duplas; necessita mediação leve para ampliar trocas no grupo." },
+            { "id": "reage-comandos", "pergunta": "Como reage a comandos, combinados e mudanças de rotina?", "resposta": "Atende a comandos objetivos. Mudanças não antecipadas podem gerar hesitação e necessidade de pausa." },
+            { "id": "estrategias-funcionaram", "pergunta": "Quais estratégias já funcionaram em sala comum?", "resposta": "Agenda visual, modelagem, instrução segmentada, marcação de palavras-chave e dupla colaborativa." },
+            { "id": "apoios-sugeridos", "pergunta": "Quais apoios o professor sugere?", "resposta": "Checklist, organizador textual, antecipação de mudanças e avaliação com comandos diretos." }
+          ]
+        },
+        {
+          "id": "observacao-pedagogica",
+          "titulo": "Observação pedagógica escolar",
+          "fonteInformacao": "Observação pedagógica demonstrativa",
+          "perguntas": [
+            { "id": "participa-atividades", "pergunta": "Participa das atividades propostas?", "resposta": "Sempre" },
+            { "id": "inicia-sozinho", "pergunta": "Consegue iniciar as atividades sozinho?", "resposta": "Às vezes" },
+            { "id": "conclui-atividades", "pergunta": "Consegue concluir as atividades?", "resposta": "Às vezes" },
+            { "id": "mantem-atencao", "pergunta": "Mantém atenção nas atividades?", "resposta": "Às vezes" },
+            { "id": "compreende-orientacoes", "pergunta": "Compreende as orientações dadas pelo professor?", "resposta": "Sim" },
+            { "id": "interage-colegas", "pergunta": "Interage com colegas?", "resposta": "Às vezes" },
+            { "id": "organiza-materiais", "pergunta": "Organiza seus materiais escolares?", "resposta": "Sim" },
+            { "id": "apoio-constante", "pergunta": "Necessita de apoio constante?", "resposta": "Às vezes" }
+          ],
+          "observacoes": "A participação aumenta quando há roteiro visual, tempo de preparação e redução de estímulos concorrentes."
+        },
+        {
+          "id": "barreiras-apoios",
+          "titulo": "Barreiras, apoios e acessibilidade",
+          "fonteInformacao": "Análise integrada da equipe fictícia",
+          "perguntas": [
+            { "id": "barreiras-ambiente", "pergunta": "Quais barreiras o ambiente escolar impõe ao estudante?", "resposta": "Ruído intenso, mudanças não antecipadas e excesso de informações simultâneas." },
+            { "id": "barreiras-comunicacao", "pergunta": "Existem barreiras de comunicação? Quais?", "resposta": "Comandos longos, linguagem implícita e pouca espera para processamento da resposta." },
+            { "id": "barreiras-fisicas", "pergunta": "Existem barreiras físicas ou de acessibilidade? Quais?", "resposta": "Não foram identificadas barreiras físicas no cenário fictício." },
+            { "id": "barreiras-materiais", "pergunta": "Existem barreiras nos materiais, currículo ou avaliações? Quais?", "resposta": "Textos sem organização visual, tarefas extensas em uma única etapa e avaliações com comandos ambíguos." },
+            { "id": "barreiras-atitudinais", "pergunta": "Existem barreiras atitudinais ou sociais? Quais?", "resposta": "Expectativa de participação uniforme e pouca definição de papéis em trabalhos coletivos." },
+            { "id": "recursos-acessibilidade", "pergunta": "A escola dispõe de recursos de acessibilidade para o estudante?", "resposta": "Dispõe de recursos visuais, computador, espaço de menor estímulo e atendimento no AEE." },
+            { "id": "recursos-necessarios", "pergunta": "Quais recursos humanos ou materiais ainda são necessários?", "resposta": "Ampliação de organizadores gráficos e alinhamento periódico entre AEE e professores." },
+            { "id": "apoios-revisar", "pergunta": "Que apoios precisam ser mantidos, ampliados ou revistos?", "resposta": "Manter agenda e checklist; ampliar autorregulação e reduzir gradualmente prompts adultos." }
+          ]
+        },
+        {
+          "id": "informacoes-aee",
+          "titulo": "Informações do AEE",
+          "fonteInformacao": "Registros do AEE fictício",
+          "perguntas": [
+            { "id": "potencialidades-aee", "pergunta": "Quais potencialidades foram observadas no AEE?", "resposta": "Raciocínio visual, curiosidade científica, memória temática e bom uso de tecnologia." },
+            { "id": "interesses-ponto-partida", "pergunta": "Quais interesses podem ser usados como ponto de partida?", "resposta": "Ciências, tecnologia, organização de dados e jogos de estratégia." },
+            { "id": "necessidades-especificas", "pergunta": "Quais necessidades específicas foram identificadas?", "resposta": "Planejamento executivo, comunicação para pedir ajuda, flexibilidade e participação colaborativa." },
+            { "id": "habilidades-consolidadas", "pergunta": "Quais habilidades já estão consolidadas?", "resposta": "Leitura informativa, pesquisa digital e organização de materiais conhecidos." },
+            { "id": "habilidades-desenvolvimento", "pergunta": "Quais habilidades estão em desenvolvimento?", "resposta": "Produção escrita organizada, execução de sequências e autorregulação." },
+            { "id": "habilidades-priorizadas", "pergunta": "Quais habilidades precisam ser priorizadas?", "resposta": "Planejar tarefas, estruturar textos, solicitar apoio e colaborar com alternância de turnos." },
+            { "id": "resultado-sondagem", "pergunta": "O que a Sondagem Diagnóstica mostrou?", "resposta": "Potencial visual e leitor, com necessidade de apoio em funções executivas, escrita e interação em grupo." },
+            { "id": "estrategias-aee", "pergunta": "Quais estratégias devem ser trabalhadas no AEE?", "resposta": "Modelagem, checklist, organizadores gráficos, ensaio de situações sociais e autoavaliação." },
+            { "id": "orientacoes-regente", "pergunta": "Quais orientações devem ser dadas ao professor regente?", "resposta": "Segmentar comandos, explicitar critérios, antecipar mudanças e oferecer formas diversas de resposta." }
+          ]
+        },
+        {
+          "id": "sintese-final",
+          "titulo": "Síntese pedagógica final",
+          "fonteInformacao": "Síntese das fontes demonstrativas anteriores",
+          "perguntas": [
+            { "id": "potencialidades-principais", "pergunta": "Quais são as principais potencialidades do estudante?", "resposta": "Raciocínio visual, interesse científico, leitura informativa, tecnologia e atenção a detalhes." },
+            { "id": "barreiras-principais", "pergunta": "Quais são as principais barreiras identificadas?", "resposta": "Sobrecarga de informações, pouca previsibilidade, demandas abertas e interação coletiva sem estrutura." },
+            { "id": "necessidades-prioritarias", "pergunta": "Quais são as necessidades prioritárias de apoio?", "resposta": "Organização executiva, comunicação funcional para pedir apoio, autorregulação e participação colaborativa." },
+            { "id": "habilidades-planejamento", "pergunta": "Quais habilidades devem orientar o planejamento?", "resposta": "Planejar e concluir tarefas, organizar textos, seguir sequências e participar de pequenos grupos." },
+            { "id": "recursos-estrategias", "pergunta": "Quais recursos e estratégias são recomendados?", "resposta": "Agenda visual, checklist, organizadores gráficos, instrução segmentada, modelagem e tempo de processamento." },
+            { "id": "informacoes-pendentes", "pergunta": "Há informações pendentes para aprofundamento?", "resposta": "Observar a generalização das estratégias em diferentes componentes curriculares." },
+            { "id": "encaminhamentos-finais", "pergunta": "Quais encaminhamentos devem ser feitos?", "resposta": "Elaborar PAEE e PEI articulados, realizar atendimentos focados nas prioridades e monitorar mensalmente." },
+            { "id": "pronto-para-paee", "pergunta": "O Estudo de Caso está pronto para orientar o PAEE?", "resposta": "Sim. As prioridades pedagógicas e os apoios estão definidos de forma suficiente." }
+          ]
+        }
+      ]
+    },
+    "habilidades": [
+      { "id": "demo-habilidade-01", "titulo": "Planejamento de tarefas", "objetivo": "Utilizar checklist para iniciar, acompanhar e concluir atividades com menor necessidade de prompts.", "prioridade": "Alta", "origem": "Sondagem e Estudo de Caso" },
+      { "id": "demo-habilidade-02", "titulo": "Organização da produção escrita", "objetivo": "Estruturar textos com organizador gráfico e revisar a sequência das ideias.", "prioridade": "Alta", "origem": "Sondagem e Estudo de Caso" },
+      { "id": "demo-habilidade-03", "titulo": "Comunicação para apoio", "objetivo": "Solicitar ajuda, esclarecimento ou pausa de forma funcional em diferentes contextos.", "prioridade": "Alta", "origem": "Escuta do estudante e observação" },
+      { "id": "demo-habilidade-04", "titulo": "Participação colaborativa", "objetivo": "Participar de pequenos grupos respeitando turnos e cumprindo um papel previamente definido.", "prioridade": "Média", "origem": "Professor regente e barreiras sociais" }
+    ],
+    "paee": {
+      "id": "demo-paee-01",
+      "status": "Concluído",
+      "objetivoGeral": "Ampliar autonomia, comunicação funcional e participação curricular por meio de estratégias visuais e ensino explícito.",
+      "objetivos": [
+        { "id": "demo-paee-obj-01", "area": "Funções executivas", "objetivo": "Planejar e concluir tarefas com checklist visual.", "estrategias": "Modelagem, redução gradual de prompts e autoavaliação.", "recursos": "Agenda visual, checklist e temporizador visual.", "criterio": "Concluir quatro de cinco etapas com no máximo um lembrete." },
+        { "id": "demo-paee-obj-02", "area": "Linguagem escrita", "objetivo": "Organizar textos curtos em sequência lógica.", "estrategias": "Mapa de ideias, modelo de parágrafo e revisão guiada.", "recursos": "Organizador gráfico e editor de texto.", "criterio": "Produzir texto com início, desenvolvimento e conclusão em três propostas consecutivas." },
+        { "id": "demo-paee-obj-03", "area": "Comunicação e interação", "objetivo": "Solicitar apoio e participar de atividades colaborativas.", "estrategias": "Ensaios, cartões de comunicação e papéis definidos no grupo.", "recursos": "Roteiro social e cartão de solicitação de ajuda ou pausa.", "criterio": "Usar a estratégia combinada em três contextos diferentes." }
+      ],
+      "articulacao": "Orientação quinzenal fictícia entre AEE e professores para acompanhar o uso das estratégias em sala comum."
+    },
+    "pei": {
+      "id": "demo-pei-01",
+      "status": "Em acompanhamento",
+      "objetivoGeral": "Garantir participação no currículo do 8º ano com acessibilidade pedagógica e progressiva autonomia.",
+      "metas": [
+        "Utilizar roteiro de tarefas em pelo menos quatro componentes curriculares.",
+        "Produzir textos com organizador visual e revisão por critérios explícitos.",
+        "Participar semanalmente de atividade em dupla ou pequeno grupo com papel definido.",
+        "Comunicar necessidade de ajuda ou pausa antes de abandonar uma tarefa."
+      ],
+      "estrategiasSalaComum": [
+        "Apresentar comandos curtos e segmentados.",
+        "Antecipar alterações na rotina e explicar o que será mantido.",
+        "Disponibilizar exemplos, rubricas e organizadores gráficos.",
+        "Permitir resposta escrita, oral ou digital quando compatível com o objetivo curricular."
+      ],
+      "avaliacao": "Manter os objetivos curriculares, com comandos objetivos, tempo de processamento, organização visual e ambiente com menos estímulos quando necessário.",
+      "apoios": ["AEE", "Professor regente", "Equipe pedagógica", "Família fictícia"]
+    },
+    "atendimentosAee": [
+      { "id": "demo-atendimento-01", "encontro": "Encontro demonstrativo 1", "dataAtendimento": "05/03/2026", "semanaReferencia": "1ª semana de março", "statusPresenca": "Presente", "eixoTematico": "Atenção e Funções Executivas", "objetivoRelacionado": "Planejamento de tarefas", "atividade": "Montagem e uso de checklist para pesquisa de Ciências.", "recursos": "Checklist visual, cartões de etapas e temporizador visual.", "resultado": "Iniciou após modelagem e concluiu quatro de cinco etapas com dois lembretes.", "proximaAcao": "Reduzir para um lembrete e transferir o checklist para outra disciplina." },
+      { "id": "demo-atendimento-02", "encontro": "Encontro demonstrativo 2", "dataAtendimento": "12/03/2026", "semanaReferencia": "2ª semana de março", "statusPresenca": "Presente", "eixoTematico": "Escrita", "objetivoRelacionado": "Organização da produção escrita", "atividade": "Planejamento de texto informativo com mapa de ideias.", "recursos": "Mapa de ideias, modelo de parágrafo e editor de texto.", "resultado": "Organizou três ideias centrais e produziu parágrafos em sequência com revisão guiada.", "proximaAcao": "Inserir revisão independente por três critérios visuais." },
+      { "id": "demo-atendimento-03", "encontro": "Encontro demonstrativo 3", "dataAtendimento": "19/03/2026", "semanaReferencia": "3ª semana de março", "statusPresenca": "Presente", "eixoTematico": "Comunicação e Linguagem", "objetivoRelacionado": "Comunicação para apoio", "atividade": "Ensaio de solicitação de esclarecimento, ajuda e pausa.", "recursos": "Cartões de comunicação e roteiro social.", "resultado": "Selecionou e utilizou a frase adequada em três situações simuladas.", "proximaAcao": "Generalizar o recurso na sala comum com registro do professor." },
+      { "id": "demo-atendimento-04", "encontro": "Encontro demonstrativo 4", "dataAtendimento": "26/03/2026", "semanaReferencia": "4ª semana de março", "statusPresenca": "Presente", "eixoTematico": "Interação Social", "objetivoRelacionado": "Participação colaborativa", "atividade": "Resolução de desafio em dupla com alternância de papéis.", "recursos": "Cartões de papéis e desafio colaborativo estruturado.", "resultado": "Respeitou os turnos e concluiu sua função; precisou de um lembrete para ouvir a proposta do colega.", "proximaAcao": "Ampliar gradualmente para grupo de três estudantes." }
+    ],
+    "acompanhamentos": [
+      { "id": "demo-acompanhamento-01", "origem": "Sala comum", "avanco": "Passou a iniciar tarefas conhecidas consultando o checklist.", "dificuldade": "Ainda solicita confirmação adulta antes de etapas novas.", "ajuste": "Usar marcador visual de conferência antes de solicitar ajuda." },
+      { "id": "demo-acompanhamento-02", "origem": "Produção escrita", "avanco": "Apresenta melhor sequência de ideias com o mapa visual.", "dificuldade": "A revisão autônoma ainda é parcial.", "ajuste": "Manter apenas três critérios de revisão, apresentados com ícones." },
+      { "id": "demo-acompanhamento-03", "origem": "Atividade coletiva", "avanco": "Participou de dupla e pequeno grupo com papel definido.", "dificuldade": "Mudanças de função durante a atividade geram hesitação.", "ajuste": "Antecipar a troca de papéis e oferecer breve tempo de preparação." }
+    ],
+    "monitoramento": {
+      "id": "demo-monitoramento-01",
+      "status": "Em evolução",
+      "periodo": "Ciclo demonstrativo de quatro encontros",
+      "indicadores": [
+        { "habilidade": "Planejamento de tarefas", "inicial": 2, "atual": 4, "escala": 5, "analise": "Evolução consistente com checklist; iniciar redução gradual de prompts." },
+        { "habilidade": "Organização da escrita", "inicial": 2, "atual": 3, "escala": 5, "analise": "Avanço parcial; manter organizador e fortalecer revisão autônoma." },
+        { "habilidade": "Comunicação para apoio", "inicial": 1, "atual": 3, "escala": 5, "analise": "Estratégia aprendida no AEE; precisa ser generalizada para a sala comum." },
+        { "habilidade": "Participação colaborativa", "inicial": 2, "atual": 3, "escala": 5, "analise": "Participa melhor com papéis definidos; ampliar gradualmente o tamanho do grupo." }
+      ],
+      "sintese": "O caso demonstra progresso sem indicar conclusão total. As estratégias visuais permanecem necessárias, com redução gradual da mediação adulta."
+    },
+    "relatorios": [
+      {
+        "id": "demo-relatorio-01",
+        "titulo": "Relatório pedagógico demonstrativo",
+        "periodo": "Ciclo demonstrativo inicial",
+        "sintese": "Lucas apresenta potencial em raciocínio visual, leitura informativa, tecnologia e temas científicos. Ao longo do ciclo fictício, ampliou o uso de checklist, a organização inicial da escrita e a comunicação para solicitar apoio. Permanecem como prioridades a revisão autônoma, a generalização das estratégias e a flexibilidade em situações coletivas.",
+        "encaminhamentos": [
+          "Manter PAEE e PEI articulados às quatro habilidades prioritárias.",
+          "Reduzir prompts apenas quando houver estabilidade no uso das estratégias.",
+          "Ampliar gradualmente a participação de dupla para grupo de três estudantes.",
+          "Revisar os indicadores no próximo ciclo demonstrativo."
+        ]
+      }
+    ],
+    "indicadoresCoordenacao": {
+      "id": "demo-coordenacao-01",
+      "totalEstudantes": 1,
+      "documentos": [
+        { "nome": "Sondagem", "status": "Concluída" },
+        { "nome": "Estudo de Caso", "status": "Concluído" },
+        { "nome": "PAEE", "status": "Concluído" },
+        { "nome": "PEI", "status": "Em acompanhamento" },
+        { "nome": "Monitoramento", "status": "Em evolução" }
+      ],
+      "atendimentosRegistrados": 4,
+      "habilidadesPrioritarias": 4,
+      "habilidadesComEvolucao": 4,
+      "alertas": [
+        "Manter acompanhamento da generalização da comunicação para apoio.",
+        "Reavaliar a redução de prompts no próximo ciclo demonstrativo."
+      ],
+      "sintese": "O percurso fictício possui documentação articulada e evolução observável nas quatro prioridades, sem registro de conclusão integral das metas."
+    }
+  }
+}

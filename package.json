@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "npm run verify:demo-isolation",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "verify:demo-isolation": "node scripts/verify-demo-isolation.mjs"
   },
   "dependencies": {
     "firebase": "^12.0.0",

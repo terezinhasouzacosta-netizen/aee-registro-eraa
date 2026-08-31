@@ -1,11 +1,19 @@
-import { AuthProvider } from "./contexts/AuthContext";
-import AppRoutes from "./routes/AppRoutes";
+import { lazy, Suspense } from "react";
+
+const DemonstracaoApp = lazy(() => import("./demo/DemonstracaoApp.jsx"));
+const InstitutionalApp = lazy(() => import("./InstitutionalApp.jsx"));
+
+function estaNoAmbienteDemonstrativo(pathname) {
+  return pathname === "/demonstracao" || pathname.startsWith("/demonstracao/");
+}
 
 function App() {
+  const demonstracaoAtiva = estaNoAmbienteDemonstrativo(window.location.pathname);
+
   return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
+    <Suspense fallback={<p className="status-message">Carregando ambiente...</p>}>
+      {demonstracaoAtiva ? <DemonstracaoApp /> : <InstitutionalApp />}
+    </Suspense>
   );
 }
 
