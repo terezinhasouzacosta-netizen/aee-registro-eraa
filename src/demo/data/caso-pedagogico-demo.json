@@ -66,6 +66,10 @@
     },
     "estudoCaso": {
       "id": "demo-estudo-caso-01",
+      "titulo": "Estudo de Caso demonstrativo — Lucas Gabriel Martins",
+      "dataInicio": "2026-02-20",
+      "anoLetivoPeriodo": "Ano letivo demonstrativo de 2026",
+      "responsavelPreenchimento": "Profissional AEE fictício",
       "status": "Concluído",
       "totalPerguntas": 55,
       "respondidas": 55,
@@ -193,21 +197,32 @@
       ]
     },
     "habilidades": [
-      { "id": "demo-habilidade-01", "titulo": "Planejamento de tarefas", "objetivo": "Utilizar checklist para iniciar, acompanhar e concluir atividades com menor necessidade de prompts.", "prioridade": "Alta", "origem": "Sondagem e Estudo de Caso" },
-      { "id": "demo-habilidade-02", "titulo": "Organização da produção escrita", "objetivo": "Estruturar textos com organizador gráfico e revisar a sequência das ideias.", "prioridade": "Alta", "origem": "Sondagem e Estudo de Caso" },
-      { "id": "demo-habilidade-03", "titulo": "Comunicação para apoio", "objetivo": "Solicitar ajuda, esclarecimento ou pausa de forma funcional em diferentes contextos.", "prioridade": "Alta", "origem": "Escuta do estudante e observação" },
-      { "id": "demo-habilidade-04", "titulo": "Participação colaborativa", "objetivo": "Participar de pequenos grupos respeitando turnos e cumprindo um papel previamente definido.", "prioridade": "Média", "origem": "Professor regente e barreiras sociais" }
+      { "id": "demo-habilidade-01", "titulo": "Planejamento de tarefas", "objetivo": "Utilizar checklist para iniciar, acompanhar e concluir atividades com menor necessidade de prompts.", "bimestre": "1º", "status": "Em andamento", "prioridade": "Alta", "origem": "Sondagem e Estudo de Caso" },
+      { "id": "demo-habilidade-02", "titulo": "Organização da produção escrita", "objetivo": "Estruturar textos com organizador gráfico e revisar a sequência das ideias.", "bimestre": "1º", "status": "Em andamento", "prioridade": "Alta", "origem": "Sondagem e Estudo de Caso" },
+      { "id": "demo-habilidade-03", "titulo": "Comunicação para apoio", "objetivo": "Solicitar ajuda, esclarecimento ou pausa de forma funcional em diferentes contextos.", "bimestre": "1º", "status": "Em andamento", "prioridade": "Alta", "origem": "Escuta do estudante e observação" },
+      { "id": "demo-habilidade-04", "titulo": "Participação colaborativa", "objetivo": "Participar de pequenos grupos respeitando turnos e cumprindo um papel previamente definido.", "bimestre": "1º", "status": "Em andamento", "prioridade": "Média", "origem": "Professor regente e barreiras sociais" }
     ],
     "paee": {
       "id": "demo-paee-01",
       "status": "Concluído",
+      "anoLetivo": "2026",
+      "periodo": "1º semestre",
+      "dataInicio": "2026-03-02",
+      "dataFim": "2026-06-30",
+      "responsavel": "Profissional AEE fictício",
       "objetivoGeral": "Ampliar autonomia, comunicação funcional e participação curricular por meio de estratégias visuais e ensino explícito.",
       "objetivos": [
-        { "id": "demo-paee-obj-01", "area": "Funções executivas", "objetivo": "Planejar e concluir tarefas com checklist visual.", "estrategias": "Modelagem, redução gradual de prompts e autoavaliação.", "recursos": "Agenda visual, checklist e temporizador visual.", "criterio": "Concluir quatro de cinco etapas com no máximo um lembrete." },
-        { "id": "demo-paee-obj-02", "area": "Linguagem escrita", "objetivo": "Organizar textos curtos em sequência lógica.", "estrategias": "Mapa de ideias, modelo de parágrafo e revisão guiada.", "recursos": "Organizador gráfico e editor de texto.", "criterio": "Produzir texto com início, desenvolvimento e conclusão em três propostas consecutivas." },
-        { "id": "demo-paee-obj-03", "area": "Comunicação e interação", "objetivo": "Solicitar apoio e participar de atividades colaborativas.", "estrategias": "Ensaios, cartões de comunicação e papéis definidos no grupo.", "recursos": "Roteiro social e cartão de solicitação de ajuda ou pausa.", "criterio": "Usar a estratégia combinada em três contextos diferentes." }
+        { "id": "demo-paee-obj-01", "area": "Funções executivas", "status": "Em andamento", "objetivo": "Planejar e concluir tarefas com checklist visual.", "estrategias": "Modelagem, redução gradual de prompts e autoavaliação.", "recursos": "Agenda visual, checklist e temporizador visual.", "prazo": "1º semestre de 2026", "criterio": "Concluir quatro de cinco etapas com no máximo um lembrete." },
+        { "id": "demo-paee-obj-02", "area": "Linguagem escrita", "status": "Em andamento", "objetivo": "Organizar textos curtos em sequência lógica.", "estrategias": "Mapa de ideias, modelo de parágrafo e revisão guiada.", "recursos": "Organizador gráfico e editor de texto.", "prazo": "1º semestre de 2026", "criterio": "Produzir texto com início, desenvolvimento e conclusão em três propostas consecutivas." },
+        { "id": "demo-paee-obj-03", "area": "Comunicação e interação", "status": "Em andamento", "objetivo": "Solicitar apoio e participar de atividades colaborativas.", "estrategias": "Ensaios, cartões de comunicação e papéis definidos no grupo.", "recursos": "Roteiro social e cartão de solicitação de ajuda ou pausa.", "prazo": "1º semestre de 2026", "criterio": "Usar a estratégia combinada em três contextos diferentes." }
       ],
-      "articulacao": "Orientação quinzenal fictícia entre AEE e professores para acompanhar o uso das estratégias em sala comum."
+      "articulacao": "Orientação quinzenal fictícia entre AEE e professores para acompanhar o uso das estratégias em sala comum.",
+      "organizacaoAtendimento": {
+        "frequencia": "Uma vez por semana",
+        "duracaoMedia": "50 minutos",
+        "modalidade": "Individual, com experiências planejadas em pequeno grupo",
+        "articulacaoSalaComumFamilia": "Orientação quinzenal fictícia entre AEE e professores, com comunicação pedagógica à família quando necessário."
+      }
     },
     "pei": {
       "id": "demo-pei-01",
@@ -226,17 +241,98 @@
         "Permitir resposta escrita, oral ou digital quando compatível com o objetivo curricular."
       ],
       "avaliacao": "Manter os objetivos curriculares, com comandos objetivos, tempo de processamento, organização visual e ambiente com menos estímulos quando necessário.",
-      "apoios": ["AEE", "Professor regente", "Equipe pedagógica", "Família fictícia"]
+      "apoios": ["AEE", "Professor regente", "Equipe pedagógica", "Família fictícia"],
+      "formulario": {
+        "identificacao": {
+          "alunoCadastrado": "Lucas Gabriel Martins",
+          "nome": "Lucas Gabriel Martins",
+          "dataNascimento": "",
+          "idade": "13",
+          "anoLetivo": "2026",
+          "serieAno": "8º ano",
+          "turma": "Turma demonstrativa 8A",
+          "turno": "Tarde",
+          "escola": "Escola Demonstrativa Horizonte",
+          "municipio": "",
+          "dataPlanejamento": "2026-03-02",
+          "periodoVigencia": "1º semestre de 2026",
+          "professorSalaComum": "Professor regente fictício",
+          "professorAee": "Profissional AEE fictício",
+          "profissionalApoio": "Não informado no caso demonstrativo",
+          "condicaoDiagnostico": "TEA — informação exclusivamente fictícia para contextualização acadêmica."
+        },
+        "participantesArticulacao": {
+          "participantesEnvolvidos": "Estudante fictício, professor regente fictício, profissional AEE fictício e equipe pedagógica demonstrativa.",
+          "estrategiasColaborativasAee": "Alinhar checklist, organizadores gráficos, comunicação para ajuda ou pausa e participação em pequenos grupos.",
+          "participacaoFamilia": "Compartilhamento de orientações pedagógicas gerais, sem inclusão de informação familiar adicional.",
+          "participacaoEstudante": "A escuta demonstrativa indicou preferência por instruções objetivas, apoio visual e antecipação de mudanças.",
+          "articulacaoOutrosProfissionais": "Não informado no caso demonstrativo"
+        },
+        "basePedagogica": {
+          "potencialidades": "Raciocínio visual, interesse por ciências e tecnologia, compreensão de textos informativos e persistência quando a sequência está clara.",
+          "barreirasAcessoCurriculo": "Tarefas extensas sem etapas explícitas, produção escrita sem organizador, mudanças inesperadas e atividades coletivas sem papéis definidos.",
+          "necessidadesApoioSalaComum": "Instruções segmentadas, organizadores gráficos, checklist, tempo de processamento, antecipação de mudanças e mediação gradual em pequenos grupos.",
+          "resumoEstudoCasoPaee": "O Estudo de Caso e o PAEE priorizam planejamento de tarefas, organização da escrita, comunicação funcional para solicitar apoio e participação colaborativa."
+        },
+        "planejamentoCurricular": {
+          "componenteCurricular": "Língua Portuguesa e componentes com produção escrita",
+          "periodoTrabalho": "1º semestre de 2026",
+          "objetoConhecimento": "Planejamento, produção e revisão de textos informativos articulados aos conteúdos da turma.",
+          "conceitoCentral": "Organizar ideias em sequência lógica e comunicar o conhecimento com clareza."
+        },
+        "habilidadesObjetosPriorizados": [
+          { "habilidade": "Planejar e concluir tarefas com apoio de checklist visual.", "objetoConhecimento": "Organização de etapas e autorregulação da atividade.", "prazoExecucao": "Curto prazo — 1 mês" },
+          { "habilidade": "Organizar a produção escrita com início, desenvolvimento e conclusão.", "objetoConhecimento": "Estrutura e revisão de texto informativo.", "prazoExecucao": "Médio prazo — 2 meses" },
+          { "habilidade": "Solicitar ajuda ou pausa e participar de pequenos grupos com papel definido.", "objetoConhecimento": "Comunicação funcional e participação colaborativa.", "prazoExecucao": "Médio prazo — 2 meses" }
+        ],
+        "objetivosMetas": [
+          { "objetivoMeta": "Utilizar checklist para concluir quatro de cinco etapas com no máximo um lembrete.", "resultadoEsperado": "Registro de conclusão das etapas em três atividades consecutivas.", "prioridade": "Alta", "prazo": "Até o final do 1º bimestre" },
+          { "objetivoMeta": "Produzir texto informativo curto usando organizador e três critérios de revisão.", "resultadoEsperado": "Texto com sequência lógica em três propostas consecutivas.", "prioridade": "Alta", "prazo": "Até o final do 2º bimestre" },
+          { "objetivoMeta": "Solicitar ajuda ou pausa e cumprir papel definido em pequeno grupo.", "resultadoEsperado": "Uso funcional da estratégia em três contextos e participação semanal em atividade colaborativa.", "prioridade": "Alta", "prazo": "Durante o 1º semestre" }
+        ],
+        "metodologiasAtividades": {
+          "metodologias": "Ensino explícito, modelagem, prática guiada e redução gradual de prompts.",
+          "propostasAtividades": "Pesquisa orientada, produção de texto informativo, ensaios de comunicação e desafios colaborativos estruturados.",
+          "adaptacoesAtividades": "Comandos em etapas, organizadores visuais, redução de cópia e critérios de revisão apresentados por ícones.",
+          "organizacaoParticipacaoSalaComum": "Participação individual, em dupla e em pequenos grupos com papéis previamente definidos."
+        },
+        "recursosAcessibilidadeApoios": {
+          "recursosUtilizados": "Agenda visual, checklist, temporizador visual, mapa de ideias, roteiro social e editor de texto.",
+          "acessibilidadeCurricular": "Manter o objetivo curricular e tornar comandos, etapas e critérios visualmente explícitos.",
+          "apoiosNecessarios": "Mediação inicial, tempo de processamento, antecipação de mudanças e redução gradual de lembretes.",
+          "tecnologiaAssistivaComunicacao": "Cartão visual para solicitar ajuda ou pausa e recursos digitais de organização textual."
+        },
+        "avaliacaoAprendizagem": {
+          "estrategiasAvaliacao": "Avaliação processual a partir da participação, dos registros de tarefa e das produções do período.",
+          "formasDemonstrarAprendizagem": "Produção escrita, resposta oral, registro digital e atividade prática, conforme o objetivo curricular.",
+          "criteriosObservacao": "Autonomia para iniciar e concluir etapas, sequência das ideias, comunicação funcional e participação colaborativa.",
+          "instrumentosRegistros": "Checklist, produções do estudante, observações do professor, registros do AEE e portfólio demonstrativo."
+        },
+        "acompanhamentoRevisao": {
+          "registrosProcesso": "Os quatro atendimentos demonstrativos evidenciam melhor uso do checklist, organização inicial da escrita e comunicação para apoio.",
+          "desafiosEncontrados": "A revisão autônoma, a generalização das estratégias e a flexibilidade em mudanças ainda precisam de acompanhamento.",
+          "avancosObservados": "Maior iniciativa em tarefas conhecidas, sequência de ideias mais clara e participação com papel definido.",
+          "expectativasProximoPeriodo": "Reduzir gradualmente os prompts e ampliar o uso das estratégias em novos componentes e grupos de três estudantes.",
+          "dataPrevistaRevisao": "2026-06-30"
+        },
+        "encaminhamentosFinais": {
+          "salaComum": "Manter comandos segmentados, checklist e organizadores gráficos, registrando a redução de apoios.",
+          "aee": "Dar continuidade às quatro prioridades e promover generalização das estratégias.",
+          "familia": "Compartilhar orientações pedagógicas sobre organização e comunicação funcional, sem ampliar dados pessoais.",
+          "coordenacaoGestao": "Acompanhar a articulação entre AEE e sala comum e garantir disponibilidade dos recursos visuais.",
+          "observacoesFinais": "Plano demonstrativo sujeito a revisão pedagógica ao final do período de vigência."
+        }
+      }
     },
     "atendimentosAee": [
-      { "id": "demo-atendimento-01", "encontro": "Encontro demonstrativo 1", "dataAtendimento": "05/03/2026", "semanaReferencia": "1ª semana de março", "statusPresenca": "Presente", "eixoTematico": "Atenção e Funções Executivas", "objetivoRelacionado": "Planejamento de tarefas", "atividade": "Montagem e uso de checklist para pesquisa de Ciências.", "recursos": "Checklist visual, cartões de etapas e temporizador visual.", "resultado": "Iniciou após modelagem e concluiu quatro de cinco etapas com dois lembretes.", "proximaAcao": "Reduzir para um lembrete e transferir o checklist para outra disciplina." },
-      { "id": "demo-atendimento-02", "encontro": "Encontro demonstrativo 2", "dataAtendimento": "12/03/2026", "semanaReferencia": "2ª semana de março", "statusPresenca": "Presente", "eixoTematico": "Escrita", "objetivoRelacionado": "Organização da produção escrita", "atividade": "Planejamento de texto informativo com mapa de ideias.", "recursos": "Mapa de ideias, modelo de parágrafo e editor de texto.", "resultado": "Organizou três ideias centrais e produziu parágrafos em sequência com revisão guiada.", "proximaAcao": "Inserir revisão independente por três critérios visuais." },
-      { "id": "demo-atendimento-03", "encontro": "Encontro demonstrativo 3", "dataAtendimento": "19/03/2026", "semanaReferencia": "3ª semana de março", "statusPresenca": "Presente", "eixoTematico": "Comunicação e Linguagem", "objetivoRelacionado": "Comunicação para apoio", "atividade": "Ensaio de solicitação de esclarecimento, ajuda e pausa.", "recursos": "Cartões de comunicação e roteiro social.", "resultado": "Selecionou e utilizou a frase adequada em três situações simuladas.", "proximaAcao": "Generalizar o recurso na sala comum com registro do professor." },
-      { "id": "demo-atendimento-04", "encontro": "Encontro demonstrativo 4", "dataAtendimento": "26/03/2026", "semanaReferencia": "4ª semana de março", "statusPresenca": "Presente", "eixoTematico": "Interação Social", "objetivoRelacionado": "Participação colaborativa", "atividade": "Resolução de desafio em dupla com alternância de papéis.", "recursos": "Cartões de papéis e desafio colaborativo estruturado.", "resultado": "Respeitou os turnos e concluiu sua função; precisou de um lembrete para ouvir a proposta do colega.", "proximaAcao": "Ampliar gradualmente para grupo de três estudantes." }
+      { "id": "demo-atendimento-01", "encontro": "Encontro demonstrativo 1", "dataAtendimento": "05/03/2026", "dataAtendimentoIso": "2026-03-05", "semanaReferencia": "1ª semana de março", "statusPresenca": "Presente", "eixoTematico": "Atenção e Funções Executivas", "objetivoRelacionado": "Planejamento de tarefas", "habilidadesSelecionadas": ["Utilizar checklist para iniciar, acompanhar e concluir atividades com menor necessidade de prompts."], "habilidadesComplementares": "Montagem e uso de checklist para pesquisa de Ciências, com cartões de etapas e temporizador visual.", "atividade": "Montagem e uso de checklist para pesquisa de Ciências.", "recursos": "Checklist visual, cartões de etapas e temporizador visual.", "dificuldadesObservadas": "Precisou de modelagem inicial e de dois lembretes para retomar a sequência.", "avancosPercebidos": "Iniciou após modelagem e concluiu quatro de cinco etapas com dois lembretes.", "observacoes": "O apoio visual favoreceu permanência e compreensão da sequência.", "encaminhamentos": "Reduzir para um lembrete e transferir o checklist para outra disciplina.", "resultado": "Iniciou após modelagem e concluiu quatro de cinco etapas com dois lembretes.", "proximaAcao": "Reduzir para um lembrete e transferir o checklist para outra disciplina." },
+      { "id": "demo-atendimento-02", "encontro": "Encontro demonstrativo 2", "dataAtendimento": "12/03/2026", "dataAtendimentoIso": "2026-03-12", "semanaReferencia": "2ª semana de março", "statusPresenca": "Presente", "eixoTematico": "Escrita", "objetivoRelacionado": "Organização da produção escrita", "habilidadesSelecionadas": ["Estruturar textos com organizador gráfico e revisar a sequência das ideias."], "habilidadesComplementares": "Planejamento de texto informativo com mapa de ideias, modelo de parágrafo e editor de texto.", "atividade": "Planejamento de texto informativo com mapa de ideias.", "recursos": "Mapa de ideias, modelo de parágrafo e editor de texto.", "dificuldadesObservadas": "A revisão independente ainda exigiu orientação por critérios.", "avancosPercebidos": "Organizou três ideias centrais e produziu parágrafos em sequência com revisão guiada.", "observacoes": "O mapa visual reduziu a dispersão e apoiou a sequência textual.", "encaminhamentos": "Inserir revisão independente por três critérios visuais.", "resultado": "Organizou três ideias centrais e produziu parágrafos em sequência com revisão guiada.", "proximaAcao": "Inserir revisão independente por três critérios visuais." },
+      { "id": "demo-atendimento-03", "encontro": "Encontro demonstrativo 3", "dataAtendimento": "19/03/2026", "dataAtendimentoIso": "2026-03-19", "semanaReferencia": "3ª semana de março", "statusPresenca": "Presente", "eixoTematico": "Comunicação e Linguagem", "objetivoRelacionado": "Comunicação para apoio", "habilidadesSelecionadas": ["Solicitar ajuda, esclarecimento ou pausa de forma funcional em diferentes contextos."], "habilidadesComplementares": "Ensaio de solicitação de esclarecimento, ajuda e pausa com cartões de comunicação e roteiro social.", "atividade": "Ensaio de solicitação de esclarecimento, ajuda e pausa.", "recursos": "Cartões de comunicação e roteiro social.", "dificuldadesObservadas": "O uso da estratégia ainda precisa ser generalizado para situações espontâneas.", "avancosPercebidos": "Selecionou e utilizou a frase adequada em três situações simuladas.", "observacoes": "Demonstrou compreensão da finalidade das três formas de solicitação.", "encaminhamentos": "Generalizar o recurso na sala comum com registro do professor.", "resultado": "Selecionou e utilizou a frase adequada em três situações simuladas.", "proximaAcao": "Generalizar o recurso na sala comum com registro do professor." },
+      { "id": "demo-atendimento-04", "encontro": "Encontro demonstrativo 4", "dataAtendimento": "26/03/2026", "dataAtendimentoIso": "2026-03-26", "semanaReferencia": "4ª semana de março", "statusPresenca": "Presente", "eixoTematico": "Interação Social", "objetivoRelacionado": "Participação colaborativa", "habilidadesSelecionadas": ["Participar de pequenos grupos respeitando turnos e cumprindo um papel previamente definido."], "habilidadesComplementares": "Resolução de desafio em dupla com cartões de papéis e alternância de turnos.", "atividade": "Resolução de desafio em dupla com alternância de papéis.", "recursos": "Cartões de papéis e desafio colaborativo estruturado.", "dificuldadesObservadas": "Precisou de um lembrete para ouvir a proposta do colega e hesitou diante da troca de função.", "avancosPercebidos": "Respeitou os turnos e concluiu sua função no desafio em dupla.", "observacoes": "A definição prévia dos papéis favoreceu a participação colaborativa.", "encaminhamentos": "Ampliar gradualmente para grupo de três estudantes.", "resultado": "Respeitou os turnos e concluiu sua função; precisou de um lembrete para ouvir a proposta do colega.", "proximaAcao": "Ampliar gradualmente para grupo de três estudantes." }
     ],
     "acompanhamentos": [
-      { "id": "demo-acompanhamento-01", "origem": "Sala comum", "avanco": "Passou a iniciar tarefas conhecidas consultando o checklist.", "dificuldade": "Ainda solicita confirmação adulta antes de etapas novas.", "ajuste": "Usar marcador visual de conferência antes de solicitar ajuda." },
-      { "id": "demo-acompanhamento-02", "origem": "Produção escrita", "avanco": "Apresenta melhor sequência de ideias com o mapa visual.", "dificuldade": "A revisão autônoma ainda é parcial.", "ajuste": "Manter apenas três critérios de revisão, apresentados com ícones." },
+      { "id": "demo-acompanhamento-01", "tipo": "diario_bordo", "origem": "Sala comum", "responsavelNome": "Mediador fictício", "funcaoResponsavel": "Mediador", "dataRegistro": "2026-03-27", "semanaReferencia": "2026-W13", "disciplina": "Ciências e Língua Portuguesa", "professorAula": "Professores fictícios da turma", "tipoAtividade": "atividade escrita", "ambiente": "sala comum", "participacao": "participou com apoio", "compreensao": "compreendeu com apoio", "atencaoPermanencia": "manteve-se na maior parte do tempo", "interacaoSocial": "interagiu com colegas com mediação", "autonomia": "pequena necessidade de apoio", "intervencoesProfessorObservadas": ["apoio visual", "instrução em etapas", "tempo ampliado", "trabalho em dupla"], "resultadoIntervencao": "respondeu bem", "avancosPercebidos": "Passou a iniciar tarefas conhecidas consultando o checklist.", "dificuldadesObservadas": "Ainda solicita confirmação adulta antes de etapas novas.", "observacaoGeral": "O checklist e a instrução em etapas favoreceram a continuidade da tarefa.", "encaminhamentos": "Usar marcador visual de conferência antes de solicitar ajuda.", "avanco": "Passou a iniciar tarefas conhecidas consultando o checklist.", "dificuldade": "Ainda solicita confirmação adulta antes de etapas novas.", "ajuste": "Usar marcador visual de conferência antes de solicitar ajuda." },
+      { "id": "demo-acompanhamento-02", "tipo": "registro_professor", "origem": "Produção escrita", "disciplina": "Língua Portuguesa", "professorNome": "Professor regente fictício", "dataRegistro": "2026-03-30", "bimestre": "1º bimestre", "participacaoDisciplina": "boa com apoio", "compreensaoConteudo": "compreende com algum apoio", "realizacaoAtividades": "realiza com apoio", "desenvolvimentoDisciplina": "Apresenta melhor sequência de ideias quando utiliza mapa visual e critérios explícitos de revisão.", "intervencoesRealizadas": "Organizador gráfico, modelo de parágrafo, instrução em etapas e tempo de processamento.", "estrategiasQueFuncionaram": "Mapa de ideias, apoio visual e revisão guiada por três critérios.", "dificuldadesObservadas": "A revisão autônoma ainda é parcial.", "encaminhamentosPedagogicos": "Manter apenas três critérios de revisão, apresentados com ícones.", "marcadoresIntervencao": ["atividade adaptada", "apoio visual", "mais tempo para concluir"], "avaliacaoIntervencoesRealizadas": "As estratégias favoreceram a organização do texto; a retirada de apoio deve ocorrer gradualmente.", "avanco": "Apresenta melhor sequência de ideias com o mapa visual.", "dificuldade": "A revisão autônoma ainda é parcial.", "ajuste": "Manter apenas três critérios de revisão, apresentados com ícones." },
       { "id": "demo-acompanhamento-03", "origem": "Atividade coletiva", "avanco": "Participou de dupla e pequeno grupo com papel definido.", "dificuldade": "Mudanças de função durante a atividade geram hesitação.", "ajuste": "Antecipar a troca de papéis e oferecer breve tempo de preparação." }
     ],
     "monitoramento": {
@@ -256,6 +352,21 @@
         "id": "demo-relatorio-01",
         "titulo": "Relatório pedagógico demonstrativo",
         "periodo": "Ciclo demonstrativo inicial",
+        "bimestre": "1º",
+        "periodoAnalisado": "01/03/2026 até 31/03/2026",
+        "funcaoProfissional": "Professor(a) do AEE",
+        "introducao": "Lucas Gabriel Martins é um estudante fictício do 8º ano apresentado exclusivamente para demonstração acadêmica. O acompanhamento pedagógico considera suas potencialidades em raciocínio visual, leitura informativa, tecnologia e temas científicos, além das necessidades de apoio já identificadas.",
+        "interacaoComunicacao": "Participa melhor em duplas ou pequenos grupos com papéis definidos. Ampliou o uso de estratégias para solicitar ajuda ou pausa, ainda necessitando generalizá-las em situações espontâneas.",
+        "habilidadesMotoras": "Manipula materiais escolares e recursos digitais com autonomia; não foram identificadas prioridades motoras neste ciclo demonstrativo.",
+        "habilidadesCognitivas": "Apresenta raciocínio visual, atenção a detalhes e boa compreensão de textos informativos. O uso de checklist e instruções segmentadas favorece planejamento, atenção e conclusão das tarefas.",
+        "autonomiaIndependencia": "Iniciou tarefas conhecidas consultando o checklist e ampliou a organização dos materiais, mantendo necessidade de apoio diante de etapas novas e mudanças não antecipadas.",
+        "outrasInformacoes": "A organização da produção escrita evoluiu com mapa de ideias e revisão guiada; a revisão autônoma permanece como prioridade.",
+        "situacaoObjetivos": "Parcialmente alcançados",
+        "conclusaoParecer": "O ciclo demonstrativo evidencia avanços nas quatro prioridades, sem indicar conclusão integral. Recomenda-se manter os apoios visuais, ampliar a generalização e reduzir a mediação de forma gradual.",
+        "localAssinatura": "Escola Demonstrativa Horizonte",
+        "dataAssinatura": "31/03/2026",
+        "assinaturaProfissional": "Profissional AEE fictício",
+        "cargoFuncao": "Professor(a) do AEE",
         "sintese": "Lucas apresenta potencial em raciocínio visual, leitura informativa, tecnologia e temas científicos. Ao longo do ciclo fictício, ampliou o uso de checklist, a organização inicial da escrita e a comunicação para solicitar apoio. Permanecem como prioridades a revisão autônoma, a generalização das estratégias e a flexibilidade em situações coletivas.",
         "encaminhamentos": [
           "Manter PAEE e PEI articulados às quatro habilidades prioritárias.",
