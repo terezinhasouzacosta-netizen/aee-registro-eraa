@@ -359,16 +359,13 @@ function AppLayout() {
     >
       <aside className="app-sidebar">
         <div className="sidebar-brand">
-          <img
-            src={aeeRegistroLogo}
-            alt="Logo AEE Registro"
-            className="sidebar-logo-img"
-          />
-          <p className="sidebar-brand-slogan">
-            Acolher • Planejar
-            <br />
-            Acompanhar • Incluir
-          </p>
+          <div className="sidebar-logo-frame">
+            <img
+              src={aeeRegistroLogo}
+              alt="Logo AEE Registro"
+              className="sidebar-logo-img"
+            />
+          </div>
         </div>
         <nav className="sidebar-nav">
           <div className="sidebar-section">
