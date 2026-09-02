@@ -13,12 +13,13 @@ function DemonstracaoLayout({ children }) {
       </a>
       <aside className="demo-sidebar">
         <div className="demo-brand">
-          <img src={aeeRegistroLogo} alt="AEE Registro" />
-          <p>
-            Acolher • Planejar
-            <br />
-            Acompanhar • Incluir
-          </p>
+          <div className="demo-logo-frame">
+            <img
+              src={aeeRegistroLogo}
+              alt="AEE Registro"
+              className="demo-logo-img"
+            />
+          </div>
         </div>
 
         <div className="demo-desktop-navigation">
