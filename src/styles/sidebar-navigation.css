@@ -1,0 +1,47 @@
+/* Refinamento visual exclusivo da navegação lateral institucional. */
+.app-shell > .app-sidebar .sidebar-brand {
+  gap: 1px;
+  padding: 1px 6px 3px;
+  margin-bottom: 2px;
+}
+
+.app-shell > .app-sidebar .sidebar-logo-img {
+  width: 126px;
+  height: 90px;
+  object-fit: cover;
+  object-position: center 46%;
+  transform: translateY(-2px);
+}
+
+.app-shell > .app-sidebar .sidebar-brand-slogan {
+  line-height: 1.42;
+}
+
+.app-shell > .app-sidebar .sidebar-nav {
+  gap: 0.22rem;
+}
+
+.app-shell > .app-sidebar .sidebar-section {
+  gap: 0.06rem;
+}
+
+.app-shell > .app-sidebar .sidebar-section-title {
+  margin: 0 0.62rem 0.06rem;
+  color: #72f8a1 !important;
+}
+
+.app-shell > .app-sidebar .sidebar-section + .sidebar-section {
+  padding-top: 4px;
+}
+
+.app-shell > .app-sidebar .sidebar-nav a {
+  gap: 0.58rem;
+  min-height: 35px;
+  padding: 0.38rem 0.62rem;
+}
+
+@media (min-width: 841px) {
+  .app-shell > .app-sidebar .sidebar-nav a > span:last-child {
+    white-space: nowrap;
+  }
+}

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import aeeRegistroLogo from "../assets/aee-registro-logo.png";
+import "../styles/sidebar-navigation.css";
 import {
   podeAcessarAcompanhamento,
   podeVisualizarAtendimentoAEE,
