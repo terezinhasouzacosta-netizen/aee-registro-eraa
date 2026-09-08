@@ -3,6 +3,7 @@ import { Users } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import AlunoForm from "../components/AlunoForm";
 import AlunosList from "../components/AlunosList";
+import AtualizacaoInteligenteCadastros from "../components/AtualizacaoInteligenteCadastros";
 import { useAuth } from "../hooks/useAuth";
 import {
   atualizarAluno,
@@ -159,6 +160,13 @@ function AlunosPage() {
           podeEditar={podeEditar}
         />
       </div>
+
+      {podeEditar ? (
+        <AtualizacaoInteligenteCadastros
+          alunos={alunos}
+          loading={loadingList}
+        />
+      ) : null}
     </main>
   );
 }
