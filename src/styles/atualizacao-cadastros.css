@@ -1,0 +1,128 @@
+.cadastro-update-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  overflow-y: auto;
+  background: rgba(15, 42, 64, 0.62);
+  backdrop-filter: blur(3px);
+}
+
+.cadastro-update-modal {
+  width: min(760px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  border: 1px solid #d9e4ef;
+  border-radius: 18px;
+  padding: 1.25rem;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(15, 42, 64, 0.28);
+}
+
+.cadastro-update-modal-header,
+.cadastro-update-modal-header > div,
+.cadastro-update-modal-actions {
+  display: flex;
+  align-items: center;
+}
+
+.cadastro-update-modal-header {
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cadastro-update-modal-header > div {
+  gap: 0.65rem;
+}
+
+.cadastro-update-modal-header h3 {
+  margin: 0;
+  color: #17324d;
+}
+
+.cadastro-update-modal-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  color: #9a5b00;
+  background: #fff4d6;
+}
+
+.cadastro-update-modal-icon svg,
+.cadastro-update-modal-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.cadastro-update-modal-close {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 10px;
+  color: #425b72;
+  background: #eef3f8;
+  cursor: pointer;
+}
+
+.cadastro-update-modal-close:hover:not(:disabled) {
+  background: #e1e9f1;
+}
+
+.cadastro-update-modal-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.cadastro-update-security-notice {
+  margin-top: 1rem;
+  border: 1px solid #b9d4ee;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  color: #1d4263;
+  background: #f3f8fd;
+}
+
+.cadastro-update-security-notice ul {
+  margin: 0.6rem 0;
+  padding-left: 1.25rem;
+}
+
+.cadastro-update-security-notice p {
+  margin: 0;
+}
+
+.cadastro-update-modal-actions {
+  justify-content: flex-end;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 680px) {
+  .cadastro-update-modal {
+    padding: 1rem;
+  }
+
+  .cadastro-update-modal-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .cadastro-update-modal-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .cadastro-update-modal-actions .alunos-page-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -1,6 +1,8 @@
-import { useMemo, useState } from "react";
-import { ClipboardCheck, ShieldCheck } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AlertTriangle, ClipboardCheck, ShieldCheck, X } from "lucide-react";
+import { aplicarAtualizacoesInteligentesCadastros } from "../services/alunosService";
 import { analisarAtualizacaoCadastros } from "../utils/cadastroNormalization";
+import "../styles/atualizacao-cadastros.css";
 
 function ResumoItem({ titulo, valor }) {
   return (
@@ -17,10 +19,16 @@ function valoresUnicos(itens, campo) {
   );
 }
 
-function AtualizacaoInteligenteCadastros({ alunos = [], loading = false }) {
+function AtualizacaoInteligenteCadastros({ alunos = [], loading = false, onAtualizado }) {
   const [filtros, setFiltros] = useState({ turma: "", serie: "", campo: "", status: "" });
   const [confirmacaoRevisao, setConfirmacaoRevisao] = useState(false);
-  const [autorizacaoRegistrada, setAutorizacaoRegistrada] = useState(false);
+  const [confirmacaoAberta, setConfirmacaoAberta] = useState(false);
+  const [alteracoesParaConfirmar, setAlteracoesParaConfirmar] = useState([]);
+  const [resumoConfirmacao, setResumoConfirmacao] = useState(null);
+  const [executando, setExecutando] = useState(false);
+  const [erro, setErro] = useState("");
+  const [relatorioFinal, setRelatorioFinal] = useState(null);
+  const botaoConfirmarRef = useRef(null);
   const analise = useMemo(() => analisarAtualizacaoCadastros(alunos), [alunos]);
 
   const itensFiltrados = useMemo(
@@ -43,13 +51,89 @@ function AtualizacaoInteligenteCadastros({ alunos = [], loading = false }) {
   const atualizarFiltro = (campo, valor) => {
     setFiltros((atuais) => ({ ...atuais, [campo]: valor }));
     setConfirmacaoRevisao(false);
-    setAutorizacaoRegistrada(false);
+    setRelatorioFinal(null);
   };
 
-  const registrarAutorizacao = () => {
+  const abrirConfirmacaoFinal = () => {
     if (!confirmacaoRevisao) return;
-    setAutorizacaoRegistrada(true);
+    const aprovadas = analise.alteracoes.filter((item) => item.status === "Aprovado");
+    setAlteracoesParaConfirmar(aprovadas);
+    setResumoConfirmacao({
+      alunos: new Set(aprovadas.map((item) => item.alunoId)).size,
+      turmas: aprovadas.filter((item) => item.campo === "turma").length,
+      series: aprovadas.filter((item) => item.campo === "serieAno").length,
+      turnos: aprovadas.filter((item) => item.campo === "turno").length,
+      revisaoManual: analise.registrosEdicaoManual,
+      registrosManuais: analise.registrosManuais,
+    });
+    setErro("");
+    setConfirmacaoAberta(true);
   };
+
+  const fecharConfirmacao = () => {
+    if (executando) return;
+    setConfirmacaoAberta(false);
+  };
+
+  const confirmarAtualizacao = async () => {
+    if (executando || alteracoesParaConfirmar.length === 0) return;
+
+    setExecutando(true);
+    setErro("");
+
+    try {
+      const resultado = await aplicarAtualizacoesInteligentesCadastros(
+        alteracoesParaConfirmar
+      );
+      const pendentes = new Set([
+        ...(resumoConfirmacao?.registrosManuais || []),
+        ...resultado.resultados
+          .filter((item) => item.status === "revisao")
+          .map((item) => item.alunoId),
+      ]);
+
+      setRelatorioFinal({
+        atualizados: resultado.registrosAtualizados,
+        ignorados: resultado.registrosIgnorados,
+        erros: resultado.quantidadeErros,
+        pendentes: pendentes.size,
+      });
+      setConfirmacaoAberta(false);
+      setConfirmacaoRevisao(false);
+      if (onAtualizado) {
+        try {
+          await onAtualizado();
+        } catch (reloadError) {
+          console.error(
+            "[AtualizacaoInteligenteCadastros] Falha ao recarregar a lista",
+            reloadError
+          );
+          setErro(
+            "A atualização foi concluída, mas a lista não pôde ser recarregada automaticamente."
+          );
+        }
+      }
+    } catch (error) {
+      console.error("[AtualizacaoInteligenteCadastros] Falha na atualização", error);
+      setErro(
+        "Não foi possível iniciar a atualização. A leitura de segurança falhou e nenhuma gravação foi executada."
+      );
+      setConfirmacaoAberta(false);
+    } finally {
+      setExecutando(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!confirmacaoAberta) return undefined;
+
+    botaoConfirmarRef.current?.focus();
+    const fecharComEscape = (event) => {
+      if (event.key === "Escape" && !executando) fecharConfirmacao();
+    };
+    document.addEventListener("keydown", fecharComEscape);
+    return () => document.removeEventListener("keydown", fecharComEscape);
+  }, [confirmacaoAberta, executando]);
 
   return (
     <section className="panel" aria-labelledby="atualizacao-inteligente-titulo">
@@ -61,8 +145,8 @@ function AtualizacaoInteligenteCadastros({ alunos = [], loading = false }) {
       </h2>
 
       <p className="muted">
-        Versão para conferência da prévia. Nenhuma atualização será aplicada ao Firebase nesta
-        etapa.
+        Confira integralmente a prévia. A gravação somente será iniciada após duas confirmações
+        explícitas de segurança.
       </p>
 
       <div className="dashboard-grid" aria-label="Resumo geral da prévia">
@@ -180,7 +264,7 @@ function AtualizacaoInteligenteCadastros({ alunos = [], loading = false }) {
             checked={confirmacaoRevisao}
             onChange={(event) => {
               setConfirmacaoRevisao(event.target.checked);
-              setAutorizacaoRegistrada(false);
+              setRelatorioFinal(null);
             }}
           />{" "}
           Confirmo que revisei integralmente a prévia apresentada.
@@ -190,25 +274,105 @@ function AtualizacaoInteligenteCadastros({ alunos = [], loading = false }) {
           <button
             type="button"
             className="alunos-page-button alunos-primary-action"
-            disabled={!confirmacaoRevisao || autorizacaoRegistrada}
-            onClick={registrarAutorizacao}
+            disabled={!confirmacaoRevisao || loading || executando}
+            onClick={abrirConfirmacaoFinal}
           >
             <ShieldCheck aria-hidden="true" />
             Autorizar Atualização
           </button>
         </div>
 
-        {autorizacaoRegistrada ? (
-          <p className="toast-success" role="status">
-            Autorização registrada somente nesta tela. Nenhum cadastro foi atualizado.
-          </p>
-        ) : null}
       </section>
+
+      {erro ? <p className="toast-error" role="alert">{erro}</p> : null}
+
+      {relatorioFinal ? (
+        <section className="panel" aria-labelledby="relatorio-final-atualizacao">
+          <h3 id="relatorio-final-atualizacao">Relatório resumido da atualização</h3>
+          <div className="dashboard-grid" aria-live="polite">
+            <ResumoItem titulo="Registros atualizados" valor={relatorioFinal.atualizados} />
+            <ResumoItem titulo="Registros ignorados" valor={relatorioFinal.ignorados} />
+            <ResumoItem titulo="Registros com erro" valor={relatorioFinal.erros} />
+            <ResumoItem titulo="Pendentes de revisão" valor={relatorioFinal.pendentes} />
+          </div>
+        </section>
+      ) : null}
 
       <p className="muted" role="note">
         Diagnóstico, comorbidades, laudo, escola, município, professor(a) do AEE, nome, data de
         nascimento e tipo de acompanhamento não fazem parte desta atualização.
       </p>
+
+      {confirmacaoAberta && resumoConfirmacao ? (
+        <div className="cadastro-update-modal-backdrop" role="presentation">
+          <section
+            className="cadastro-update-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirmacao-atualizacao-titulo"
+            aria-describedby="confirmacao-atualizacao-aviso"
+          >
+            <header className="cadastro-update-modal-header">
+              <div>
+                <span className="cadastro-update-modal-icon" aria-hidden="true">
+                  <AlertTriangle />
+                </span>
+                <h3 id="confirmacao-atualizacao-titulo">Confirmação final de segurança</h3>
+              </div>
+              <button
+                type="button"
+                className="cadastro-update-modal-close"
+                aria-label="Fechar confirmação"
+                disabled={executando}
+                onClick={fecharConfirmacao}
+              >
+                <X aria-hidden="true" />
+              </button>
+            </header>
+
+            <div className="cadastro-update-modal-summary">
+              <ResumoItem titulo="Alunos que serão atualizados" valor={resumoConfirmacao.alunos} />
+              <ResumoItem titulo="Turmas que serão padronizadas" valor={resumoConfirmacao.turmas} />
+              <ResumoItem titulo="Série/Ano que será preenchido" valor={resumoConfirmacao.series} />
+              <ResumoItem titulo="Sugestões de turno" valor={resumoConfirmacao.turnos} />
+              <ResumoItem titulo="Registros em revisão manual" valor={resumoConfirmacao.revisaoManual} />
+            </div>
+
+            <div id="confirmacao-atualizacao-aviso" className="cadastro-update-security-notice">
+              <strong>Esta operação atualizará somente os campos:</strong>
+              <ul>
+                <li>Turma</li>
+                <li>Série/Ano</li>
+                <li>Turno (quando aplicável para EJA)</li>
+              </ul>
+              <p>
+                Nenhum diagnóstico, laudo, escola, professor do AEE ou outro dado pedagógico
+                será alterado.
+              </p>
+            </div>
+
+            <footer className="cadastro-update-modal-actions">
+              <button
+                type="button"
+                className="btn-secondary alunos-page-button"
+                disabled={executando}
+                onClick={fecharConfirmacao}
+              >
+                Cancelar
+              </button>
+              <button
+                ref={botaoConfirmarRef}
+                type="button"
+                className="alunos-page-button alunos-primary-action"
+                disabled={executando}
+                onClick={confirmarAtualizacao}
+              >
+                {executando ? "Atualizando cadastros..." : "Confirmar Atualização"}
+              </button>
+            </footer>
+          </section>
+        </div>
+      ) : null}
     </section>
   );
 }

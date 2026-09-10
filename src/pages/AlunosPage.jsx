@@ -165,6 +165,7 @@ function AlunosPage() {
         <AtualizacaoInteligenteCadastros
           alunos={alunos}
           loading={loadingList}
+          onAtualizado={carregarAlunos}
         />
       ) : null}
     </main>
