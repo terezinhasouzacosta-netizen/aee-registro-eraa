@@ -145,6 +145,28 @@ const ORDEM_DIAGNOSTICOS = [
   "Não informado",
 ];
 
+const ORDEM_SERIES_TURMAS = [
+  "6º ano A",
+  "6º ano B",
+  "6º ano C",
+  "6º ano D",
+  "7º ano A",
+  "7º ano B",
+  "7º ano C",
+  "7º ano D",
+  "8º ano A",
+  "8º ano B",
+  "8º ano C",
+  "8º ano D",
+  "9º ano A",
+  "9º ano B",
+  "9º ano C",
+  "9º ano D",
+  "EJA",
+];
+
+const ORDEM_TURNOS = ["Matutino", "Vespertino", "Noturno"];
+
 function normalizarTexto(valor) {
   return String(valor || "")
     .normalize("NFD")
@@ -168,6 +190,84 @@ function classificarDiagnostico(valor) {
     return "Deficiência Intelectual (DI)";
   }
   return "Outros";
+}
+
+function normalizarValorEscolar(valor) {
+  return normalizarTexto(valor).replace(/\s+/g, " ");
+}
+
+function extrairTurmaInstitucional(valor) {
+  const turma = normalizarValorEscolar(valor);
+  if (!turma) return "";
+  if (/\beja\b|jovens e adultos/.test(turma)) return "EJA";
+
+  const correspondencia = turma.match(/\b([6-9])\s*[º°o]?\s*(?:ano\s*)?([a-d])\b/i);
+  if (!correspondencia) return "";
+
+  return correspondencia[1] + "º ano " + correspondencia[2].toUpperCase();
+}
+
+function normalizarSerieTurmaAluno(aluno) {
+  const turma = normalizarValorEscolar(aluno?.turma);
+  const serieAno = normalizarValorEscolar(aluno?.serieAno);
+  const valorCompleto = extrairTurmaInstitucional(turma) || extrairTurmaInstitucional(serieAno);
+
+  if (valorCompleto) return valorCompleto;
+  if (/\beja\b|jovens e adultos/.test(serieAno + " " + turma)) return "EJA";
+
+  const ano = serieAno.match(/\b([6-9])\s*[º°o]?\s*(?:ano)?\b/i)?.[1];
+  const letra = turma.match(/\b([a-d])\b/i)?.[1];
+
+  return ano && letra ? ano + "º ano " + letra.toUpperCase() : "";
+}
+
+function agruparSeriesTurmas(alunos) {
+  const contagens = new Map(ORDEM_SERIES_TURMAS.map((serieTurma) => [serieTurma, 0]));
+
+  alunos.forEach((aluno) => {
+    const serieTurma = normalizarSerieTurmaAluno(aluno);
+    if (contagens.has(serieTurma)) {
+      contagens.set(serieTurma, contagens.get(serieTurma) + 1);
+    }
+  });
+
+  return ORDEM_SERIES_TURMAS.map((label) => {
+    const total = contagens.get(label);
+    return {
+      label,
+      total,
+      percentual: alunos.length ? Math.round((total / alunos.length) * 100) : 0,
+    };
+  }).filter((item) => item.total > 0);
+}
+
+function normalizarTurno(valor) {
+  const turno = normalizarTexto(valor);
+  if (!turno) return "";
+  if (/manha|matutin/.test(turno)) return "Matutino";
+  if (/tarde|vespertin/.test(turno)) return "Vespertino";
+  if (/noite|noturn/.test(turno)) return "Noturno";
+  return "";
+}
+
+function agruparTurnos(alunos) {
+  const contagens = new Map(ORDEM_TURNOS.map((turno) => [turno, 0]));
+
+  alunos.forEach((aluno) => {
+    const turno = normalizarTurno(aluno?.turno);
+    if (contagens.has(turno)) {
+      contagens.set(turno, contagens.get(turno) + 1);
+    }
+  });
+
+  return ORDEM_TURNOS.map((label) => {
+    const total = contagens.get(label);
+    return {
+      label,
+      total,
+      percentual: alunos.length ? Math.round((total / alunos.length) * 100) : 0,
+    };
+  });
 }
 
 function agruparDistribuicao(alunos, obterValor, ordemPreferencial) {
@@ -450,8 +550,8 @@ function DashboardPage() {
       (aluno) => classificarDiagnostico(aluno.diagnostico),
       ORDEM_DIAGNOSTICOS
     );
-    const series = agruparDistribuicao(alunos, (aluno) => String(aluno.serieAno || "").trim());
-    const turnos = agruparDistribuicao(alunos, (aluno) => String(aluno.turno || "").trim());
+    const series = agruparSeriesTurmas(alunos);
+    const turnos = agruparTurnos(alunos);
     const escolas = agruparDistribuicao(alunos, (aluno) => String(aluno.nomeEscola || "").trim());
     const totalEscolasInformadas = new Set(
       alunos.map((aluno) => normalizarTexto(aluno.nomeEscola)).filter(Boolean)
