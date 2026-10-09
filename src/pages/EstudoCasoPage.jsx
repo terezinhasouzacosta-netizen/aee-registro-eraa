@@ -21,8 +21,12 @@ import {
   criarEstudoCaso,
   listarEstudosCaso,
 } from "../services/estudosCasoService";
+import EstudoCasoAlunoAutocomplete from "../components/EstudoCasoAlunoAutocomplete";
+import { db } from "../services/firebase";
+import { listarAlunos, listarAlunosPorIds } from "../services/alunosService";
+import { buscarIdsAlunosVinculados } from "../services/vinculacoesService";
 import { useAuth } from "../hooks/useAuth";
-import { podeVisualizarSondagens } from "../utils/permissions";
+import { podeVisualizarSondagens, visualizaSomenteVinculados } from "../utils/permissions";
 
 const ESTUDO_CASO_RASCUNHO_ID_KEY = "estudoCasoRascunhoId";
 const COMANDO_REVISAO_CHATGPT =
@@ -80,7 +84,7 @@ const FORMAS_PREENCHIMENTO = [
     id: "usar-dados-plataforma",
     titulo: "Usar dados da plataforma",
     descricao:
-      "Recurso futuro para importar informações do Cadastro, Sondagem, Habilidades, PAEE e PEI, sempre com revisão da professora.",
+      "Identificação sincronizada com o Cadastro de Alunos. As demais integrações permanecem planejadas.",
     status: "Recurso futuro",
     ativa: false,
   },
@@ -95,7 +99,7 @@ const FORMAS_PREENCHIMENTO = [
 ];
 
 const IDENTIFICACAO_FIELDS = [
-  { id: "aluno", label: "Aluno", placeholder: "Digite o nome do estudante." },
+  { id: "aluno", label: "Nome do aluno" },
   { id: "dataNascimento", label: "Data de nascimento", placeholder: "Ex.: 10/03/2016" },
   { id: "serieAno", label: "Série/Ano", placeholder: "Ex.: 3º ano" },
   { id: "turma", label: "Turma", placeholder: "Ex.: Turma A" },
@@ -1940,10 +1944,14 @@ function gerarTextoPreviaEstudoCaso({
 }
 
 function EstudoCasoPage() {
-  const { perfil } = useAuth();
+  const { currentUser, perfil } = useAuth();
+  const somenteAlunosVinculados = visualizaSomenteVinculados(perfil);
   const podeLer = podeVisualizarSondagens(perfil);
   const [metaEstudo, setMetaEstudo] = useState(META_ESTUDO_INICIAL);
   const [identificacaoEstudante, setIdentificacaoEstudante] = useState(IDENTIFICACAO_INICIAL);
+  const [alunos, setAlunos] = useState([]);
+  const [alunoIdSelecionado, setAlunoIdSelecionado] = useState("");
+  const [carregandoAlunos, setCarregandoAlunos] = useState(false);
   const [formaPreenchimento] = useState("manual");
   const [perguntasEstado, setPerguntasEstado] = useState(() => criarEstadoInicialPerguntas());
   const [estudoCasoSalvoId, setEstudoCasoSalvoId] = useState("");
@@ -1963,6 +1971,24 @@ function EstudoCasoPage() {
   const [estudosSalvos, setEstudosSalvos] = useState([]);
   const [carregandoEstudosSalvos, setCarregandoEstudosSalvos] = useState(false);
   const [abrindoEstudoId, setAbrindoEstudoId] = useState("");
+
+  const alunoSelecionado = useMemo(
+    () => alunos.find((aluno) => aluno.id === alunoIdSelecionado) || null,
+    [alunos, alunoIdSelecionado],
+  );
+  const identificacaoExibida = useMemo(
+    () => alunoIdSelecionado
+      ? {
+          aluno: limparTexto(alunoSelecionado?.nome),
+          dataNascimento: limparTexto(alunoSelecionado?.dataNascimento),
+          serieAno: limparTexto(alunoSelecionado?.serieAno),
+          turma: limparTexto(alunoSelecionado?.turma),
+          turno: limparTexto(alunoSelecionado?.turno),
+          professorAee: limparTexto(alunoSelecionado?.professorAee),
+        }
+      : identificacaoEstudante,
+    [alunoIdSelecionado, alunoSelecionado, identificacaoEstudante],
+  );
 
   const progressoPreenchimento = useMemo(
     () => obterProgressoPerguntas(perguntasEstado),
@@ -2001,6 +2027,25 @@ function EstudoCasoPage() {
 
     return "Concluir o Estudo de Caso após validar o texto final.";
   }, [blocoAtual, metaEstudo.status, previaTexto, textoFinalRevisado]);
+  const carregarAlunosCadastro = async () => {
+    if (!currentUser) return;
+
+    setCarregandoAlunos(true);
+    try {
+      const alunosCarregados = somenteAlunosVinculados
+        ? await listarAlunosPorIds(await buscarIdsAlunosVinculados(currentUser.uid))
+        : await listarAlunos();
+      setAlunos(alunosCarregados);
+      return true;
+    } catch (error) {
+      console.error("[EstudoCasoPage] Erro ao carregar alunos do Cadastro", error);
+      setAlunos([]);
+      setErro("Não foi possível carregar os dados do Cadastro de Alunos.");
+      return false;
+    } finally {
+      setCarregandoAlunos(false);
+    }
+  };
   const carregarListaEstudosSalvos = async () => {
     setCarregandoEstudosSalvos(true);
     try {
@@ -2029,6 +2074,7 @@ function EstudoCasoPage() {
       ...IDENTIFICACAO_INICIAL,
       ...(estudoSalvo.identificacaoEstudante || {}),
     });
+    setAlunoIdSelecionado(estudoSalvo.alunoId || "");
     setPerguntasEstado({
       ...criarEstadoInicialPerguntas(),
       ...(estudoSalvo.perguntasEstado || {}),
@@ -2056,7 +2102,11 @@ function EstudoCasoPage() {
     setFeedback("");
     setAviso("");
     try {
-      const estudoSalvo = await buscarEstudoCasoPorId(estudoId);
+      const [estudoSalvo, cadastroCarregado] = await Promise.all([
+        buscarEstudoCasoPorId(estudoId),
+        carregarAlunosCadastro(),
+      ]);
+      if (!cadastroCarregado) return;
       if (!estudoSalvo) {
         setAviso("O Estudo de Caso selecionado não foi encontrado.");
         await carregarListaEstudosSalvos();
@@ -2073,6 +2123,10 @@ function EstudoCasoPage() {
       setAbrindoEstudoId("");
     }
   };
+
+  useEffect(() => {
+    carregarAlunosCadastro();
+  }, [currentUser, perfil]);
 
   useEffect(() => {
     let ativo = true;
@@ -2132,11 +2186,11 @@ function EstudoCasoPage() {
     }));
   };
 
-  const atualizarIdentificacao = (campo, valor) => {
-    setIdentificacaoEstudante((prev) => ({
-      ...prev,
-      [campo]: valor,
-    }));
+  const selecionarAlunoCadastro = (alunoId) => {
+    setAlunoIdSelecionado(alunoId);
+    if (!estudoCasoSalvoId) {
+      setIdentificacaoEstudante({ ...IDENTIFICACAO_INICIAL });
+    }
   };
 
   const atualizarPergunta = (blocoId, perguntaId, campo, valor) => {
@@ -2170,27 +2224,32 @@ function EstudoCasoPage() {
     const sintesePreviaAtual = limparTexto(previaTexto)
       ? gerarTextoPreviaEstudoCaso({
           metaEstudo,
-          identificacaoEstudante,
+          identificacaoEstudante: identificacaoExibida,
           perguntasEstado,
           observacoesObjetivas,
         })
       : "";
 
     const payload = {
-      alunoId: null,
-      alunoNome: limparTexto(identificacaoEstudante.aluno),
+      alunoId: alunoIdSelecionado || null,
       tituloEstudo: limparTexto(metaEstudo.tituloEstudo),
       dataInicio: metaEstudo.dataInicio || "",
       periodo: limparTexto(metaEstudo.periodo),
       responsavel: limparTexto(metaEstudo.responsavel),
       statusGeral,
-      identificacaoEstudante: normalizarIdentificacaoEstudante(identificacaoEstudante),
+      identificacaoEstudante: alunoIdSelecionado
+        ? {}
+        : normalizarIdentificacaoEstudante(identificacaoEstudante),
       perguntasEstado: montarPerguntasEstadoPersistido(perguntasEstado),
       observacoesObjetivas: montarObservacoesObjetivasPersistidas(observacoesObjetivas),
       resumo: resumoAtualizado,
       sintesePrevia: sintesePreviaAtual,
       textoFinalRevisado: limparTexto(textoFinalRevisado),
     };
+
+    if (!alunoIdSelecionado) {
+      payload.alunoNome = limparTexto(identificacaoEstudante.aluno);
+    }
 
     if (dataConclusao) {
       payload.dataConclusao = dataConclusao;
@@ -2232,6 +2291,7 @@ function EstudoCasoPage() {
   };
 
   const handleNovoEstudo = () => {
+    setAlunoIdSelecionado("");
     setMetaEstudo({ ...META_ESTUDO_INICIAL });
     setIdentificacaoEstudante({ ...IDENTIFICACAO_INICIAL });
     setPerguntasEstado(criarEstadoInicialPerguntas());
@@ -2250,7 +2310,7 @@ function EstudoCasoPage() {
   const handleGerarSintesePrevia = () => {
     const textoGerado = gerarTextoPreviaEstudoCaso({
       metaEstudo,
-      identificacaoEstudante,
+      identificacaoEstudante: identificacaoExibida,
       perguntasEstado,
       observacoesObjetivas,
     });
@@ -2527,7 +2587,7 @@ function EstudoCasoPage() {
         ) : estudosSalvos.length ? (
           <div className="estudo-caso-question-list estudo-caso-salvos-list">
             {estudosSalvos.map((estudo) => {
-              const nomeAluno = obterNomeEstudoSalvo(estudo);
+              const nomeAluno = alunos.find((aluno) => aluno.id === estudo.alunoId)?.nome || obterNomeEstudoSalvo(estudo);
               const statusLabel = obterLabelStatusEstudo(estudo.statusGeral);
               const statusClasse = obterClasseStatusEstudo(estudo.statusGeral);
               const abrindoEstudoAtual = abrindoEstudoId === estudo.id;
@@ -2739,8 +2799,8 @@ function EstudoCasoPage() {
             <div>
               <h2>Forma de preenchimento</h2>
               <p className="muted">
-                Nesta versão, apenas o preenchimento manual está disponível. As demais opções
-                aparecem como planejamento de recursos futuros e ainda não executam ações.
+                O conteúdo pedagógico continua sendo preenchido manualmente. A identificação utiliza
+                o Cadastro de Alunos; as demais integrações permanecem planejadas.
               </p>
             </div>
           </div>
@@ -2833,22 +2893,30 @@ function EstudoCasoPage() {
                 {aberto && bloco.tipo === "identificacao" && (
                   <div className="estudo-caso-question-list">
                     <article className="estudo-caso-question-card">
-                      <p className="muted estudo-caso-block-note">
-                        Campos visuais de identificação do estudante, ainda sem integração com o
-                        cadastro da plataforma.
+                      <EstudoCasoAlunoAutocomplete
+                        key={estudoCasoSalvoId}
+                        alunos={alunos}
+                        alunoId={alunoIdSelecionado}
+                        carregando={carregandoAlunos}
+                        bloqueado={Boolean(estudoCasoSalvoId && alunoIdSelecionado)}
+                        onSelecionar={selecionarAlunoCadastro}
+                      />
+                      <p className="muted estudo-caso-block-note" role="status">
+                        {alunoSelecionado
+                          ? "Informações sincronizadas com o Cadastro de Alunos. Para alterá-las, utilize o Cadastro."
+                          : alunoIdSelecionado
+                            ? "O cadastro do aluno vinculado está indisponível."
+                            : "Selecione um aluno para preencher automaticamente a identificação."}
                       </p>
-
                       <div className="estudo-caso-identificacao-grid">
                         {IDENTIFICACAO_FIELDS.map((campo) => (
                           <div key={campo.id} className="estudo-caso-question-field">
-                            <label htmlFor={`identificacao-${campo.id}`}>{campo.label}</label>
+                            <label htmlFor={"identificacao-" + campo.id}>{campo.label}</label>
                             <input
-                              id={`identificacao-${campo.id}`}
-                              value={identificacaoEstudante[campo.id]}
-                              placeholder={campo.placeholder}
-                              onChange={(event) =>
-                                atualizarIdentificacao(campo.id, event.target.value)
-                              }
+                              id={"identificacao-" + campo.id}
+                              value={identificacaoExibida[campo.id] || ""}
+                              readOnly
+                              aria-readonly="true"
                             />
                           </div>
                         ))}
@@ -3154,4 +3222,20 @@ function EstudoCasoPage() {
   );
 }
 
-export default EstudoCasoPage;
+export default function EstudoCasoFirebaseOficial() {
+  if (db.app.options.projectId !== "aee-registro-eraa") {
+    return (
+      <main className="alunos-page module-page estudo-caso-page">
+        <section className="panel" role="alert">
+          <h1>Estudo de Caso</h1>
+          <p>
+            A conexão com o Cadastro de Alunos está indisponível. Configure o Firebase
+            oficial aee-registro-eraa para abrir este módulo.
+          </p>
+        </section>
+      </main>
+    );
+  }
+
+  return <EstudoCasoPage />;
+}
