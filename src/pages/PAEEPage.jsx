@@ -1,15 +1,32 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { listarAlunos } from "../services/alunosService";
+import EstudoCasoAlunoAutocomplete from "../components/EstudoCasoAlunoAutocomplete";
+import { db } from "../services/firebase";
+import { listarAlunos, listarAlunosPorIds } from "../services/alunosService";
+import { buscarIdsAlunosVinculados } from "../services/vinculacoesService";
 import {
   atualizarPaee,
   buscarPaeePorId,
   criarPaee,
   listarPaees,
 } from "../services/paeesService";
-import { podeVisualizarMetas } from "../utils/permissions";
+import { podeVisualizarMetas, visualizaSomenteVinculados } from "../utils/permissions";
 
 const PAEE_RASCUNHO_ID_KEY = "paeeRascunhoId";
+const CAMPOS_CADASTRO = [
+  "nome", "dataNascimento", "serieAno", "turma", "turno", "nomeEscola", "professorAee",
+];
+
+function sincronizarCadastro(form, aluno) {
+  return {
+    ...form,
+    alunoNome: aluno?.nome || "",
+    identificacaoEstudante: {
+      ...form.identificacaoEstudante,
+      ...Object.fromEntries(CAMPOS_CADASTRO.map((campo) => [campo, aluno?.[campo] || ""])),
+    },
+  };
+}
 const MENSAGEM_CAMPOS_MINIMOS =
   "Antes de concluir o PAEE, preencha os campos mínimos: identificação do estudante, ano letivo, período, síntese diagnóstica, pelo menos um objetivo, estratégias pedagógicas e critérios de acompanhamento.";
 
@@ -336,6 +353,7 @@ function montarPayload(form, currentUser) {
 function PAEEPage() {
   const { currentUser, perfil } = useAuth();
   const podeLer = podeVisualizarMetas(perfil);
+  const somenteAlunosVinculados = visualizaSomenteVinculados(perfil);
   const [form, setForm] = useState(() => criarFormularioInicial(currentUser));
   const [alunos, setAlunos] = useState([]);
   const [paeesSalvos, setPaeesSalvos] = useState([]);
@@ -348,6 +366,19 @@ function PAEEPage() {
   const [feedback, setFeedback] = useState("");
   const [aviso, setAviso] = useState("");
   const [erro, setErro] = useState("");
+
+  const carregarAlunosCadastro = () => somenteAlunosVinculados
+    ? buscarIdsAlunosVinculados(currentUser.uid).then(listarAlunosPorIds)
+    : listarAlunos();
+
+  const prepararPaee = (paee, alunosAtuais) => {
+    const formulario = normalizarPaeeParaFormulario(paee, currentUser);
+    return formulario.alunoId
+      ? sincronizarCadastro(formulario, alunosAtuais.find((aluno) => aluno.id === formulario.alunoId))
+      : formulario;
+  };
+
+  const cadastroIndisponivel = Boolean(form.alunoId && !alunos.some((aluno) => aluno.id === form.alunoId));
 
   const carregarPaeesSalvos = async () => {
     setCarregandoLista(true);
@@ -372,12 +403,18 @@ function PAEEPage() {
       setCarregando(true);
       setErro("");
 
+      let alunosData;
       try {
-        const alunosData = await listarAlunos();
+        alunosData = await carregarAlunosCadastro();
         if (ativo) setAlunos(alunosData);
       } catch (error) {
         console.error("[PAEEPage] Erro ao carregar alunos", error);
-        if (ativo) setErro("Não foi possível carregar os alunos cadastrados.");
+        if (ativo) {
+          setAlunos([]);
+          setErro("Não foi possível carregar os alunos cadastrados. Reabra o PAEE para tentar novamente.");
+          setCarregando(false);
+        }
+        return;
       }
 
       if (ativo) await carregarPaeesSalvos();
@@ -391,7 +428,7 @@ function PAEEPage() {
           if (!ativo) return;
 
           if (paeeSalvo) {
-            setForm(normalizarPaeeParaFormulario(paeeSalvo, currentUser));
+            setForm(prepararPaee(paeeSalvo, alunosData));
             setPaeeId(paeeSalvo.id || rascunhoId);
             setAviso("Rascunho anterior do PAEE carregado.");
           } else {
@@ -417,7 +454,7 @@ function PAEEPage() {
     return () => {
       ativo = false;
     };
-  }, [currentUser?.uid, podeLer]);
+  }, [currentUser?.uid, podeLer, somenteAlunosVinculados]);
 
   const handleCampoPrincipal = (event) => {
     const { name, value } = event.target;
@@ -431,42 +468,15 @@ function PAEEPage() {
     }));
   };
 
-  const handleAlunoSelecionado = (event) => {
-    const alunoId = event.target.value;
+  const handleAlunoSelecionado = (alunoId) => {
+    if (paeeId && form.alunoId) return;
     const aluno = alunos.find((item) => item.id === alunoId) || null;
-
-    setForm((prev) => {
-      if (!aluno) {
-        return {
-          ...prev,
-          alunoId: "",
-          alunoNome: prev.identificacaoEstudante.nome,
-        };
-      }
-
-      return {
-        ...prev,
-        alunoId: aluno.id,
-        alunoNome: aluno.nome || "",
-        identificacaoEstudante: {
-          ...prev.identificacaoEstudante,
-          nome: aluno.nome || "",
-          dataNascimento: aluno.dataNascimento || "",
-          serieAno: aluno.serieAno || "",
-          turma: aluno.turma || "",
-          turno: aluno.turno || "",
-          professorAee: aluno.professorAee || "",
-          diagnostico: aluno.diagnostico || "",
-          nomeEscola: aluno.nomeEscola || "",
-          municipio: aluno.municipio || "",
-          localizacao: aluno.localizacao || "",
-        },
-      };
-    });
+    setForm((prev) => sincronizarCadastro({ ...prev, alunoId: aluno?.id || "" }, aluno));
   };
 
   const handleIdentificacao = (event) => {
     const { name, value } = event.target;
+    if (CAMPOS_CADASTRO.includes(name)) return;
     setForm((prev) => ({
       ...prev,
       alunoNome: name === "nome" ? value : prev.alunoNome,
@@ -511,6 +521,10 @@ function PAEEPage() {
   const handleSalvarRascunho = async (event) => {
     event.preventDefault();
     if (!currentUser || salvando || concluindo) return;
+    if (cadastroIndisponivel || abrindoPaeeId || carregando) {
+      setErro("Aguarde o carregamento de um Cadastro de Aluno válido antes de salvar.");
+      return;
+    }
 
     setSalvando(true);
     setFeedback("");
@@ -549,6 +563,10 @@ function PAEEPage() {
 
   const handleConcluirPaee = async () => {
     if (!currentUser || salvando || concluindo) return;
+    if (cadastroIndisponivel || abrindoPaeeId || carregando) {
+      setErro("Aguarde o carregamento de um Cadastro de Aluno válido antes de concluir.");
+      return;
+    }
 
     setFeedback("");
     setAviso("");
@@ -618,7 +636,10 @@ function PAEEPage() {
     setErro("");
 
     try {
-      const paeeSalvo = await buscarPaeePorId(id);
+      const [paeeSalvo, alunosAtuais] = await Promise.all([
+        buscarPaeePorId(id),
+        carregarAlunosCadastro(),
+      ]);
 
       if (!paeeSalvo) {
         setAviso("O PAEE selecionado não foi encontrado.");
@@ -626,7 +647,8 @@ function PAEEPage() {
         return;
       }
 
-      setForm(normalizarPaeeParaFormulario(paeeSalvo, currentUser));
+      setAlunos(alunosAtuais);
+      setForm(prepararPaee(paeeSalvo, alunosAtuais));
       setPaeeId(paeeSalvo.id || id);
       salvarPaeeIdLocal(paeeSalvo.id || id);
       setFeedback("PAEE carregado com sucesso.");
@@ -835,27 +857,32 @@ function PAEEPage() {
               <div>
                 <h2>Identificação do estudante</h2>
                 <p className="muted">
-                  Selecione um aluno cadastrado ou utilize o preenchimento manual provisório.
+                  Selecione um aluno para preencher automaticamente a identificação pelo Cadastro.
                 </p>
               </div>
             </div>
 
             <div className="paee-fields-grid">
-              <div className="paee-field-span-2">
-                <label htmlFor="alunoIdPaee">Aluno cadastrado</label>
-                <select id="alunoIdPaee" value={form.alunoId} onChange={handleAlunoSelecionado}>
-                  <option value="">Preenchimento manual provisório</option>
-                  {form.alunoId && !alunos.some((aluno) => aluno.id === form.alunoId) ? (
-                    <option value={form.alunoId}>
-                      {form.alunoNome || "Aluno anteriormente vinculado"}
-                    </option>
-                  ) : null}
-                  {alunos.map((aluno) => (
-                    <option key={aluno.id} value={aluno.id}>
-                      {aluno.nome}
-                    </option>
-                  ))}
-                </select>
+              <div className="paee-field-span-2" onKeyDown={(event) => {
+                if (event.key === "Enter" && event.target.getAttribute("role") === "combobox") {
+                  event.preventDefault();
+                }
+              }}>
+                <EstudoCasoAlunoAutocomplete
+                  key={paeeId}
+                  alunos={alunos}
+                  alunoId={form.alunoId}
+                  carregando={carregando || Boolean(abrindoPaeeId)}
+                  bloqueado={Boolean(paeeId && form.alunoId)}
+                  onSelecionar={handleAlunoSelecionado}
+                />
+                <p className="muted estudo-caso-block-note" role="status">
+                  {cadastroIndisponivel
+                    ? "O cadastro do aluno vinculado está indisponível. Reabra o PAEE após verificar o Cadastro."
+                    : form.alunoId
+                      ? "Informações sincronizadas com o Cadastro de Alunos. Para alterá-las, utilize o Cadastro."
+                      : "Selecione um aluno para preencher automaticamente a identificação."}
+                </p>
               </div>
               <div className="paee-field-span-2">
                 <label htmlFor="nome">Nome do estudante</label>
@@ -863,7 +890,8 @@ function PAEEPage() {
                   id="nome"
                   name="nome"
                   value={form.identificacaoEstudante.nome}
-                  onChange={handleIdentificacao}
+                  readOnly
+                  aria-readonly="true"
                 />
               </div>
               <div>
@@ -873,7 +901,8 @@ function PAEEPage() {
                   name="dataNascimento"
                   type="date"
                   value={form.identificacaoEstudante.dataNascimento}
-                  onChange={handleIdentificacao}
+                  readOnly
+                  aria-readonly="true"
                 />
               </div>
               <div>
@@ -882,7 +911,8 @@ function PAEEPage() {
                   id="serieAno"
                   name="serieAno"
                   value={form.identificacaoEstudante.serieAno}
-                  onChange={handleIdentificacao}
+                  readOnly
+                  aria-readonly="true"
                 />
               </div>
               <div>
@@ -891,7 +921,8 @@ function PAEEPage() {
                   id="turma"
                   name="turma"
                   value={form.identificacaoEstudante.turma}
-                  onChange={handleIdentificacao}
+                  readOnly
+                  aria-readonly="true"
                 />
               </div>
               <div>
@@ -900,7 +931,8 @@ function PAEEPage() {
                   id="turno"
                   name="turno"
                   value={form.identificacaoEstudante.turno}
-                  onChange={handleIdentificacao}
+                  readOnly
+                  aria-readonly="true"
                 />
               </div>
               <div className="paee-field-span-2">
@@ -909,7 +941,8 @@ function PAEEPage() {
                   id="professorAee"
                   name="professorAee"
                   value={form.identificacaoEstudante.professorAee}
-                  onChange={handleIdentificacao}
+                  readOnly
+                  aria-readonly="true"
                 />
               </div>
               <div className="paee-field-span-2">
@@ -928,7 +961,8 @@ function PAEEPage() {
                   id="nomeEscola"
                   name="nomeEscola"
                   value={form.identificacaoEstudante.nomeEscola}
-                  onChange={handleIdentificacao}
+                  readOnly
+                  aria-readonly="true"
                 />
               </div>
               <div>
@@ -1532,4 +1566,19 @@ function PAEEPage() {
   );
 }
 
-export default PAEEPage;
+export default function PAEEFirebaseOficial() {
+  if (db.app.options.projectId !== "aee-registro-eraa") {
+    return (
+      <main className="alunos-page module-page paee-page">
+        <section className="panel" role="alert">
+          <h1>PAEE</h1>
+          <p>
+            A conexão com o Cadastro de Alunos está indisponível. Configure o Firebase
+            oficial aee-registro-eraa para abrir este módulo.
+          </p>
+        </section>
+      </main>
+    );
+  }
+  return <PAEEPage />;
+}
