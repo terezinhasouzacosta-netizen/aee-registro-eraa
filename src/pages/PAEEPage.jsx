@@ -15,6 +15,7 @@ import { podeVisualizarMetas, visualizaSomenteVinculados } from "../utils/permis
 const PAEE_RASCUNHO_ID_KEY = "paeeRascunhoId";
 const CAMPOS_CADASTRO = [
   "nome", "dataNascimento", "serieAno", "turma", "turno", "nomeEscola", "professorAee",
+  "diagnostico", "municipio", "localizacao",
 ];
 
 function sincronizarCadastro(form, aluno) {
@@ -952,7 +953,8 @@ function PAEEPage() {
                   name="diagnostico"
                   rows="3"
                   value={form.identificacaoEstudante.diagnostico}
-                  onChange={handleIdentificacao}
+                  readOnly
+                  aria-readonly="true"
                 />
               </div>
               <div className="paee-field-span-2">
@@ -971,7 +973,8 @@ function PAEEPage() {
                   id="municipio"
                   name="municipio"
                   value={form.identificacaoEstudante.municipio}
-                  onChange={handleIdentificacao}
+                  readOnly
+                  aria-readonly="true"
                 />
               </div>
               <div>
@@ -980,7 +983,8 @@ function PAEEPage() {
                   id="localizacao"
                   name="localizacao"
                   value={form.identificacaoEstudante.localizacao}
-                  onChange={handleIdentificacao}
+                  readOnly
+                  aria-readonly="true"
                 />
               </div>
             </div>

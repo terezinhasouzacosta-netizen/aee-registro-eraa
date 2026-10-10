@@ -11,6 +11,7 @@ const student = {
   id: "aluno-fixture", nome: "João Teste", dataNascimento: "2015-02-03",
   serieAno: "5º ano", turma: "A", turno: "Matutino", nomeEscola: "Escola fixture",
   professorAee: "Professora fixture",
+  diagnostico: "Condição do Cadastro", municipio: "Município do Cadastro", localizacao: "Urbana",
 };
 const fields = Object.keys(student).filter((key) => key !== "id");
 const plain = (value) => JSON.parse(JSON.stringify(value));
@@ -91,11 +92,11 @@ function harness({ saved = null, projectId = "aee-registro-eraa", restricted = f
   };
 }
 
-test("selection fills seven read-only fields and serializes alunoId using existing PAEE schema", async () => {
+test("selection fills ten read-only fields and serializes alunoId using existing PAEE schema", async () => {
   const h = harness(); await h.mount(); h.select(student.id);
   for (const field of fields) {
-    assert.equal(h.byId(field).props.value, student[field]);
-    assert.equal(h.byId(field).props.readOnly, true);
+    assert.equal(h.byId(field === "diagnostico" ? "diagnosticoPaee" : field).props.value, student[field]);
+    assert.equal(h.byId(field === "diagnostico" ? "diagnosticoPaee" : field).props.readOnly, true);
   }
   assert.equal(h.data.writes.length, 0, "Selecting must not save");
   await h.save();
@@ -109,13 +110,15 @@ test("automatic draft restoration and reopening refresh cadastro while preservin
   const saved = { id: "paee-fixture", alunoId: student.id, identificacaoEstudante: { nome: "Antigo", diagnostico: "Preservar diagnóstico", municipio: "Município" }, basePedagogica: { potencialidades: "Preservar potencialidades" }, objetivos: [{ objetivoEspecifico: "Preservar objetivo" }], sinteseDiagnostica: { texto: "Preservar síntese" } };
   const h = harness({ saved }); await h.mount();
   assert.equal(h.byId("nome").props.value, student.nome);
-  h.data.students = [{ ...student, nome: "Nome atualizado", turma: "B", professorAee: "", nomeEscola: "Nova escola" }];
+  h.data.students = [{ ...student, nome: "Nome atualizado", turma: "B", professorAee: "", nomeEscola: "Nova escola", diagnostico: "Condição atualizada", municipio: "Novo município", localizacao: "Rural" }];
   await h.open();
   assert.equal(h.byId("nome").props.value, "Nome atualizado");
   assert.equal(h.byId("turma").props.value, "B");
   assert.equal(h.byId("professorAee").props.value, "");
   assert.equal(h.byId("nomeEscola").props.value, "Nova escola");
-  assert.equal(h.byId("diagnosticoPaee").props.value, "Preservar diagnóstico");
+  assert.equal(h.byId("diagnosticoPaee").props.value, "Condição atualizada");
+  assert.equal(h.byId("municipio").props.value, "Novo município");
+  assert.equal(h.byId("localizacao").props.value, "Rural");
   assert.equal(h.byId("potencialidades").props.value, "Preservar potencialidades");
   await h.save();
   assert.equal(h.data.writes[0].objetivos[0].objetivoEspecifico, "Preservar objetivo");
@@ -125,7 +128,7 @@ test("automatic draft restoration and reopening refresh cadastro while preservin
 test("missing student clears stale identification and blocks saving", async () => {
   const h = harness({ saved: { id: "p", alunoId: "missing", identificacaoEstudante: { nome: "Obsoleto" } } });
   await h.mount();
-  for (const field of fields) assert.equal(h.byId(field).props.value, "");
+  for (const field of fields) assert.equal(h.byId(field === "diagnostico" ? "diagnosticoPaee" : field).props.value, "");
   await h.save(); assert.equal(h.data.writes.length, 0);
 });
 
@@ -140,7 +143,7 @@ test("failed cadastro refresh does not replace the currently open plan", async (
 test("legacy unlinked plan can be linked without replacing its pedagogy", async () => {
   const h = harness({ saved: { id: "legacy", identificacaoEstudante: { nome: "Legado", diagnostico: "Manter" } } });
   await h.mount(); h.select(student.id);
-  assert.equal(h.byId("diagnosticoPaee").props.value, "Manter");
+  assert.equal(h.byId("diagnosticoPaee").props.value, student.diagnostico);
   assert.equal(h.byId("nome").props.value, student.nome);
 });
 
@@ -173,4 +176,23 @@ test("Enter in the search field cannot submit the PAEE form", async () => {
   let prevented = false;
   h.find((n) => n.type === "div" && n.props.onKeyDown).props.onKeyDown({ key: "Enter", target: { getAttribute: () => "combobox" }, preventDefault() { prevented = true; } });
   assert.equal(prevented, true); assert.equal(h.data.writes.length, 0);
+});
+
+
+test("absent optional cadastro fields stay empty on selection and replace stale values on reopen", async () => {
+  const h = harness({ saved: { id: "p", alunoId: student.id, identificacaoEstudante: { municipio: "Antigo", localizacao: "Antiga", diagnostico: "Antigo" } } });
+  const { municipio, localizacao, diagnostico, ...withoutOptional } = student;
+  h.data.students = [withoutOptional];
+  await h.mount();
+  for (const id of ["municipio", "localizacao", "diagnosticoPaee"]) {
+    assert.equal(h.byId(id).props.value, "");
+    assert.equal(h.byId(id).props.readOnly, true);
+  }
+  h.data.students = [student]; await h.open();
+  assert.equal(h.byId("municipio").props.value, student.municipio);
+  h.data.students = [withoutOptional]; await h.open();
+  for (const id of ["municipio", "localizacao", "diagnosticoPaee"]) assert.equal(h.byId(id).props.value, "");
+  assert.equal(h.data.writes.length, 0);
+  const fresh = harness(); fresh.data.students = [withoutOptional]; await fresh.mount(); fresh.select(student.id);
+  for (const id of ["municipio", "localizacao", "diagnosticoPaee"]) assert.equal(fresh.byId(id).props.value, "");
 });
