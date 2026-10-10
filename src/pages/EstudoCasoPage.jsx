@@ -21,6 +21,7 @@ import {
   criarEstudoCaso,
   listarEstudosCaso,
 } from "../services/estudosCasoService";
+import EstudoCasoVersaoInicial from "../components/EstudoCasoVersaoInicial";
 import EstudoCasoAlunoAutocomplete from "../components/EstudoCasoAlunoAutocomplete";
 import { db } from "../services/firebase";
 import { listarAlunos, listarAlunosPorIds } from "../services/alunosService";
@@ -3126,6 +3127,15 @@ function EstudoCasoPage() {
           ajustes posteriores, se necessário.
         </p>
       </section>
+
+      <EstudoCasoVersaoInicial
+        key={`${estudoCasoSalvoId}-${alunoIdSelecionado}`}
+        alunoId={alunoSelecionado?.id || ""}
+        familia={(BLOCOS_ESTUDO_CASO.find((bloco) => bloco.id === "familia")?.perguntas || []).map((pergunta) => ({
+          pergunta: pergunta.enunciado,
+          resposta: perguntasEstado[`familia-${pergunta.id}`]?.resposta || "",
+        }))}
+      />
 
       {previaVisivel ? (
         <section className="panel estudo-caso-preview-panel">
