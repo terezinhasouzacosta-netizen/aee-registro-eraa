@@ -22,6 +22,8 @@ import {
   listarEstudosCaso,
 } from "../services/estudosCasoService";
 import EstudoCasoVersaoInicial from "../components/EstudoCasoVersaoInicial";
+import EstudoCasoEntrevista from "../components/EstudoCasoEntrevista";
+import { DESTINOS_ENTREVISTA_ESTUDO, obterValoresEntrevista, aplicarEntrevista } from "../utils/estudoCasoEntrevista";
 import EstudoCasoAlunoAutocomplete from "../components/EstudoCasoAlunoAutocomplete";
 import { db } from "../services/firebase";
 import { listarAlunos, listarAlunosPorIds } from "../services/alunosService";
@@ -77,9 +79,9 @@ const FORMAS_PREENCHIMENTO = [
     id: "colar-texto",
     titulo: "Colar texto de entrevista/reunião",
     descricao:
-      "Recurso futuro para transformar registros de entrevistas, reuniões e escutas em respostas organizadas.",
-    status: "Recurso futuro",
-    ativa: false,
+      "Use o Assistente de Organização da Entrevista ao final da página para copiar o prompt e importar a resposta com prévia e confirmação.",
+    status: "Assistente disponível",
+    ativa: true,
   },
   {
     id: "usar-dados-plataforma",
@@ -1945,6 +1947,7 @@ function gerarTextoPreviaEstudoCaso({
 }
 
 function EstudoCasoPage() {
+  const [entrevistaVersao, setEntrevistaVersao] = useState(0);
   const { currentUser, perfil } = useAuth();
   const somenteAlunosVinculados = visualizaSomenteVinculados(perfil);
   const podeLer = podeVisualizarSondagens(perfil);
@@ -2292,6 +2295,7 @@ function EstudoCasoPage() {
   };
 
   const handleNovoEstudo = () => {
+    setEntrevistaVersao((versao) => versao + 1);
     setAlunoIdSelecionado("");
     setMetaEstudo({ ...META_ESTUDO_INICIAL });
     setIdentificacaoEstudante({ ...IDENTIFICACAO_INICIAL });
@@ -3127,6 +3131,19 @@ function EstudoCasoPage() {
           ajustes posteriores, se necessário.
         </p>
       </section>
+
+      <EstudoCasoEntrevista
+        key={`entrevista-${entrevistaVersao}-${estudoCasoSalvoId}-${alunoIdSelecionado}`}
+        destinos={DESTINOS_ENTREVISTA_ESTUDO}
+        perguntas={BLOCOS_PEDAGOGICOS.flatMap((bloco) => bloco.perguntas.map((pergunta) => ({ id: `${bloco.id}-${pergunta.id}`, label: `${bloco.titulo} → ${pergunta.enunciado}`, resposta: perguntasEstado[`${bloco.id}-${pergunta.id}`]?.resposta || "" })))}
+        valores={obterValoresEntrevista(perguntasEstado, observacoesObjetivas, IDENTIFICACAO_FIELDS.map((campo) => `${campo.label}: ${identificacaoExibida[campo.id] || ""}`).join("\n"))}
+        disabled={salvandoRascunho || concluindoEstudo || Boolean(abrindoEstudoId)}
+        onConfirm={(alteracoes) => {
+          const resultado = aplicarEntrevista(perguntasEstado, observacoesObjetivas, alteracoes);
+          setPerguntasEstado(resultado.perguntas);
+          setObservacoesObjetivas(resultado.observacoes);
+        }}
+      />
 
       <EstudoCasoVersaoInicial
         key={`${estudoCasoSalvoId}-${alunoIdSelecionado}`}

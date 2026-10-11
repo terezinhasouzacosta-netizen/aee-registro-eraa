@@ -1,0 +1,18 @@
+.entrevista-assistente { display: grid; gap: 16px; margin-block: 24px; }
+.entrevista-assistente > *, .entrevista-assistente section, .entrevista-assistente article { min-width: 0; }
+.entrevista-assistente > button { justify-self: start; }
+.entrevista-assistente label { display: block; font-weight: 600; }
+.entrevista-assistente textarea, .entrevista-assistente select { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #9aafba; border-radius: 8px; font: inherit; color: #17394a; background: white; }
+.entrevista-assistente textarea { resize: vertical; min-height: 150px; }
+.entrevista-assistente :focus-visible { outline: 3px solid #087e8b; outline-offset: 3px; }
+.entrevista-previa article { border: 1px solid #c6d8df; border-radius: 12px; padding: 18px; margin-block: 16px; }
+.entrevista-textos { display: grid; gap: 10px; margin-top: 16px; }
+.entrevista-textos pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; background: #f1f6f8; padding: 12px; border-radius: 8px; margin-block: 8px; }
+.entrevista-acoes { display: flex; flex-wrap: wrap; gap: 12px; }
+.entrevista-erro { color: #9d2525; overflow-wrap: anywhere; }
+.entrevista-trecho { border: 1px solid #c6d8df; border-radius: 8px; padding: 16px; margin-block: 12px; }
+.entrevista-trecho pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
+.entrevista-assistente summary { cursor: pointer; font-weight: 600; padding-block: 12px; }
+.entrevista-fluxo-manual > :not(summary) { margin-block: 12px; }
+@media (max-width: 600px) { .entrevista-acoes button, .entrevista-assistente > button { width: 100%; } .entrevista-previa article { padding: 12px; } }
+@media print { .entrevista-assistente { display: none; } }
