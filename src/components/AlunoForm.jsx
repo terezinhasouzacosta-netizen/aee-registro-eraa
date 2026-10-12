@@ -22,6 +22,7 @@ const initialForm = {
   dataNascimento: "",
   serieAno: "",
   turma: "",
+  turmaAee: "",
   turno: "",
   diagnostico: "",
   laudo: "",
@@ -49,6 +50,7 @@ function mapAlunoToForm(aluno) {
     dataNascimento: aluno.dataNascimento || "",
     serieAno: aluno.serieAno || aluno.turma || "",
     turma: aluno.turma || "",
+    turmaAee: aluno.turmaAee || "",
     turno: aluno.turno || "",
     diagnostico: aluno.diagnostico || "",
     laudo: aluno.laudo || "",
@@ -93,6 +95,7 @@ function AlunoForm({ alunoEmEdicao, onSubmit, onCancel, loading }) {
       dataNascimento: form.dataNascimento,
       serieAno: form.serieAno.trim(),
       turma: form.turma.trim(),
+      turmaAee: form.turmaAee,
       turno: form.turno.trim(),
       diagnostico: form.diagnostico.trim(),
       laudo: form.laudo,
@@ -232,6 +235,12 @@ function AlunoForm({ alunoEmEdicao, onSubmit, onCancel, loading }) {
           </div>
           <div className="aluno-form-grid">
             <div className="aluno-form-grid-span-2">
+              <label htmlFor="turmaAee">Turma AEE</label>
+              <select id="turmaAee" name="turmaAee" value={form.turmaAee} onChange={handleChange}>
+                <option value="">Não definida</option>
+                <option value="Turma A">Turma A</option>
+                <option value="Turma B">Turma B</option>
+              </select>
               <label htmlFor="professorAee">Professor(a) do AEE que acompanha o aluno</label>
               <input
                 id="professorAee"

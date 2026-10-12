@@ -68,7 +68,7 @@ function normalizarHabilidadesSelecionadas(valor) {
   return [...new Set(valor.map((item) => String(item || "").trim()).filter(Boolean))];
 }
 
-function normalizarAtendimento(data = {}) {
+export function normalizarAtendimento(data = {}) {
   const dataAtendimento = String(data.dataAtendimento || data.dataRegistro || "").trim();
   const criadoEm = data.criadoEm || data.createdAt || null;
   const atualizadoEm = data.atualizadoEm || data.updatedAt || criadoEm || null;
@@ -183,6 +183,13 @@ function normalizarPayload(payload = {}) {
 
   return {
     alunoId,
+    ...(Object.prototype.hasOwnProperty.call(payload, "sequenciaId") ? {
+      sequenciaId: String(payload.sequenciaId || "").trim(),
+      sequenciaTitulo: String(payload.sequenciaTitulo || "").trim(),
+      encontroNumero: Number(payload.encontroNumero) || 0,
+      turmaAee: String(payload.turmaAee || "").trim(),
+      reposicao: Boolean(payload.reposicao),
+    } : {}),
     alunoNome: String(payload.alunoNome || payload.nomeAluno || "").trim(),
     dataAtendimento,
     semanaReferencia,

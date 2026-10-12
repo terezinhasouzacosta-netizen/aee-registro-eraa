@@ -1,0 +1,20 @@
+.srm-aee { min-width: 0; }
+.srm-aee [hidden] { display: none !important; }
+.srm-tabs, .srm-aee .form-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-block: 18px; }
+.srm-cards, .srm-grid, .srm-metricas { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,280px),1fr)); gap: 18px; }
+.srm-aee label { display: grid; gap: 7px; margin-block: 12px; font-weight: 600; }
+.srm-aee input, .srm-aee select, .srm-aee textarea { width: 100%; box-sizing: border-box; font: inherit; padding: 10px; border: 1px solid #a7bbc6; border-radius: 7px; background: #fff; color: #17394a; }
+.srm-aee textarea { resize: vertical; }
+.srm-aee fieldset { min-width: 0; border: 0; padding: 0; }
+.srm-aee article { min-width: 0; padding: 18px; margin-block: 14px; border: 1px solid #c9dbe3; border-radius: 12px; }
+.srm-aee pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; background: #f3f7fa; padding: 12px; }
+.srm-aee button { margin: 5px 5px 5px 0; }
+.srm-aee summary { cursor: pointer; padding-block: 12px; font-weight: 600; }
+.srm-aee .srm-checkbox { display: flex; align-items: center; }
+.srm-aee .srm-checkbox input { width: auto; }
+.srm-metricas dd { font-size: 1.6rem; font-weight: 700; margin: 6px 0; }
+.srm-metricas > div { background: #f0f6f8; padding: 18px; border-radius: 12px; }
+.srm-assistente { margin-top: 24px; border-top: 1px solid #c9dbe3; padding-top: 16px; }
+.srm-aee :focus-visible { outline: 3px solid #087e8b; outline-offset: 3px; }
+.srm-aee [role=alert] { color: #a32626; }
+@media print { .srm-tabs, .srm-assistente { display: none; } }

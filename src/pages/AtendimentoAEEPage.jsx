@@ -1,5 +1,8 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import SalaRecursosAee from "../components/SalaRecursosAee";
+import { EditarChamadaColetivaAee } from "../components/RegistroColetivoAee";
+import { db } from "../services/firebase";
 import { listarAlunos, listarAlunosPorIds } from "../services/alunosService";
 import {
   criarAtendimentoAEE,
@@ -42,6 +45,10 @@ function formInicial({ alunoId = "", responsavelNome = "" } = {}) {
   const dataAtendimento = dataAtualISO();
   return {
     alunoId,
+    sequenciaId: "",
+    sequenciaTitulo: "",
+    encontroNumero: "",
+    reposicao: false,
     dataAtendimento,
     semanaReferencia: obterSemanaReferenciaPorData(dataAtendimento),
     mesReferencia: dataAtendimento.slice(0, 7),
@@ -219,6 +226,9 @@ function obterRotuloTipoAtendimento(item) {
 }
 
 function AtendimentoAEEPage() {
+  const [sequenciasAee, setSequenciasAee] = useState([]);
+  const [revisaoSala, setRevisaoSala] = useState(0);
+  const [chamadaColetiva, setChamadaColetiva] = useState(null);
   const { currentUser, perfil } = useAuth();
   const [alunos, setAlunos] = useState([]);
   const [idsPermitidos, setIdsPermitidos] = useState(undefined);
@@ -346,7 +356,7 @@ function AtendimentoAEEPage() {
     }
 
     carregarHistorico();
-  }, [currentUser, podeLer, filtroAlunoId, filtroMes, filtroSemana, idsPermitidos, alunos]);
+  }, [currentUser, podeLer, filtroAlunoId, filtroMes, filtroSemana, idsPermitidos, alunos, revisaoSala]);
 
   useEffect(() => {
     async function carregarHabilidadesPorEixo() {
@@ -470,6 +480,13 @@ function AtendimentoAEEPage() {
       return;
     }
 
+    const sequenciaSelecionada = sequenciasAee.find((s) => s.id === form.sequenciaId);
+    const turmaDoRegistro = registroEmEdicao?.alunoId === aluno.id ? registroEmEdicao.turmaAee || aluno.turmaAee : aluno.turmaAee;
+    if (form.sequenciaId && (!sequenciaSelecionada || sequenciaSelecionada.turma !== turmaDoRegistro || !Number.isInteger(Number(form.encontroNumero)) || Number(form.encontroNumero) < 1 || Number(form.encontroNumero) > sequenciaSelecionada.numeroEncontros)) {
+      setErro("Verifique a sequência, a Turma AEE do Cadastro e o número do encontro.");
+      return;
+    }
+
     const tipoAtendimentoPorModo =
       modoAtendimento === "REGULAR"
         ? "Acompanhamento na Sala Regular"
@@ -504,6 +521,11 @@ function AtendimentoAEEPage() {
 
     const payload = {
       alunoId: aluno.id,
+      sequenciaId: form.sequenciaId || "",
+      sequenciaTitulo: sequenciaSelecionada?.titulo || "",
+      encontroNumero: form.sequenciaId ? Number(form.encontroNumero) : 0,
+      turmaAee: turmaDoRegistro || "",
+      reposicao: Boolean(form.reposicao),
       alunoNome: aluno.nome || "",
       dataAtendimento: form.dataAtendimento,
       semanaReferencia: form.semanaReferencia,
@@ -559,6 +581,7 @@ function AtendimentoAEEPage() {
         alunoIdsPermitidos: idsPermitidos,
       });
       setAtendimentos(registrosAtualizados);
+      setRevisaoSala((v) => v + 1);
     } catch (error) {
       setErro("Não foi possível salvar o atendimento.");
     } finally {
@@ -580,6 +603,10 @@ function AtendimentoAEEPage() {
       : [];
     setForm({
       alunoId: item.alunoId || "",
+      sequenciaId: item.sequenciaId || "",
+      sequenciaTitulo: item.sequenciaTitulo || "",
+      encontroNumero: String(item.encontroNumero || ""),
+      reposicao: Boolean(item.reposicao),
       dataAtendimento: item.dataAtendimento || dataAtualISO(),
       semanaReferencia:
         item.semanaReferencia || obterSemanaReferenciaPorData(item.dataAtendimento || dataAtualISO()),
@@ -645,6 +672,7 @@ function AtendimentoAEEPage() {
       });
       setAtendimentos(registrosAtualizados);
       setFeedback("Atendimento excluído com sucesso.");
+      setRevisaoSala((v) => v + 1);
     } catch (error) {
       setErro("Não foi possível excluir o atendimento.");
     }
@@ -697,6 +725,8 @@ function AtendimentoAEEPage() {
         </p>
       </header>
 
+      <SalaRecursosAee alunos={alunos} loadingAlunos={loadingAlunos} perfil={perfil} podeEditar={podeEditar} currentUser={currentUser} onSequenciasChange={setSequenciasAee} onRegistroSalvo={() => setRevisaoSala((v) => v + 1)} revisao={revisaoSala}>
+      {chamadaColetiva && <EditarChamadaColetivaAee key={chamadaColetiva.id} registro={chamadaColetiva} perfil={perfil} podeEditar={podeEditar} onCancel={() => setChamadaColetiva(null)} onSaved={() => { setChamadaColetiva(null); setRevisaoSala((v) => v + 1); setFeedback("Chamada individual atualizada; planejamento coletivo preservado."); }} />}
       {feedback ? <p className="toast-success">{feedback}</p> : null}
       {erro ? <p className="toast-error">{erro}</p> : null}
 
@@ -740,6 +770,17 @@ function AtendimentoAEEPage() {
         <section className="panel module-form-panel">
           <h2>{registroEmEdicao ? "Editar atendimento" : "Novo atendimento semanal"}</h2>
           <form className="aluno-form" onSubmit={handleSalvar}>
+            <div className="srm-grid">
+              <label>Sequência didática utilizada
+                <select value={form.sequenciaId || ""} onChange={(e) => setForm((old) => ({ ...old, sequenciaId: e.target.value, encontroNumero: e.target.value ? "1" : "" }))}>
+                  <option value="">Sem sequência vinculada</option>
+                  {sequenciasAee.filter((s) => s.turma === alunoSelecionado?.turmaAee || s.id === form.sequenciaId).map((s) => <option key={s.id} value={s.id}>{s.titulo} — {s.turma}</option>)}
+                  {form.sequenciaId && !sequenciasAee.some((s) => s.id === form.sequenciaId) && <option value={form.sequenciaId}>{form.sequenciaTitulo || "Sequência indisponível"}</option>}
+                </select>
+              </label>
+              {form.sequenciaId && <label>Encontro utilizado<input type="number" min="1" max={sequenciasAee.find((s) => s.id === form.sequenciaId)?.numeroEncontros || 365} required value={form.encontroNumero || ""} onChange={(e) => setForm((old) => ({ ...old, encontroNumero: e.target.value }))} /></label>}
+              <label className="srm-checkbox"><input type="checkbox" checked={Boolean(form.reposicao)} onChange={(e) => setForm((old) => ({ ...old, reposicao: e.target.checked }))} />Reposição</label>
+            </div>
             <section className="form-section" style={{ display: "grid", gap: "0.85rem" }}>
               <h3 style={{ fontSize: "1.05rem", fontWeight: 700 }}>Dados do Atendimento</h3>
 
@@ -1096,6 +1137,10 @@ function AtendimentoAEEPage() {
                 <p>
                   <strong>Eixo:</strong> {item.eixoTematico || "-"}
                 </p>
+                {item.sequenciaId && <p><strong>Sequência utilizada:</strong> {item.sequenciaTitulo || item.sequenciaId} · Encontro {item.encontroNumero || "não informado"}</p>}
+                {item.coletivoId && <p><strong>Registro coletivo:</strong> {item.turmaAee} · {item.objetivo}</p>}
+                {item.coletivoId && <details><summary>Planejamento coletivo registrado</summary><p><strong>Estratégias:</strong> {item.estrategias || "Não informado"}</p><p><strong>Recursos:</strong> {item.recursos || "Não informado"}</p><p><strong>Atividades:</strong> {item.atividades || "Não informado"}</p><p><strong>Avaliação geral:</strong> {item.avaliacaoGeral || "Não informado"}</p></details>}
+                {item.reposicao && <p>Atendimento de reposição</p>}
 
                 {ehRegular ? (
                   <>
@@ -1147,7 +1192,7 @@ function AtendimentoAEEPage() {
 
                 {podeEditar ? (
                   <div className="form-actions">
-                    <button type="button" className="btn-secondary" onClick={() => handleEditar(item)}>
+                    <button type="button" className="btn-secondary" onClick={() => item.coletivoId ? setChamadaColetiva(item) : handleEditar(item)}>
                       Editar
                     </button>
                     <button type="button" className="btn-danger" onClick={() => handleExcluir(item)}>
@@ -1185,11 +1230,15 @@ function AtendimentoAEEPage() {
           </article>
         ) : null}
       </section>
+      </SalaRecursosAee>
     </main>
   );
 }
 
-export default AtendimentoAEEPage;
+export default function AtendimentoAeeOficial() {
+  if (db.app.options.projectId !== "aee-registro-eraa") return <main><p role="alert">Atendimento AEE indisponível: utilize o Firebase oficial aee-registro-eraa.</p></main>;
+  return <AtendimentoAEEPage />;
+}
 
 
 
