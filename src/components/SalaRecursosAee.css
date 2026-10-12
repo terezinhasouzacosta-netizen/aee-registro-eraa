@@ -106,3 +106,12 @@
 @media (max-width:620px) { .srm-aee.dashboard-aee-page .srm-cards, .srm-aee.dashboard-aee-page .srm-resumo, .srm-aee.dashboard-aee-page .srm-student-info { grid-template-columns:1fr; } .srm-aee.dashboard-aee-page .srm-tabs { grid-template-columns:1fr; } }
 @media (prefers-reduced-motion:reduce) { .srm-aee.dashboard-aee-page button { transition:none; } .srm-aee.dashboard-aee-page button:hover { transform:none !important; } }
 @media print { .srm-aee.dashboard-aee-page .srm-tabs, .srm-aee.dashboard-aee-page .srm-assistente { display:none; } .srm-aee.dashboard-aee-page .srm-context { position:static; } .srm-aee.dashboard-aee-page .srm-workspace { display:block; } }
+
+/* Conteúdo textual e lista informativa: sem seleção ou interação por estudante. */
+.srm-aee.dashboard-aee-page .srm-resumo-card dd.srm-resumo-texto { display:grid; gap:.35rem; font-family:inherit; font-size:.95rem; font-weight:600; line-height:1.5; color:#475569; }
+.srm-aee.dashboard-aee-page .srm-turma .srm-estudantes-lista { display:grid; gap:.6rem; padding:0; margin:1rem 0; list-style:none; }
+.srm-aee.dashboard-aee-page .srm-estudante-linha { display:flex; align-items:center; gap:.75rem; padding:.8rem; border:1px solid var(--srm-turma-border); border-radius:12px; background:#fff; }
+.srm-aee.dashboard-aee-page .srm-estudante-icone { display:flex; align-items:center; justify-content:center; flex:0 0 36px; height:36px; border-radius:10px; color:var(--srm-turma-text); background:var(--srm-turma-bg); }
+.srm-aee.dashboard-aee-page .srm-estudante-dados { display:grid; gap:.2rem; min-width:0; overflow-wrap:anywhere; line-height:1.4; }
+.srm-aee.dashboard-aee-page .srm-estudante-dados strong { font-size:.9rem; font-weight:600; color:#12324a; }
+.srm-aee.dashboard-aee-page .srm-estudante-dados > span { font-size:.8rem; color:#64748b; }
