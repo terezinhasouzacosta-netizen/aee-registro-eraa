@@ -123,7 +123,7 @@ test("indicadores reutilizam normalização de registros antigos e excluem modos
 test("sequência exige valores válidos e assistente local preserva encontros e conflitos", () => {
   assert.equal(modelo.validarSequenciaAee(sequencia).numeroEncontros, 3);
   assert.throws(() => modelo.validarSequenciaAee({ ...sequencia, numeroEncontros: "0" }));
-  const component = carregarModulo("../src/components/SequenciaDidaticaAee.jsx", { react: {}, "../utils/salaRecursosAee": modelo, "../services/entrevistaImportService": entrevista, "../services/salaRecursosAeeService": {} });
+  const component = carregarModulo("../src/components/SequenciaDidaticaAee.jsx", { "lucide-react": {}, react: {}, "../utils/salaRecursosAee": modelo, "../services/entrevistaImportService": entrevista, "../services/salaRecursosAeeService": {} });
   const result = component.analisarTextoSequencia("# Título\nProposta fictícia\nObjetivos: Comunicar\n## Encontro 1\nUsar cartões\n## Encontro 2\nRevisar\nEstratégias: Modelagem\nRecursos: Cartões\nAvaliação: Observação\nObservações: Sem outras informações");
   assert.equal(result.desconhecidos.length, 0); assert.equal(result.semTitulo, "");
   assert.equal(result.secoes.filter((s) => s.titulo === "Encontros").length, 2);

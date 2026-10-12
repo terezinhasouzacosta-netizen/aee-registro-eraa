@@ -1,3 +1,4 @@
+import { Puzzle } from "lucide-react";
 import { useState } from "react";
 import { CAMPOS_SEQUENCIA, STATUS_SEQUENCIA, TURMAS_AEE, sequenciaInicial } from "../utils/salaRecursosAee";
 import { analisarRespostaEntrevista, prepararPreviaEntrevista, confirmarPreviaEntrevista, resultadoImportacao } from "../services/entrevistaImportService";
@@ -53,7 +54,7 @@ export default function SequenciaDidaticaAee({ sequencias, perfil, podeEditar, o
           : <textarea rows={3} required={key === "objetivoGeral"} value={form[key]} onChange={(e) => editar(key, e.target.value)} />}
       </label>)}
     </div><button className="btn-primary" type="submit">{salvando ? "Salvando..." : "Salvar sequência"}</button></fieldset></form>
-    <section className="srm-assistente"><h3>🧩 Assistente de Organização da Sequência Didática</h3>
+    <section className="srm-assistente"><h3><Puzzle aria-hidden="true" /> Assistente de Organização da Sequência Didática</h3>
       <p>Cole o texto com títulos como Título, Objetivos, Encontros, Estratégias, Recursos, Avaliação e Observações. O processamento é local, sem API ou IA online. Confira a prévia antes de aplicar; salvar é uma ação separada.</p>
       <label>Texto da sequência<textarea rows={8} value={texto} onChange={(e) => { setTexto(e.target.value); setPrevia(null); }} /></label>
       <button type="button" className="btn-secondary" disabled={!podeEditar || !texto.trim() || salvando} onClick={organizar}>Organizar sequência e visualizar prévia</button>
