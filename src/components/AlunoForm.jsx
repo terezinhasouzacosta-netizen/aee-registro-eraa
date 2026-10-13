@@ -1,3 +1,4 @@
+import { DIAS_AEE, TURNOS_AEE, agendaDoAluno, validarAgendaAee } from "../utils/agendaAee";
 import { useEffect, useMemo, useState } from "react";
 import { Pencil, Save, UserPlus, X } from "lucide-react";
 
@@ -23,6 +24,7 @@ const initialForm = {
   serieAno: "",
   turma: "",
   turmaAee: "",
+  ...agendaDoAluno(),
   turno: "",
   diagnostico: "",
   laudo: "",
@@ -51,6 +53,7 @@ function mapAlunoToForm(aluno) {
     serieAno: aluno.serieAno || aluno.turma || "",
     turma: aluno.turma || "",
     turmaAee: aluno.turmaAee || "",
+    ...agendaDoAluno(aluno),
     turno: aluno.turno || "",
     diagnostico: aluno.diagnostico || "",
     laudo: aluno.laudo || "",
@@ -65,9 +68,11 @@ function mapAlunoToForm(aluno) {
 
 function AlunoForm({ alunoEmEdicao, onSubmit, onCancel, loading }) {
   const [form, setForm] = useState(initialForm);
+  const [erroAgenda, setErroAgenda] = useState("");
 
   useEffect(() => {
     setForm(mapAlunoToForm(alunoEmEdicao));
+    setErroAgenda("");
   }, [alunoEmEdicao]);
 
   const handleChange = (event) => {
@@ -87,7 +92,10 @@ function AlunoForm({ alunoEmEdicao, onSubmit, onCancel, loading }) {
   const handleSubmit = (event) => {
     event.preventDefault();
 
+    let agenda;
+    try { agenda = validarAgendaAee(form); setErroAgenda(""); } catch (error) { setErroAgenda(error.message); return; }
     onSubmit({
+      ...agenda,
       nomeEscola: form.nomeEscola.trim(),
       municipio: form.municipio.trim(),
       localizacao: form.localizacao,
@@ -191,12 +199,12 @@ function AlunoForm({ alunoEmEdicao, onSubmit, onCancel, loading }) {
             </div>
 
             <div>
-              <label htmlFor="turma">Turma</label>
+              <label htmlFor="turma">Turma regular</label>
               <input id="turma" name="turma" value={form.turma} onChange={handleChange} required />
             </div>
 
             <div>
-              <label htmlFor="turno">Turno</label>
+              <label htmlFor="turno">Turno escolar (manhã, tarde ou noite)</label>
               <input id="turno" name="turno" value={form.turno} onChange={handleChange} />
             </div>
           </div>
@@ -249,6 +257,19 @@ function AlunoForm({ alunoEmEdicao, onSubmit, onCancel, loading }) {
                 onChange={handleChange}
               />
             </div>
+          </div>
+        </section>
+
+        <section className="aluno-form-section" aria-label="Agenda individual do AEE">
+          <div className="aluno-form-section-header"><h3>Agenda individual do AEE</h3></div>
+          <p className="muted">Dias e horários exclusivos deste estudante. O turno escolar permanece separado.</p>
+          {erroAgenda && <p role="alert" className="toast-error">{erroAgenda}</p>}
+          <div className="aluno-form-grid">
+            <div><label htmlFor="turnoAee">Turno do Atendimento AEE (contraturno)</label><select id="turnoAee" name="turnoAee" value={form.turnoAee || ""} onChange={handleChange}><option value="">Não informado</option>{TURNOS_AEE.map((t) => <option key={t}>{t}</option>)}</select></div>
+            <fieldset><legend>Dias em que frequenta o AEE</legend>{DIAS_AEE.map(([id, label]) => <label key={id} style={{display:"flex",alignItems:"center",gap:8}}><input type="checkbox" style={{width:"auto"}} checked={(form.diasAee || []).includes(id)} onChange={(e) => setForm((old) => ({...old, diasAee:e.target.checked ? [...(old.diasAee || []),id] : (old.diasAee || []).filter((d) => d !== id)}))} />{label}</label>)}</fieldset>
+            <div><label htmlFor="horaInicioAee">Horário inicial do AEE</label><input type="time" id="horaInicioAee" name="horaInicioAee" value={form.horaInicioAee || ""} onChange={handleChange} /></div>
+            <div><label htmlFor="horaFimAee">Horário final do AEE</label><input type="time" id="horaFimAee" name="horaFimAee" value={form.horaFimAee || ""} onChange={handleChange} /></div>
+            <div><label htmlFor="atendimentosSemanaisAee">Quantidade de atendimentos semanais</label><input id="atendimentosSemanaisAee" readOnly value={(form.diasAee || []).length} /><small>Um atendimento por dia selecionado, no horário individual informado.</small></div>
           </div>
         </section>
 

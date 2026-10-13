@@ -7,8 +7,8 @@ const root = resolve(import.meta.dirname, "..");
 const firestore = `
 const today = new Date(); const date = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
 const data = new Map([
- ['alunos/a',{nome:'Estudante fictício Ana',turmaAee:'Turma A',professorAee:'Professora fictícia A',turno:'Manhã'}],
- ['alunos/b',{nome:'Estudante fictício Bruno',turmaAee:'Turma A',professorAee:'Professora fictícia A',turno:'Manhã'}],
+ ['alunos/a',{nome:'Estudante fictício Ana',turnoAee:'Tarde',diasAee:['segunda','quarta'],horaInicioAee:'13:00',horaFimAee:'14:00',turmaAee:'Turma A',professorAee:'Professora fictícia A',turno:'Manhã'}],
+ ['alunos/b',{nome:'Estudante fictício Bruno',turnoAee:'Tarde',diasAee:['terca'],horaInicioAee:'15:00',horaFimAee:'16:00',turmaAee:'Turma A',professorAee:'Professora fictícia A',turno:'Manhã'}],
  ['alunos/c',{nome:'Estudante fictício Clara',turmaAee:'Turma B',professorAee:'Professora fictícia B',turno:'Tarde'}],
  ['sequenciasDidaticasAEE/s1',{titulo:'Comunicação com cartões',turma:'Turma A',eixo:'Comunicação oral',objetivoGeral:'Comunicar escolhas',objetivosEspecificos:'Selecionar cartões',numeroEncontros:3,status:'Em andamento',estrategias:'Modelagem',recursos:'Cartões',encontros:'Encontro 1: apresentar cartões\\nEncontro 2: comunicar escolhas'}],
  ['sequenciasDidaticasAEE/s2',{titulo:'Jogos de autonomia',turma:'Turma B',eixo:'Autonomia',objetivoGeral:'Organizar materiais',numeroEncontros:2,status:'Planejada'}],

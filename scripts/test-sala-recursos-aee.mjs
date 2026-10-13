@@ -1,3 +1,4 @@
+import * as agenda from "../src/utils/agendaAee.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -142,7 +143,7 @@ test("serviço individual conserva contrato legado e adiciona vínculo somente q
 });
 test("Cadastro envia turmaAee e reutiliza professorAee, sem campo de professora duplicado", () => {
   const fixture = { nomeEscola: "Escola fictícia", municipio: "", localizacao: "", nome: "Aluno fictício", dataNascimento: "", serieAno: "1º ano", turma: "1 A", turno: "Manhã", turmaAee: "Turma B", diagnostico: "", comorbidadesDiagnosticosAssociados: "", laudo: "", comprometimento: "", professorAee: "Professora existente", tipoAcompanhamento: "Sem mediação", profissionalAcompanhamentoNome: "" };
-  const component = carregarModulo("../src/components/AlunoForm.jsx", { react: { useState: () => [fixture, () => {}], useEffect: () => {}, useMemo: (fn) => fn() }, "lucide-react": {} });
+  const component = carregarModulo("../src/components/AlunoForm.jsx", { "../utils/agendaAee": agenda, react: { useState: () => [fixture, () => {}], useEffect: () => {}, useMemo: (fn) => fn() }, "lucide-react": {} });
   let payload;
   const tree = component.default({ onSubmit: (data) => { payload = data; } });
   function find(node) { if (!node || typeof node !== "object") return null; if (node.type === "form") return node; return [node.props?.children].flat(Infinity).map(find).find(Boolean); }

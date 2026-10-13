@@ -115,3 +115,8 @@
 .srm-aee.dashboard-aee-page .srm-estudante-dados { display:grid; gap:.2rem; min-width:0; overflow-wrap:anywhere; line-height:1.4; }
 .srm-aee.dashboard-aee-page .srm-estudante-dados strong { font-size:.9rem; font-weight:600; color:#12324a; }
 .srm-aee.dashboard-aee-page .srm-estudante-dados > span { font-size:.8rem; color:#64748b; }
+
+.srm-aee.dashboard-aee-page .srm-dias { display:flex; flex-wrap:wrap; gap:6px; }
+.srm-aee.dashboard-aee-page .srm-agenda-diaria { border-block:1px solid var(--srm-turma-border); padding-block:16px; margin-block:16px; }
+.srm-aee.dashboard-aee-page .srm-participante { display:flex; align-items:center; gap:12px; margin:0; width:100%; }
+.srm-aee.dashboard-aee-page .srm-participante input { width:18px; height:18px; flex:0 0 18px; accent-color:var(--srm-turma-accent); }
