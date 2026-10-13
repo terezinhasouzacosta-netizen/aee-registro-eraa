@@ -41,7 +41,9 @@ export function montarRegistrosColetivos(form, alunos, sequencia, responsavel) {
     return {
       alunoId: aluno.id, alunoNome: aluno.nome || "", turmaAee: form.turmaAee,
       professorAee: aluno.professorAee || "", turno: aluno.turno || "",
-      dataAtendimento: form.dataAtendimento, mesReferencia: form.dataAtendimento.slice(0, 7),
+      dataAtendimento: form.dataAtendimento,
+      diaSemanaAee: ["domingo", "segunda", "terca", "quarta", "quinta", "sexta", "sabado"][new Date(`${form.dataAtendimento}T12:00:00Z`).getUTCDay()],
+      mesReferencia: form.dataAtendimento.slice(0, 7),
       modoAtendimento: "AEE", tipoAtendimento: "Atendimento na Sala AEE", reposicao: Boolean(form.reposicao),
       statusPresenca: individual.statusPresenca, observacoes: String(individual.observacoes || "").trim(),
       objetivo: String(form.objetivo).trim(), eixoTematico: String(form.eixoTematico).trim(),

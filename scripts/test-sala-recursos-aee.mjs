@@ -161,3 +161,21 @@ test("horários e sequências validam campos sem modificar o Cadastro", async ()
   assert.equal(env.dados.get("sequenciasDidaticasAEE/s1").status, "Concluída");
   assert.equal(JSON.stringify(env.dados.get("alunos/a")), before);
 });
+
+test("histórico recebe somente seleção, com dia, chamada e origem; consulta não escreve", async () => {
+  const env = ambienteSimulado();
+  const f = { ...form(), dataAtendimento: "2026-10-13" };
+  await env.service.salvarColetivoAee("selecao-dia", f, [alunos[0]], sequencia, "aee");
+  const r = env.dados.get("atendimentosAEE/selecao-dia_a");
+  assert.equal(r.alunoId, "a"); assert.equal(r.dataAtendimento, "2026-10-13");
+  assert.equal(r.diaSemanaAee, "terca"); assert.equal(r.turmaAee, "Turma A");
+  assert.equal(r.professorAee, alunos[0].professorAee); assert.equal(r.statusPresenca, "Presente");
+  assert.equal(r.observacoes, "Relato A"); assert.equal(r.coletivoId, "selecao-dia");
+  assert.equal(env.dados.has("atendimentosAEE/selecao-dia_b"), false);
+  const antes = env.commits();
+  const historico = await env.service.listarRegistrosSalaAee(["a"]);
+  assert.equal(historico.length, 1); assert.equal(historico[0].diaSemanaAee, "terca");
+  await env.service.listarRegistrosSalaAee(["a"]);
+  await env.service.salvarColetivoAee("selecao-dia", f, [alunos[0]], sequencia, "aee");
+  assert.equal(env.commits(), antes);
+});
