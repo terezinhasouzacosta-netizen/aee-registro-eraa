@@ -13,7 +13,8 @@ export function analisarTextoSequencia(texto) {
     const pos = limpa.indexOf(":"); const key = normal(pos < 0 ? limpa : limpa.slice(0, pos));
     return aliases[key] ? `${aliases[key]}${pos < 0 ? "" : limpa.slice(pos)}` : linha;
   });
-  return analisarRespostaEntrevista(linhas.join("\n"), Object.values(CAMPOS_SEQUENCIA));
+  const analise = analisarRespostaEntrevista(linhas.join("\n"), Object.values(CAMPOS_SEQUENCIA));
+  return { ...analise, secoes: analise.secoes.map((secao) => ({ ...secao, texto: secao.texto.replace(/^Copiar(?:\s+|$)/i, "") })) };
 }
 
 export default function SequenciaDidaticaAee({ sequencias, perfil, podeEditar, onSaved, bloqueado }) {
@@ -53,7 +54,7 @@ export default function SequenciaDidaticaAee({ sequencias, perfil, podeEditar, o
           : ["titulo", "eixo"].includes(key) ? <input required value={form[key]} onChange={(e) => editar(key, e.target.value)} />
           : <textarea rows={3} required={key === "objetivoGeral"} value={form[key]} onChange={(e) => editar(key, e.target.value)} />}
       </label>)}
-    </div><button className="btn-primary" type="submit">{salvando ? "Salvando..." : "Salvar sequência"}</button></fieldset></form>
+    </div><button className="btn-primary" type="submit">{salvando ? "Salvando..." : id ? "Atualizar sequência" : "Salvar sequência"}</button></fieldset></form>
     <section className="srm-assistente"><h3><Puzzle aria-hidden="true" /> Assistente de Organização da Sequência Didática</h3>
       <p>Cole o texto com títulos como Título, Objetivos, Encontros, Estratégias, Recursos, Avaliação e Observações. O processamento é local, sem API ou IA online. Confira a prévia antes de aplicar; salvar é uma ação separada.</p>
       <label>Texto da sequência<textarea rows={8} value={texto} onChange={(e) => { setTexto(e.target.value); setPrevia(null); }} /></label>
