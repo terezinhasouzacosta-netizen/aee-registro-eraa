@@ -1,16 +1,17 @@
+import * as agendaModelo from '../src/utils/agendaAee.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {transformSync} from 'esbuild';
 import * as modelo from '../src/utils/salaRecursosAee.js';
-function harness(alunoIds = ["a", "b"]) {
+function harness(alunoIds = ["a", "b"], fornecidos) {
  const states=[];let cursor=0;const saves=[];
  const jsx=(type,props)=>({type,props});
- const deps={react:{useState(init){const i=cursor++;if(!(i in states))states[i]=typeof init==='function'?init():init;return [states[i],v=>{states[i]=typeof v==='function'?v(states[i]):v;}];}},'react/jsx-runtime':{jsx,jsxs:jsx},'lucide-react':new Proxy({},{get:(_,key)=>key}),'../utils/salaRecursosAee':modelo,'../services/atendimentoAeeService':{EIXOS_TEMATICOS_OPCOES:[]},'../services/salaRecursosAeeService':{salvarColetivoAee:async(...args)=>saves.push(args)}};
+ const deps={react:{useState(init){const i=cursor++;if(!(i in states))states[i]=typeof init==='function'?init():init;return [states[i],v=>{states[i]=typeof v==='function'?v(states[i]):v;}];}},'react/jsx-runtime':{jsx,jsxs:jsx},'lucide-react':new Proxy({},{get:(_,key)=>key}),'../utils/agendaAee':agendaModelo,'../utils/salaRecursosAee':modelo,'../services/atendimentoAeeService':{EIXOS_TEMATICOS_OPCOES:[]},'../services/salaRecursosAeeService':{salvarColetivoAee:async(...args)=>saves.push(args)}};
  const ctx={module:{exports:{}},crypto:{randomUUID:()=> 'sessao'},require:id=>{if(!(id in deps))throw Error(id);return deps[id];}};
  vm.runInNewContext(transformSync(readFileSync(new URL('../src/components/RegistroColetivoAee.jsx',import.meta.url),'utf8'),{loader:'jsx',jsx:'automatic',format:'cjs'}).code,ctx);
- const alunos=[{id:'a',nome:'Ana',turmaAee:'Turma A'},{id:'b',nome:'Bruno',turmaAee:'Turma A'}];
+ const alunos=fornecidos || [{id:'a',nome:'Ana',turmaAee:'Turma A'},{id:'b',nome:'Bruno',turmaAee:'Turma A'}];
  const props={turma:'Turma A',alunos,sequencias:[],agenda:alunoIds === null ? undefined : {alunoIds, dataAtendimento:'2026-10-13',participantes:[]},podeEditar:true,onSaved:async()=>{}};
  return {saves,render(){cursor=0;return ctx.module.exports.default(props);}};
 }
@@ -29,6 +30,70 @@ test('revisão preserva chamada e zero presentes não abre registro pedagógico'
 });
 
 test('lista preparada prevalece mesmo recebendo a turma completa',async()=>{const h=harness(['a']);let tree=h.render();assert.deepEqual(nodes(tree).filter(n=>n.type==='h4').map(text),['Ana']);nodes(tree).find(n=>n.type==='select').props.onChange({target:{value:'Presente'}});tree=h.render();button(tree,'Confirmar chamada').props.onClick();tree=h.render();await nodes(tree).find(n=>n.type==='form').props.onSubmit({preventDefault(){}});assert.deepEqual(Array.from(h.saves[0][2],a=>a.id),['a']);assert.deepEqual(Object.keys(h.saves[0][1].individuais),['a']);});
-test('lista preparada vazia nunca retorna turma completa',()=>{const tree=harness([]).render();assert.equal(nodes(tree).filter(n=>n.type==='h4').length,0);assert.equal(button(tree,'Confirmar chamada').props.disabled,true);});
+test('lista preparada vazia nunca retorna turma completa',()=>{const tree=harness([]).render();assert.equal(nodes(tree).filter(n=>n.type==='h4').length,0);assert.equal(button(tree,'Confirmar chamada'),undefined);});
 
-test('abertura direta sem lista preparada conserva turma completa',()=>{const tree=harness(null).render();assert.deepEqual(nodes(tree).filter(n=>n.type==='h4').map(text),['Ana','Bruno']);assert.ok(button(tree,'Salvar atendimento coletivo'));});
+test('abertura direta sem preparação é bloqueada',()=>{const tree=harness(null).render();assert.equal(nodes(tree).filter(n=>n.type==='h4').length,0);assert.equal(button(tree,'Salvar atendimento coletivo'),undefined);});
+
+function salaHarness() {
+  const states=[]; let cursor=0; let serial=0;
+  const jsx=(type,props)=>({type,props});
+  const deps={
+    react:{useEffect(){},useState(init){const i=cursor++;if(!(i in states))states[i]=init===true?false:typeof init==='function'?init():init;return [states[i],v=>{states[i]=typeof v==='function'?v(states[i]):v;}];}},
+    'react/jsx-runtime':{jsx,jsxs:jsx},
+    'lucide-react':new Proxy({},{get:(_,key)=>key}),
+    '../utils/agendaAee':agendaModelo,'../utils/salaRecursosAee':modelo,
+    '../services/firebase':{db:{app:{options:{projectId:'aee-registro-eraa'}}}},
+    '../services/salaRecursosAeeService':{},
+    './CronogramaDiarioAee':{__esModule:true,default:'Cronograma'},
+    './RegistroColetivoAee':{__esModule:true,default:'Coletivo'},
+    './SequenciaDidaticaAee':{__esModule:true,default:'Sequencia'},
+    './SalaRecursosAee.css':{},
+  };
+  const ctx={module:{exports:{}},crypto:{randomUUID:()=>String(++serial)},require:id=>{if(!(id in deps))throw Error(id);return deps[id];}};
+  vm.runInNewContext(transformSync(readFileSync(new URL('../src/components/SalaRecursosAee.jsx',import.meta.url),'utf8'),{loader:'jsx',jsx:'automatic',format:'cjs'}).code,ctx);
+  const alunos=Array.from({length:32},(_,i)=>({id:'a'+i,nome:'Aluno '+i,turmaAee:'Turma A',diasAee:['quarta'],turnoAee:'Tarde',horaInicioAee:'13:00',horaFimAee:'14:00'})).concat(Array.from({length:5},(_,i)=>({id:'b'+i,nome:'Outro '+i,turmaAee:'Turma B',diasAee:['quarta'],turnoAee:'Tarde',horaInicioAee:'14:00',horaFimAee:'15:00'})));
+  const render=()=>{cursor=0;return ctx.module.exports.default({alunos,podeEditar:true,currentUser:{uid:'teste'},onSequenciasChange(){},onRegistroSalvo(){}});};
+  const preparar=(turma,ids)=>agendaModelo.prepararParticipantesAee(alunos,turma,'quarta','2026-10-14',ids);
+  const cron=turma=>nodes(render()).find(n=>n.type==='Cronograma'&&n.props.turma===turma);
+  const abrir=turma=>{button(render(),'Registro coletivo existente — '+turma).props.onClick();return nodes(render()).find(n=>n.type==='Coletivo');};
+  return {alunos,render,preparar,cron,abrir};
+}
+test('9 de 32 da A e 2 da B permanecem separados ao alternar e retornar',()=>{
+ const h=salaHarness(),ids=h.alunos.slice(0,9).map(a=>a.id);
+ h.cron('Turma A').props.onPreparar(h.preparar('Turma A',ids));
+ h.cron('Turma B').props.onPreparar(h.preparar('Turma B',['b1','b3']));
+ for(const turma of ['Turma A','Turma B','Turma A']) {
+  const c=h.abrir(turma);assert.deepEqual(Array.from(c.props.alunos,a=>a.id),turma==='Turma A'?ids:['b1','b3']);
+  assert.equal(nodes(h.render()).filter(n=>n.type==='Cronograma').length,2);
+ }
+});
+test('sem preparação e seleção alterada exigem nova preparação',()=>{
+ const h=salaHarness();assert.equal(h.abrir('Turma A'),undefined);
+ h.cron('Turma A').props.onPreparar(h.preparar('Turma A',['a0']));assert.ok(h.abrir('Turma A'));
+ h.cron('Turma A').props.onPreparar(null);assert.equal(h.abrir('Turma A'),undefined);
+ h.cron('Turma A').props.onPreparar(h.preparar('Turma A',['a1']));assert.deepEqual(Array.from(h.abrir('Turma A').props.alunos,a=>a.id),['a1']);
+});
+test('dia, turma, IDs estrangeiros, vazios ou duplicados invalidam preparação',()=>{
+ for(const patch of [{diaSemanaAee:'segunda'},{turmaAee:'Turma B'},{alunoIds:['a0','b1']},{alunoIds:[]},{alunoIds:['a0','a0']}]) {
+  const h=salaHarness();h.cron('Turma A').props.onPreparar({...h.preparar('Turma A',['a0']),...patch});assert.equal(h.abrir('Turma A'),undefined);
+ }
+});
+test('mudança da agenda cadastrada bloqueia inclusive sessão aberta',()=>{
+ const h=salaHarness();h.cron('Turma A').props.onPreparar(h.preparar('Turma A',['a0']));assert.ok(h.abrir('Turma A'));
+ h.alunos[0].diasAee=['segunda'];assert.equal(nodes(h.render()).find(n=>n.type==='Coletivo'),undefined);assert.equal(h.abrir('Turma A'),undefined);
+});
+
+test('sessão com 9 cartões salva apenas seus IDs, chamada e observações',async()=>{
+ const sala=salaHarness(),ids=sala.alunos.slice(0,9).map(a=>a.id);
+ sala.cron('Turma A').props.onPreparar(sala.preparar('Turma A',ids));
+ const props=sala.abrir('Turma A').props,h=harness(props.agenda.alunoIds,props.alunos);
+ let tree=h.render();assert.equal(nodes(tree).filter(n=>n.type==='h4').length,9);
+ const estudantes=nodes(tree).find(n=>n.type==='div'&&nodes(n).some(v=>v.type==='dt'&&text(v)==='Estudantes')&&nodes(n).some(v=>v.type==='dd'&&v.props.children===9));assert.ok(estudantes);
+ const selects=nodes(tree).filter(n=>n.type==='select');
+ selects.forEach((n,i)=>n.props.onChange({target:{value:i===7?'Ausente':i===8?'Falta justificada':'Presente'}}));
+ nodes(tree).filter(n=>n.type==='textarea').forEach((n,i)=>n.props.onChange({target:{value:'Observação fictícia '+i}}));
+ tree=h.render();button(tree,'Confirmar chamada').props.onClick();tree=h.render();assert.equal(nodes(tree).filter(n=>n.type==='h4').length,7);
+ await nodes(tree).find(n=>n.type==='form').props.onSubmit({preventDefault(){}});
+ assert.deepEqual(Array.from(h.saves[0][2],a=>a.id),ids);assert.equal(Object.keys(h.saves[0][1].individuais).length,9);
+ assert.equal(h.saves[0][1].individuais.a7.statusPresenca,'Ausente');assert.equal(h.saves[0][1].individuais.a8.statusPresenca,'Falta justificada');assert.equal(h.saves[0][1].individuais.a8.observacoes,'Observação fictícia 8');
+});

@@ -12,7 +12,7 @@ export function EditarChamadaColetivaAee({ registro, perfil, podeEditar, onSaved
 }
 
 export default function RegistroColetivoAee({ turma, alunos: alunosRecebidos, sequencias, perfil, onSaved, onCancel, podeEditar, horario, agenda, registros = [] }) {
-  const alunos = agenda ? alunosRecebidos.filter((a) => (agenda.alunoIds || []).includes(a.id)) : alunosRecebidos;
+  const alunos = agenda ? alunosRecebidos.filter((a) => (agenda.alunoIds || []).includes(a.id)) : [];
   const [coletivoId] = useState(() => crypto.randomUUID());
   const [form, setForm] = useState(() => ({ turmaAee: turma, dataAtendimento: agenda?.dataAtendimento || dataLocalAee(), sequenciaId: "", encontroNumero: "1", reposicao: false, objetivo: "", eixoTematico: "", estrategias: "", recursos: "", atividades: "", avaliacaoGeral: "", encaminhamentos: "", individuais: Object.fromEntries(alunos.map((a) => [a.id, { statusPresenca: "", observacoes: "" }])) }));
   const [chamadaConfirmada, setChamadaConfirmada] = useState(!agenda);
@@ -34,6 +34,7 @@ export default function RegistroColetivoAee({ turma, alunos: alunosRecebidos, se
   const faltas = Object.values(form.individuais).filter((i) => ["Ausente", "Falta justificada"].includes(i.statusPresenca)).length;
   const progresso = seq ? historicoSequenciaAee(seq, registros) : null;
   const campo = (key, titulo) => <label key={key}>{titulo}<textarea required={key === "objetivo"} rows={3} value={form[key]} onChange={(e) => editar(key, e.target.value)} /></label>;
+  if (!agenda || !alunos.length || agenda.alunoIds.length !== alunos.length || new Set(agenda.alunoIds).size !== alunos.length || alunos.some((a) => a.turmaAee !== turma)) return <section className="panel" role="alert"><p>Prepare uma seleção válida de estudantes no Cronograma antes de registrar o atendimento.</p><button type="button" className="btn-secondary" onClick={onCancel}>Voltar ao cronograma</button></section>;
   return <section className={"srm-coletivo " + (turma === "Turma A" ? "srm-turma-a" : "srm-turma-b")}><div className="srm-section-heading"><span className="srm-eyebrow">ENCONTRO DA TURMA</span><h2>Registrar Atendimento — {turma}</h2><p>Confira a chamada dos participantes antes de preencher o registro pedagógico.</p></div>
     {erro && <p role="alert">{erro}</p>}{salvo && <p role="status">Atendimento coletivo salvo.</p>}
     <div className="srm-workspace"><form onSubmit={salvar}><fieldset disabled={salvando || salvo || !podeEditar}>
