@@ -34,7 +34,7 @@ test('lista preparada vazia nunca retorna turma completa',()=>{const tree=harnes
 
 test('abertura direta sem preparação é bloqueada',()=>{const tree=harness(null).render();assert.equal(nodes(tree).filter(n=>n.type==='h4').length,0);assert.equal(button(tree,'Salvar atendimento coletivo'),undefined);});
 
-function salaHarness() {
+function salaHarness(opcoes = {}) {
   const states=[]; let cursor=0; let serial=0;
   const jsx=(type,props)=>({type,props});
   const deps={
@@ -52,10 +52,10 @@ function salaHarness() {
   const ctx={module:{exports:{}},crypto:{randomUUID:()=>String(++serial)},require:id=>{if(!(id in deps))throw Error(id);return deps[id];}};
   vm.runInNewContext(transformSync(readFileSync(new URL('../src/components/SalaRecursosAee.jsx',import.meta.url),'utf8'),{loader:'jsx',jsx:'automatic',format:'cjs'}).code,ctx);
   const alunos=Array.from({length:32},(_,i)=>({id:'a'+i,nome:'Aluno '+i,turmaAee:'Turma A',diasAee:['quarta'],turnoAee:'Tarde',horaInicioAee:'13:00',horaFimAee:'14:00'})).concat(Array.from({length:5},(_,i)=>({id:'b'+i,nome:'Outro '+i,turmaAee:'Turma B',diasAee:['quarta'],turnoAee:'Tarde',horaInicioAee:'14:00',horaFimAee:'15:00'})));
-  const render=()=>{cursor=0;return ctx.module.exports.default({alunos,podeEditar:true,currentUser:{uid:'teste'},onSequenciasChange(){},onRegistroSalvo(){}});};
+  const render=()=>{cursor=0;if(opcoes.registros)states[3]=opcoes.registros;return ctx.module.exports.default({alunos,podeEditar:opcoes.podeEditar ?? true,currentUser:{uid:'teste'},onSequenciasChange(){},onRegistroSalvo(){}});};
   const preparar=(turma,ids)=>agendaModelo.prepararParticipantesAee(alunos,turma,'quarta','2026-10-14',ids);
   const cron=turma=>nodes(render()).find(n=>n.type==='Cronograma'&&n.props.turma===turma);
-  const abrir=turma=>{button(render(),'Registro coletivo existente — '+turma).props.onClick();return nodes(render()).find(n=>n.type==='Coletivo');};
+  const abrir=turma=>{button(render(),'Abrir atendimento preparado — '+turma).props.onClick();return nodes(render()).find(n=>n.type==='Coletivo');};
   return {alunos,render,preparar,cron,abrir};
 }
 test('9 de 32 da A e 2 da B permanecem separados ao alternar e retornar',()=>{
@@ -96,4 +96,34 @@ test('sessão com 9 cartões salva apenas seus IDs, chamada e observações',asy
  await nodes(tree).find(n=>n.type==='form').props.onSubmit({preventDefault(){}});
  assert.deepEqual(Array.from(h.saves[0][2],a=>a.id),ids);assert.equal(Object.keys(h.saves[0][1].individuais).length,9);
  assert.equal(h.saves[0][1].individuais.a7.statusPresenca,'Ausente');assert.equal(h.saves[0][1].individuais.a8.statusPresenca,'Falta justificada');assert.equal(h.saves[0][1].individuais.a8.observacoes,'Observação fictícia 8');
+});
+
+test('consulta de existentes abre sem preparação e não cria novo atendimento',()=>{
+ const h=salaHarness();button(h.render(),'Registro coletivo existente — Turma A').props.onClick();
+ const tree=h.render();assert.ok(nodes(tree).some(n=>n.props?.['aria-label']==='Consulta de registros coletivos'));
+ assert.equal(nodes(tree).find(n=>n.type==='Coletivo'),undefined);
+});
+
+test('consulta isola coletivo, turma e alunoId, sem permitir escrita',()=>{
+ const registros=[
+ {id:'c1_a0',coletivoId:'c1',alunoId:'a0',alunoNome:'Participante salvo',turmaAee:'Turma A',dataAtendimento:'2026-10-14',statusPresenca:'Presente',observacoes:'Relato preservado'},
+ {id:'c2_a1',coletivoId:'c2',alunoId:'a1',alunoNome:'Outra sessão',turmaAee:'Turma A',dataAtendimento:'2026-10-13',statusPresenca:'Falta justificada'},
+ {id:'c3_b0',coletivoId:'c3',alunoId:'b0',alunoNome:'Somente B',turmaAee:'Turma B',dataAtendimento:'2026-10-14'},
+ {id:'c4_x',coletivoId:'c4',alunoId:'fora-do-acesso',alunoNome:'Não autorizado',turmaAee:'Turma A'},
+ {id:'individual',alunoId:'a2',alunoNome:'Somente individual',turmaAee:'Turma A'}];
+ const antes=JSON.stringify(registros),h=salaHarness({registros,podeEditar:false});
+ const b=button(h.render(),'Registro coletivo existente — Turma A');assert.equal(b.props.disabled,false);b.props.onClick();
+ const tree=h.render(),consulta=nodes(tree).find(n=>n.props?.['aria-label']==='Consulta de registros coletivos');
+ assert.equal(nodes(consulta).filter(n=>n.type==='details').length,2);
+ assert.match(text(consulta),/Participante salvo/);assert.match(text(consulta),/Relato preservado/);
+ for(const nome of ['Somente B','Não autorizado','Somente individual','Aluno 31'])assert.equal(text(consulta).includes(nome),false);
+ assert.equal(nodes(consulta).some(n=>['input','textarea','select','form'].includes(n.type)),false);
+ assert.equal(JSON.stringify(registros),antes);
+});
+test('consulta e retorno preservam preparação e novo registro continua protegido',()=>{
+ const h=salaHarness();h.cron('Turma A').props.onPreparar(h.preparar('Turma A',['a0','a1']));
+ button(h.render(),'Registro coletivo existente — Turma B').props.onClick();
+ const consulta=nodes(h.render()).find(n=>n.props?.['aria-label']==='Consulta de registros coletivos');assert.match(text(consulta),/Nenhum registro coletivo/);
+ button(h.render(),'Voltar ao Cronograma').props.onClick();assert.equal(h.abrir('Turma A').props.alunos.length,2);
+ assert.equal(h.abrir('Turma B'),undefined);
 });
