@@ -26,6 +26,12 @@ export function validarSequenciaAee(form) {
   if (!Number.isInteger(n) || n < 1 || n > 365) throw new Error("O número de encontros deve estar entre 1 e 365.");
   return { ...result, numeroEncontros: n };
 }
+export function planejamentoColetivoAee(form) {
+  return Object.fromEntries(["objetivo", "eixoTematico", "estrategias", "recursos", "atividades", "avaliacaoGeral", "encaminhamentos"].map((campo) => [campo, String(form[campo] || "").trim()]));
+}
+export function execucaoAusenteAee() {
+  return { ...planejamentoColetivoAee({}), habilidadesSelecionadas: [], habilidadesComplementares: "", habilidadesTrabalhadas: "", dificuldadesObservadas: "", avancosPercebidos: "" };
+}
 export function montarRegistrosColetivos(form, alunos, sequencia, responsavel) {
   if (!TURMAS_AEE.includes(form.turmaAee)) throw new Error("Turma inválida.");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(form.dataAtendimento) || Number.isNaN(Date.parse(form.dataAtendimento)) || new Date(form.dataAtendimento).toISOString().slice(0, 10) !== form.dataAtendimento) throw new Error("Data inválida.");
@@ -53,6 +59,8 @@ export function montarRegistrosColetivos(form, alunos, sequencia, responsavel) {
       habilidadesSelecionadas: [], habilidadesComplementares: String(form.atividades || "").trim(),
       habilidadesTrabalhadas: String(form.atividades || form.objetivo).trim(),
       dificuldadesObservadas: "", avancosPercebidos: "",
+      versaoRegistroColetivo: 2,
+      ...(individual.statusPresenca === "Presente" ? {} : execucaoAusenteAee()),
       sequenciaId: sequencia?.id || "", sequenciaTitulo: sequencia?.titulo || "", encontroNumero: encontro,
       responsavelId: responsavel.uid, responsavelNome: responsavel.displayName || responsavel.email || "", responsavelEmail: responsavel.email || "",
     };

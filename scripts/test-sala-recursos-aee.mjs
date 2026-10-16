@@ -1,3 +1,4 @@
+import { resumirAtendimentosAEE } from '../src/utils/relatorioAutomatico.js';
 import * as agenda from "../src/utils/agendaAee.js";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -54,7 +55,7 @@ test("turmas reutilizam Cadastro e agrupam por ID, sem inventar professora ou ho
 test("registro coletivo cria um payload compatível por aluno e conserva o planejamento", () => {
   const r = modelo.montarRegistrosColetivos(form(), alunos.slice(0, 2), sequencia, usuario);
   assert.deepEqual(r.map((i) => i.alunoId), ["a", "b"]);
-  for (const i of r) { assert.equal(i.sequenciaId, "s1"); assert.equal(i.encontroNumero, 1); assert.equal(i.objetivo, form().objetivo); assert.equal(i.habilidadesTrabalhadas, "Escolha de cartões"); assert.equal(i.modoAtendimento, "AEE"); }
+  for (const i of r) { assert.equal(i.sequenciaId, "s1"); assert.equal(i.encontroNumero, 1); assert.equal(i.objetivo, i.statusPresenca === "Presente" ? form().objetivo : ""); assert.equal(i.habilidadesTrabalhadas, i.statusPresenca === "Presente" ? "Escolha de cartões" : ""); assert.equal(i.modoAtendimento, "AEE"); }
   assert.equal(r[0].observacoes, "Relato A"); assert.equal(r[1].statusPresenca, "Ausente");
 });
 test("validação impede presença presumida, turma errada, datas e encontros inválidos", () => {
@@ -178,4 +179,52 @@ test("histórico recebe somente seleção, com dia, chamada e origem; consulta n
   await env.service.listarRegistrosSalaAee(["a"]);
   await env.service.salvarColetivoAee("selecao-dia", f, [alunos[0]], sequencia, "aee");
   assert.equal(env.commits(), antes);
+});
+
+test("presentes mantêm execução; faltas e justificadas mantêm apenas frequência e observações, com planejamento na sessão", async () => {
+ const env=ambienteSimulado(), terceiro={...alunos[1],id:'d',nome:'Fictício D'};
+ env.dados.set('alunos/d',terceiro);
+ const f=form();f.individuais.d={statusPresenca:'Falta justificada',observacoes:'Ausência justificada pela família'};
+ const antes=JSON.stringify(f);
+ await env.service.salvarColetivoAee('protecao',f,[...alunos.slice(0,2),terceiro],sequencia,'aee');
+ const sessao=env.dados.get('atendimentosColetivosAEE/protecao');
+ assert.equal(sessao.planejamentoColetivo.atividades,f.atividades);assert.equal(sessao.planejamentoColetivo.avaliacaoGeral,f.avaliacaoGeral);
+ assert.equal(sessao.sequenciaId,'s1');assert.deepEqual(Array.from(sessao.alunoIds),['a','b','d']);
+ const presente=env.dados.get('atendimentosAEE/protecao_a');
+ for(const [campo,valor] of Object.entries(modelo.planejamentoColetivoAee(f)))assert.equal(presente[campo],valor);
+ for(const id of ['b','d']) {
+  const r=env.dados.get('atendimentosAEE/protecao_'+id);
+  for(const [campo,vazio] of Object.entries(modelo.execucaoAusenteAee()))assert.deepEqual(r[campo],vazio);
+  assert.equal(r.statusPresenca,f.individuais[id].statusPresenca);assert.equal(r.observacoes,f.individuais[id].observacoes);
+  assert.equal(r.alunoId,id);assert.equal(r.coletivoId,'protecao');assert.equal(r.dataAtendimento,f.dataAtendimento);assert.equal(r.turmaAee,'Turma A');
+ }
+ const historico=await env.service.listarRegistrosSalaAee(['b','d']);
+ for(const r of historico)for(const campo of ['habilidadesTrabalhadas','habilidadesComplementares','avancosPercebidos','dificuldadesObservadas','eixoTematico','encaminhamentos'])assert.equal(r[campo],'');
+ const metricas=modelo.indicadoresSalaAee(await env.service.listarRegistrosSalaAee(['a','b','d']),[]);
+ assert.equal(metricas.presentes,1);assert.equal(metricas.faltas,2);assert.equal(metricas.justificadas,1);
+ const commits=env.commits();await env.service.salvarColetivoAee('protecao',f,[...alunos.slice(0,2),terceiro],sequencia,'aee');assert.equal(env.commits(),commits);
+ assert.equal(JSON.stringify(f),antes);
+});
+test("correção de presença em novos registros elimina execução sem inventá-la ao voltar para presente",async()=>{
+ const env=ambienteSimulado();await env.service.salvarColetivoAee('correcao',form(),alunos.slice(0,2),sequencia,'aee');
+ const path='atendimentosAEE/correcao_a',registro=()=>({...env.dados.get(path),id:'correcao_a'});
+ const plano=JSON.stringify(env.dados.get('atendimentosColetivosAEE/correcao'));
+ await env.service.atualizarIndividualColetivoAee(registro(),'Ausente','Correção da chamada','aee');
+ assert.equal(registro().atividades,'');assert.equal(registro().avaliacaoGeral,'');
+ await env.service.atualizarIndividualColetivoAee(registro(),'Presente','Revisado','aee');assert.equal(registro().atividades,'');
+ assert.equal(JSON.stringify(env.dados.get('atendimentosColetivosAEE/correcao')),plano);
+});
+test("leitura e novos salvamentos não migram registros antigos",async()=>{
+ const env=ambienteSimulado(),antigo={alunoId:'b',coletivoId:'antigo',statusPresenca:'Ausente',atividades:'Texto legado',observacoes:'Legado'};
+ env.dados.set('atendimentosAEE/antigo_b',{...antigo});
+ await env.service.listarRegistrosSalaAee(['b']);await env.service.salvarColetivoAee('novo',form(),alunos.slice(0,2),sequencia,'aee');
+ assert.deepEqual(env.dados.get('atendimentosAEE/antigo_b'),antigo);
+});
+
+test("resumo de relatório mantém ausência sem atribuir avanços ou dificuldades",async()=>{
+ const env=ambienteSimulado();await env.service.salvarColetivoAee('relatorio',form(),alunos.slice(0,2),sequencia,'aee');
+ const registros=await env.service.listarRegistrosSalaAee(['b']);const resumo=resumirAtendimentosAEE(registros,4);
+ assert.match(resumo.texto,/0 presença/);assert.match(resumo.texto,/1 ausência/);
+ assert.doesNotMatch(resumo.texto,/avanços mais recorrentes|dificuldades observadas concentram/);
+ assert.equal(env.dados.get('atendimentosColetivosAEE/relatorio').planejamentoColetivo.objetivo,form().objetivo);
 });

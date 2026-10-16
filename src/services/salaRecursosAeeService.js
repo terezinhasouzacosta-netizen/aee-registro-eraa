@@ -1,7 +1,7 @@
 import { collection, doc, getDocs, query, where, runTransaction, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import { podeEditarHistoricoAcompanhamento } from "../utils/permissions";
-import { montarRegistrosColetivos, validarSequenciaAee, TURMAS_AEE, PRESENCAS_AEE } from "../utils/salaRecursosAee";
+import { planejamentoColetivoAee, execucaoAusenteAee, montarRegistrosColetivos, validarSequenciaAee, TURMAS_AEE, PRESENCAS_AEE } from "../utils/salaRecursosAee";
 import { obterSemanaReferenciaPorData, normalizarAtendimento } from "./atendimentoAeeService";
 
 function oficial() { if (db.app.options.projectId !== "aee-registro-eraa") throw new Error("Operação bloqueada: Firebase institucional incorreto."); }
@@ -38,7 +38,7 @@ export async function salvarColetivoAee(coletivoId, form, alunos, sequencia, per
     let seq = sequencia;
     if (form.sequenciaId) { const s = await transaction.get(doc(db, "sequenciasDidaticasAEE", form.sequenciaId)); if (!s.exists()) throw new Error("Sequência não encontrada."); seq = { ...s.data(), id: s.id }; }
     const registros = montarRegistrosColetivos(form, atuais.map((a) => ({ ...a.data(), id: a.id })), seq, usuario);
-    transaction.set(ref, { turmaAee: form.turmaAee, alunoIds: registros.map((r) => r.alunoId), dataAtendimento: form.dataAtendimento, responsavelId: usuario.uid, criadoEm: serverTimestamp() });
+    transaction.set(ref, { versaoRegistroColetivo: 2, planejamentoColetivo: planejamentoColetivoAee(form), sequenciaId: seq?.id || "", sequenciaTitulo: seq?.titulo || "", encontroNumero: registros[0].encontroNumero, turmaAee: form.turmaAee, alunoIds: registros.map((r) => r.alunoId), dataAtendimento: form.dataAtendimento, responsavelId: usuario.uid, criadoEm: serverTimestamp() });
     registros.forEach((registro) => transaction.set(doc(db, "atendimentosAEE", `${coletivoId}_${registro.alunoId}`), { ...registro, coletivoId, semanaReferencia: obterSemanaReferenciaPorData(registro.dataAtendimento), criadoEm: serverTimestamp(), createdAt: serverTimestamp(), atualizadoEm: serverTimestamp(), updatedAt: serverTimestamp() }));
     return coletivoId;
   });
@@ -52,6 +52,6 @@ export async function atualizarIndividualColetivoAee(registro, presenca, observa
     const atual = await transaction.get(ref);
     if (!atual.exists() || atual.data().alunoId !== registro.alunoId || atual.data().coletivoId !== registro.coletivoId) throw new Error("O registro mudou. Atualize o histórico antes de editar.");
     if ((atual.data().statusPresenca || "") !== (registro.statusPresenca || "") || (atual.data().observacoes || "") !== (registro.observacoes || "")) throw new Error("Outro usuário alterou a chamada. Atualize o histórico antes de editar.");
-    transaction.update(ref, { statusPresenca: presenca, observacoes: String(observacoes || "").trim(), atualizadoEm: serverTimestamp(), updatedAt: serverTimestamp() });
+    transaction.update(ref, { ...(atual.data().versaoRegistroColetivo === 2 && presenca !== "Presente" ? execucaoAusenteAee() : {}), statusPresenca: presenca, observacoes: String(observacoes || "").trim(), atualizadoEm: serverTimestamp(), updatedAt: serverTimestamp() });
   });
 }
