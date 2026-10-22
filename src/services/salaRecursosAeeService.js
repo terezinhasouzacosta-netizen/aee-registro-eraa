@@ -1,7 +1,7 @@
 import { collection, doc, getDocs, query, where, runTransaction, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import { podeEditarHistoricoAcompanhamento } from "../utils/permissions";
-import { planejamentoColetivoAee, execucaoAusenteAee, montarRegistrosColetivos, validarSequenciaAee, TURMAS_AEE, PRESENCAS_AEE } from "../utils/salaRecursosAee";
+import { referenciaPlanejamentoAee, planejamentoColetivoAee, execucaoAusenteAee, montarRegistrosColetivos, validarSequenciaAee, TURMAS_AEE, PRESENCAS_AEE } from "../utils/salaRecursosAee";
 import { obterSemanaReferenciaPorData, normalizarAtendimento } from "./atendimentoAeeService";
 
 function oficial() { if (db.app.options.projectId !== "aee-registro-eraa") throw new Error("Operação bloqueada: Firebase institucional incorreto."); }
@@ -35,10 +35,11 @@ export async function salvarColetivoAee(coletivoId, form, alunos, sequencia, per
     if (existente.exists()) return coletivoId; // Retrying the same submission never duplicates records.
     const atuais = await Promise.all(alunos.map((a) => transaction.get(doc(db, "alunos", a.id))));
     if (atuais.some((a) => !a.exists())) throw new Error("Um estudante foi removido. Recarregue a turma.");
-    let seq = sequencia;
+    let seq = form.sequenciaId ? sequencia : null;
     if (form.sequenciaId) { const s = await transaction.get(doc(db, "sequenciasDidaticasAEE", form.sequenciaId)); if (!s.exists()) throw new Error("Sequência não encontrada."); seq = { ...s.data(), id: s.id }; }
+    if (form.sequenciaId && JSON.stringify(referenciaPlanejamentoAee(seq)) !== JSON.stringify(referenciaPlanejamentoAee(sequencia))) throw new Error("A sequência foi alterada durante o preenchimento. Confira sua versão atual antes de salvar. Nenhum texto do formulário foi apagado.");
     const registros = montarRegistrosColetivos(form, atuais.map((a) => ({ ...a.data(), id: a.id })), seq, usuario);
-    transaction.set(ref, { versaoRegistroColetivo: 2, planejamentoColetivo: planejamentoColetivoAee(form), sequenciaId: seq?.id || "", sequenciaTitulo: seq?.titulo || "", encontroNumero: registros[0].encontroNumero, turmaAee: form.turmaAee, alunoIds: registros.map((r) => r.alunoId), dataAtendimento: form.dataAtendimento, responsavelId: usuario.uid, criadoEm: serverTimestamp() });
+    transaction.set(ref, { referenciaPlanejamento: referenciaPlanejamentoAee(seq), versaoRegistroColetivo: 2, planejamentoColetivo: planejamentoColetivoAee(form), sequenciaId: seq?.id || "", sequenciaTitulo: seq?.titulo || "", encontroNumero: registros[0].encontroNumero, turmaAee: form.turmaAee, alunoIds: registros.map((r) => r.alunoId), dataAtendimento: form.dataAtendimento, responsavelId: usuario.uid, criadoEm: serverTimestamp() });
     registros.forEach((registro) => transaction.set(doc(db, "atendimentosAEE", `${coletivoId}_${registro.alunoId}`), { ...registro, coletivoId, semanaReferencia: obterSemanaReferenciaPorData(registro.dataAtendimento), criadoEm: serverTimestamp(), createdAt: serverTimestamp(), atualizadoEm: serverTimestamp(), updatedAt: serverTimestamp() }));
     return coletivoId;
   });

@@ -13,7 +13,7 @@ function harness(alunoIds = ["a", "b"], fornecidos) {
  vm.runInNewContext(transformSync(readFileSync(new URL('../src/components/RegistroColetivoAee.jsx',import.meta.url),'utf8'),{loader:'jsx',jsx:'automatic',format:'cjs'}).code,ctx);
  const alunos=fornecidos || [{id:'a',nome:'Ana',turmaAee:'Turma A'},{id:'b',nome:'Bruno',turmaAee:'Turma A'}];
  const props={turma:'Turma A',alunos,sequencias:[],agenda:alunoIds === null ? undefined : {alunoIds, dataAtendimento:'2026-10-13',participantes:[]},podeEditar:true,onSaved:async()=>{}};
- return {saves,render(){cursor=0;return ctx.module.exports.default(props);}};
+ return {props,saves,render(){cursor=0;return ctx.module.exports.default(props);}};
 }
 function nodes(node){return !node||typeof node!=='object'?[]:Array.isArray(node)?node.flatMap(nodes):[node,...nodes(node.props?.children)];}
 const text=n=>typeof n==='string'?n:Array.isArray(n)?n.map(text).join(''):n&&typeof n==='object'?text(n.props?.children):'';
@@ -126,4 +126,20 @@ test('consulta e retorno preservam preparação e novo registro continua protegi
  const consulta=nodes(h.render()).find(n=>n.props?.['aria-label']==='Consulta de registros coletivos');assert.match(text(consulta),/Nenhum registro coletivo/);
  button(h.render(),'Voltar ao Cronograma').props.onClick();assert.equal(h.abrir('Turma A').props.alunos.length,2);
  assert.equal(h.abrir('Turma B'),undefined);
+});
+
+
+test('tela aprovada mantém seções e sete campos; troca preserva textos e encontro, com aviso', async()=>{
+ const h=harness();h.props.sequencias=[{id:'s1',titulo:'Primeira',turma:'Turma A',numeroEncontros:3},{id:'s2',titulo:'Segunda',turma:'Turma A',numeroEncontros:1}];
+ let t=h.render();nodes(t).filter(n=>n.type==='select').forEach(n=>n.props.onChange({target:{value:'Presente'}}));button(h.render(),'Confirmar chamada').props.onClick();t=h.render();
+ assert.deepEqual(nodes(t).filter(n=>n.type==='h3').map(text).filter(v=>v.trim()!=='Turma A'),[' Estudantes presentes',' Planejamento',' Objetivos',' Desenvolvimento',' Avaliação']);
+ const input=(tree,label,type)=>nodes(nodes(tree).find(n=>n.type==='label'&&text(n).startsWith(label))).find(n=>n.type===type);
+ const campos=[['Eixo do atendimento','input'],['Objetivo','textarea'],['Estratégias','textarea'],['Recursos','textarea'],['Atividades','textarea'],['Avaliação geral','textarea'],['Encaminhamentos','textarea']];
+ for(const [label,type] of campos)input(t,label,type).props.onChange({target:{value:'Texto próprio: '+label}});
+ input(h.render(),'Sequência utilizada','select').props.onChange({target:{value:'s1'}});t=h.render();input(t,'Encontro da sequência','input').props.onChange({target:{value:'3'}});
+ button(h.render(),'Usar planejamento nos campos vazios').props.onClick();t=h.render();for(const [label,type] of campos)assert.equal(input(t,label,type).props.value,'Texto próprio: '+label);
+ input(t,'Sequência utilizada','select').props.onChange({target:{value:'s2'}});t=h.render();assert.equal(input(t,'Encontro da sequência','input').props.value,'3');assert.equal(input(t,'Encontro da sequência','input').props.max,1);assert.match(text(t),/podem pertencer ao planejamento anterior/);
+ input(t,'Encontro da sequência','input').props.onChange({target:{value:'1'}});t=h.render();for(const [label,type] of campos)assert.equal(input(t,label,type).props.value,'Texto próprio: '+label);
+ input(t,'Sequência utilizada','select').props.onChange({target:{value:''}});t=h.render();for(const [label,type] of campos)assert.equal(input(t,label,type).props.value,'Texto próprio: '+label);
+ await nodes(t).find(n=>n.type==='form').props.onSubmit({preventDefault(){}});assert.equal(h.saves[0][1].objetivo,'Texto próprio: Objetivo');
 });

@@ -228,3 +228,21 @@ test("resumo de relatório mantém ausência sem atribuir avanços ou dificuldad
  assert.doesNotMatch(resumo.texto,/avanços mais recorrentes|dificuldades observadas concentram/);
  assert.equal(env.dados.get('atendimentosColetivosAEE/relatorio').planejamentoColetivo.objetivo,form().objetivo);
 });
+
+
+test('melhoria técnica preserva sete campos dos presentes, ausentes e cópia histórica independente',async()=>{
+ const env=ambienteSimulado(),f=form();await env.service.salvarColetivoAee('historico-plano',f,alunos.slice(0,2),sequencia,'aee');const a=env.dados.get('atendimentosAEE/historico-plano_a'),b=env.dados.get('atendimentosAEE/historico-plano_b'),sessao=env.dados.get('atendimentosColetivosAEE/historico-plano');
+ for(const [k,v] of Object.entries(modelo.planejamentoColetivoAee(f))){assert.equal(a[k],v);assert.equal(b[k],'');assert.equal(sessao.planejamentoColetivo[k],v);}
+ assert.equal(a.observacoes,'Relato A');assert.equal(b.observacoes,'Relato B');assert.equal(b.statusPresenca,'Ausente');assert.equal(sessao.referenciaPlanejamento.id,'s1');
+ env.dados.get('sequenciasDidaticasAEE/s1').objetivoGeral='Alteração posterior';assert.equal(sessao.referenciaPlanejamento.objetivoGeral,sequencia.objetivoGeral);
+ const n=env.commits();await env.service.salvarColetivoAee('historico-plano',f,alunos.slice(0,2),sequencia,'aee');assert.equal(env.commits(),n);
+});
+test('planejamento alterado durante preenchimento bloqueia escrita sem mudar os textos',async()=>{
+ const env=ambienteSimulado(),f=form(),antes=JSON.stringify(f);env.dados.get('sequenciasDidaticasAEE/s1').recursos='Outro recurso';await assert.rejects(()=>env.service.salvarColetivoAee('desatualizado',f,alunos.slice(0,2),sequencia,'aee'),/sequência foi alterada/);assert.equal(env.commits(),0);assert.equal(JSON.stringify(f),antes);
+});
+test('encontro incompatível impede salvar; corrigir preserva textos; sem sequência não mantém vínculo antigo',async()=>{
+ const env=ambienteSimulado(),seq2={...sequencia,id:'s2',numeroEncontros:1};env.dados.set('sequenciasDidaticasAEE/s2',seq2);const f={...form(),sequenciaId:'s2',encontroNumero:'3'};
+ for(const valor of ['3','0','1.5','abc']){f.encontroNumero=valor;await assert.rejects(()=>env.service.salvarColetivoAee('encontro',f,alunos.slice(0,2),seq2,'aee'),/encontro válido/);}assert.equal(env.commits(),0);
+ f.encontroNumero='1';await env.service.salvarColetivoAee('encontro',f,alunos.slice(0,2),seq2,'aee');assert.equal(env.dados.get('atendimentosAEE/encontro_a').objetivo,f.objetivo);
+ f.sequenciaId='';await env.service.salvarColetivoAee('eventual',f,alunos.slice(0,2),null,'aee');const sessao=env.dados.get('atendimentosColetivosAEE/eventual');assert.equal(sessao.referenciaPlanejamento,null);assert.equal(sessao.sequenciaId,'');assert.equal(sessao.encontroNumero,0);
+});

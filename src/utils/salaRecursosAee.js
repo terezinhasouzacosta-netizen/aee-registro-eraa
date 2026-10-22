@@ -32,6 +32,11 @@ export function planejamentoColetivoAee(form) {
 export function execucaoAusenteAee() {
   return { ...planejamentoColetivoAee({}), habilidadesSelecionadas: [], habilidadesComplementares: "", habilidadesTrabalhadas: "", dificuldadesObservadas: "", avancosPercebidos: "" };
 }
+// Historical planning is stored on the session, separately from the teacher's fields.
+export function referenciaPlanejamentoAee(sequencia) {
+  if (!sequencia) return null;
+  return Object.fromEntries(["id", ...Object.keys(CAMPOS_SEQUENCIA)].map(k => [k, String(sequencia[k] ?? "")]));
+}
 export function montarRegistrosColetivos(form, alunos, sequencia, responsavel) {
   if (!TURMAS_AEE.includes(form.turmaAee)) throw new Error("Turma inválida.");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(form.dataAtendimento) || Number.isNaN(Date.parse(form.dataAtendimento)) || new Date(form.dataAtendimento).toISOString().slice(0, 10) !== form.dataAtendimento) throw new Error("Data inválida.");

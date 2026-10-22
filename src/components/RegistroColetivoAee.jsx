@@ -19,8 +19,15 @@ export default function RegistroColetivoAee({ turma, alunos: alunosRecebidos, se
   const [salvando, setSalvando] = useState(false);
   const [salvo, setSalvo] = useState(false);
   const [erro, setErro] = useState("");
+  const [avisoPlanejamento, setAvisoPlanejamento] = useState("");
   const seq = sequencias.find((s) => s.id === form.sequenciaId);
   const editar = (k, value) => setForm((old) => ({ ...old, [k]: value }));
+  function trocarReferencia(campo, valor) {
+    if (String(form[campo]) !== String(valor)) {
+      if (form.sequenciaId || ["objetivo", "eixoTematico", "estrategias", "recursos", "atividades", "avaliacaoGeral", "encaminhamentos"].some(k => String(form[k] || "").trim())) setAvisoPlanejamento("Sequência ou encontro alterado. Os textos foram preservados e podem pertencer ao planejamento anterior. Confira os campos antes de salvar.");
+      editar(campo, valor);
+    }
+  }
   const individual = (id, k, value) => setForm((old) => ({ ...old, individuais: { ...old.individuais, [id]: { ...old.individuais[id], [k]: value } } }));
   async function salvar(event) {
     event.preventDefault(); if (salvando || salvo || !podeEditar || !chamadaConfirmada) return;
@@ -44,10 +51,11 @@ export default function RegistroColetivoAee({ turma, alunos: alunosRecebidos, se
       {chamadaConfirmada && (!agenda || presentes > 0) && <>
       <section className="srm-form-card dashboard-card dashboard-section-card"><h3><span className="dashboard-icon-badge" aria-hidden="true"><CalendarDays /></span> Planejamento</h3><div className="srm-grid">
         <label>Data do atendimento coletivo<input type="date" required readOnly={Boolean(agenda)} value={form.dataAtendimento} onChange={(e) => editar("dataAtendimento", e.target.value)} /></label>
-        <label>Sequência utilizada<select value={form.sequenciaId} onChange={(e) => editar("sequenciaId", e.target.value)}><option value="">Sem sequência vinculada</option>{sequencias.filter((s) => s.turma === turma).map((s) => <option key={s.id} value={s.id}>{s.titulo} — {s.status}</option>)}</select></label>
-        {seq && <label>Encontro da sequência<input type="number" required min="1" max={seq.numeroEncontros} value={form.encontroNumero} onChange={(e) => editar("encontroNumero", e.target.value)} /></label>}
+        <label>Sequência utilizada<select value={form.sequenciaId} onChange={(e) => trocarReferencia("sequenciaId", e.target.value)}><option value="">Sem sequência vinculada</option>{sequencias.filter((s) => s.turma === turma).map((s) => <option key={s.id} value={s.id}>{s.titulo} — {s.status}</option>)}</select></label>
+        {seq && <label>Encontro da sequência<input type="number" required min="1" max={seq.numeroEncontros} value={form.encontroNumero} onChange={(e) => trocarReferencia("encontroNumero", e.target.value)} /></label>}
         <label className="srm-checkbox"><input type="checkbox" checked={form.reposicao} onChange={(e) => editar("reposicao", e.target.checked)} />Atendimento de reposição</label>
       </div>
+      {avisoPlanejamento && <p role="status">{avisoPlanejamento}</p>}
       {seq && <section className="srm-sequence-preview dashboard-meta-card" aria-label="Sequência selecionada"><span className="srm-eyebrow">SEQUÊNCIA ATUAL</span><h4>{seq.titulo}</h4><p><strong>Eixo:</strong> {seq.eixo}</p><p><strong>Objetivo:</strong> {seq.objetivoGeral}</p><div className="srm-sequence-progress"><strong>Encontro selecionado: {form.encontroNumero} de {seq.numeroEncontros}</strong><span>{progresso.encontros} de {seq.numeroEncontros} encontros registrados</span><progress aria-label="Progresso registrado da sequência" value={progresso.progresso} max="100" /></div>
         <details><summary>Consultar planejamento da sequência</summary><pre>{seq.encontros}</pre><p><strong>Estratégias:</strong> {seq.estrategias}</p><p><strong>Recursos:</strong> {seq.recursos}</p><button type="button" className="btn-secondary" onClick={() => setForm((old) => ({ ...old, objetivo: old.objetivo || seq.objetivoGeral || "", eixoTematico: old.eixoTematico || seq.eixo || "", estrategias: old.estrategias || seq.estrategias || "", recursos: old.recursos || seq.recursos || "" }))}>Usar planejamento nos campos vazios</button></details>
       </section>}</section>
