@@ -5,10 +5,10 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {transformSync} from 'esbuild';
 import * as modelo from '../src/utils/salaRecursosAee.js';
-function harness(alunoIds = ["a", "b"], fornecidos) {
+function harness(alunoIds = ["a", "b"], fornecidos, salvarSimulado) {
  const states=[];let cursor=0;const saves=[];
  const jsx=(type,props)=>({type,props});
- const deps={react:{useState(init){const i=cursor++;if(!(i in states))states[i]=typeof init==='function'?init():init;return [states[i],v=>{states[i]=typeof v==='function'?v(states[i]):v;}];}},'react/jsx-runtime':{jsx,jsxs:jsx},'lucide-react':new Proxy({},{get:(_,key)=>key}),'../utils/agendaAee':agendaModelo,'../utils/salaRecursosAee':modelo,'../services/atendimentoAeeService':{EIXOS_TEMATICOS_OPCOES:[]},'../services/salaRecursosAeeService':{salvarColetivoAee:async(...args)=>saves.push(args)}};
+ const deps={react:{useState(init){const i=cursor++;if(!(i in states))states[i]=typeof init==='function'?init():init;return [states[i],v=>{states[i]=typeof v==='function'?v(states[i]):v;}];}},'react/jsx-runtime':{jsx,jsxs:jsx},'lucide-react':new Proxy({},{get:(_,key)=>key}),'../utils/agendaAee':agendaModelo,'../utils/salaRecursosAee':modelo,'../services/atendimentoAeeService':{EIXOS_TEMATICOS_OPCOES:[]},'../services/salaRecursosAeeService':{salvarColetivoAee:async(...args)=>{saves.push(args); if(salvarSimulado) return salvarSimulado(...args);}}};
  const ctx={module:{exports:{}},crypto:{randomUUID:()=> 'sessao'},require:id=>{if(!(id in deps))throw Error(id);return deps[id];}};
  vm.runInNewContext(transformSync(readFileSync(new URL('../src/components/RegistroColetivoAee.jsx',import.meta.url),'utf8'),{loader:'jsx',jsx:'automatic',format:'cjs'}).code,ctx);
  const alunos=fornecidos || [{id:'a',nome:'Ana',turmaAee:'Turma A'},{id:'b',nome:'Bruno',turmaAee:'Turma A'}];
@@ -143,3 +143,29 @@ test('tela aprovada mantém seções e sete campos; troca preserva textos e enco
  input(t,'Sequência utilizada','select').props.onChange({target:{value:''}});t=h.render();for(const [label,type] of campos)assert.equal(input(t,label,type).props.value,'Texto próprio: '+label);
  await nodes(t).find(n=>n.type==='form').props.onSubmit({preventDefault(){}});assert.equal(h.saves[0][1].objetivo,'Texto próprio: Objetivo');
 });
+
+
+for (const comSequencia of [false,true]) {
+ const preparar = salvar => {
+  const h=harness(undefined,undefined,salvar);h.props.sequencias=[{id:'s1',titulo:'Fictícia',turma:'Turma A',numeroEncontros:2}];
+  let t=h.render();nodes(t).filter(n=>n.type==='select').forEach(n=>n.props.onChange({target:{value:'Presente'}}));button(h.render(),'Confirmar chamada').props.onClick();
+  if(comSequencia){t=h.render();nodes(t).find(n=>n.type==='label'&&text(n).startsWith('Sequência utilizada')).props.children.find(n=>n?.type==='select').props.onChange({target:{value:'s1'}});}
+  return h;
+ };
+ const enviar=h=>nodes(h.render()).find(n=>n.type==='form').props.onSubmit({preventDefault(){}});
+ const bloqueado=h=>nodes(h.render()).find(n=>n.type==='fieldset').props.disabled;
+ const rodape=h=>text(nodes(h.render()).find(n=>n.props?.className==='srm-savebar'));
+ test('comunicação pendente e sucesso sem duplicação; sequência='+comSequencia,async()=>{
+  let resolver;const h=preparar(()=>new Promise(r=>resolver=r));const promessa=enviar(h);assert.equal(bloqueado(h),true);assert.ok(button(h.render(),'Salvando...'));assert.match(rodape(h),/Aguarde/);
+  await enviar(h);assert.equal(h.saves.length,1);resolver();await promessa;assert.ok(button(h.render(),'Atendimento salvo'));assert.equal(bloqueado(h),true);await enviar(h);assert.equal(h.saves.length,1);
+ });
+ test('falha preserva dados e permite tentar com mesma referência; sequência='+comSequencia,async()=>{
+  let falhar=true;const h=preparar(async()=>{if(falhar)throw Error('Falha simulada');});await enviar(h);assert.equal(bloqueado(h),false);assert.match(rodape(h),/mesma referência/);assert.ok(button(h.render(),'Salvar atendimento coletivo'));const dados=JSON.stringify(h.saves[0][1]);falhar=false;await enviar(h);assert.equal(h.saves[0][0],h.saves[1][0]);assert.equal(JSON.stringify(h.saves[1][1]),dados);assert.ok(button(h.render(),'Atendimento salvo'));
+ });
+ test('carregamento e erro explicam bloqueio junto ao botão; sequência='+comSequencia,async()=>{
+  const h=preparar();h.props.podeEditar=false;for(const motivo of ['Carregando dados fictícios.','Erro ao carregar dados fictícios.']){h.props.motivoBloqueio=motivo;assert.equal(bloqueado(h),true);assert.ok(rodape(h).includes(motivo));await enviar(h);}assert.equal(h.saves.length,0);h.props.podeEditar=true;h.props.motivoBloqueio='';await enviar(h);assert.equal(h.saves.length,1);
+ });
+ test('falha de atualização após sucesso não é apresentada como falha de gravação; sequência='+comSequencia,async()=>{
+  const h=preparar();h.props.onSaved=async()=>{throw Error('Atualização falhou');};await enviar(h);assert.ok(button(h.render(),'Atendimento salvo'));assert.match(rodape(h),/foi salvo, mas a atualização/);assert.equal(bloqueado(h),true);await enviar(h);assert.equal(h.saves.length,1);
+ });
+}
